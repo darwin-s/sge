@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.17)
+
+project(sge
+        VERSION 0.1.0.0
+        LANGUAGES CXX)
+        
+include(GenerateExportHeader)
+add_subdirectory(src)
