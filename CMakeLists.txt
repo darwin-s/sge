@@ -6,3 +6,6 @@ project(sge
         
 include(GenerateExportHeader)
 add_subdirectory(src)
+
+include(CTest)
+add_subdirectory(test)
