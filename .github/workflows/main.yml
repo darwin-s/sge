@@ -1,4 +1,4 @@
-name: CMake
+name: CMake Build
 
 on:
     push:
@@ -11,15 +11,6 @@ jobs:
         runs-on: [ubuntu-18.04]
         steps:
             - uses: actions/checkout@v2
-            
-            - name: Configure Environment
-              run: |
-                  sudo add-apt-repository -y ppa:jonathonf/gcc-9.2
-                  sudo add-apt-repository -y ppa:hnakamur/libarchive
-                  sudo add-apt-repository -y ppa:hnakamur/libzstd
-                  sudo add-apt-repository -y ppa:hnakamur/cmake
-                  sudo apt-get update
-                  sudo apt-get install -qq gcc-9 cmake
                   
             - name: Create Build Environment
               run: cmake -E make_directory ${{runner.workspace}}/build
@@ -38,3 +29,26 @@ jobs:
               working-directory: ${{runner.workspace}}/build
               shell: bash
               run: ctest -C Release
+              
+    build-windows:
+            runs-on: [windows-latest]
+            steps:
+                - uses: actions/checkout@v2
+
+                - name: Create Build Environment
+                  run: cmake -E make_directory ${{runner.workspace}}/build
+
+                - name: Configure CMake
+                  shell: bash
+                  working-directory: ${{runner.workspace}}/build
+                  run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release
+
+                - name: Build
+                  working-directory: ${{runner.workspace}}/build
+                  shell: bash
+                  run: cmake --build . --config Release
+
+                - name: Test
+                  working-directory: ${{runner.workspace}}/build
+                  shell: bash
+                  run: ctest -C Release
