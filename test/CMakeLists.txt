@@ -6,6 +6,8 @@ FetchContent_Declare(
     GIT_TAG        release-1.10.0
 )
 
+message(STATUS "Downloading Google Test. Please wait")
+
 FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
