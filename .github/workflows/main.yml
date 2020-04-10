@@ -11,6 +11,9 @@ jobs:
         runs-on: [ubuntu-18.04]
         steps:
             - uses: actions/checkout@v2
+              
+            - name: Download xorg development files
+              run: sudo apt-get install -qq xorg-dev
                   
             - name: Create Build Environment
               run: cmake -E make_directory ${{runner.workspace}}/build
