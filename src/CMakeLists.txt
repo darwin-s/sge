@@ -14,8 +14,3 @@ target_include_directories(sge PUBLIC
 generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/sge/export.hpp
     INCLUDE_GUARD_NAME __SGE_EXPORT_HPP__ EXPORT_MACRO_NAME SGE_API
     NO_EXPORT_MACRO_NAME SGE_PRIVATE)
-
-add_custom_command(TARGET sge POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:SDL2> ${CMAKE_BINARY_DIR}/binaries/$<TARGET_FILE_NAME:SDL2>
-    COMMENT "Copying SDL2 to binary directory"
-)
