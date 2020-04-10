@@ -1,17 +1,6 @@
-include(FetchContent)
-FetchContent_Declare(
-    sdl
-    GIT_REPOSITORY https://github.com/spurious/SDL-mirror.git
-    GIT_TAG        release-2.0.12
-)
-
-message(STATUS "Downloading SDL2. Please wait")
-FetchContent_MakeAvailable(sdl)
-
 set(SGE_SRC hash.cpp)
 
 add_library(sge SHARED ${SGE_SRC})
-target_link_libraries(sge PUBLIC SDL2)
 target_compile_features(sge PUBLIC cxx_std_17)
 set_target_properties(sge PROPERTIES CXX_EXTENSIONS OFF
                                      RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries
