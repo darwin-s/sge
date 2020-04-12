@@ -23,7 +23,7 @@ namespace
     {
         uint64_t hash = fnv_offset;
 
-        for(std::size_t i = 0; i < size; i++)
+        for (std::size_t i = 0; i < size; i++)
             hash = (hash ^ data[i]) * fnv_prime;
 
         return hash;
@@ -44,7 +44,7 @@ namespace sge
 
     }
 
-    Hash::Hash(Hash&& other)
+    Hash::Hash(Hash&& other) noexcept
         : mHash(other.mHash)
     {
         other.mHash = 0;
@@ -62,8 +62,8 @@ namespace sge
 
     }
 
-    Hash::Hash(const std::string& s)
-        : mHash(fnv(reinterpret_cast<const std::uint8_t*>(s.c_str()), s.length()))
+    Hash::Hash(std::string_view s)
+        : mHash(fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length()))
     {
 
     }
@@ -75,7 +75,7 @@ namespace sge
         return *this;
     }
 
-    Hash& Hash::operator=(Hash&& other)
+    Hash& Hash::operator=(Hash&& other) noexcept
     {
         mHash = other.mHash;
         other.mHash = 0;
@@ -90,9 +90,9 @@ namespace sge
         return *this;
     }
 
-    Hash& Hash::operator=(const std::string& s)
+    Hash& Hash::operator=(std::string_view s)
     {
-        mHash = fnv(reinterpret_cast<const std::uint8_t*>(s.c_str()), s.length());
+        mHash = fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length());
 
         return *this;
     }

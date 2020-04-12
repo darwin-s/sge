@@ -18,7 +18,7 @@
 #include <sge/export.hpp>
 #include <cstdint>
 #include <cstddef> //std::size_t
-#include <string>
+#include <string_view>
 
 namespace sge
 {
@@ -30,21 +30,21 @@ namespace sge
 
         Hash(const Hash& other);
 
-        Hash(Hash&& other);
+        Hash(Hash&& other) noexcept;
 
         explicit Hash(std::uint64_t hash);
 
         Hash(const std::uint8_t* data, std::size_t size);
 
-        Hash(const std::string& s);
+        Hash(std::string_view s);
 
         Hash& operator=(const Hash& other);
 
-        Hash& operator=(Hash&& other);
+        Hash& operator=(Hash&& other) noexcept;
 
         Hash& operator=(std::uint64_t hash);
 
-        Hash& operator=(const std::string& s);
+        Hash& operator=(std::string_view s);
 
         bool operator==(const Hash& other) const;
 
