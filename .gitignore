@@ -122,4 +122,11 @@ $RECYCLE.BIN/
 
 #CMake Tools build directory
 build
+
+#Visual Studio Code directory
 .vscode
+
+#Visual Studio
+.vs
+CMakeSettings.json
+out
