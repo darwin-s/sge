@@ -20,257 +20,257 @@
 
 namespace
 {
-	std::tm GetLocalTime()
-	{
-		std::tm t;
+    std::tm GetLocalTime()
+    {
+        std::tm t;
 
-		auto now  = std::chrono::system_clock::now();
-		auto time = std::chrono::system_clock::to_time_t(now);
+        auto now  = std::chrono::system_clock::now();
+        auto time = std::chrono::system_clock::to_time_t(now);
 
-		#ifdef SGE_UNIX
-			localtime_r(&time, &t);
-		#elif defined SGE_WIN32
-			localtime_s(&t, &time);
-		#else
-			#error "No safe localtime alternative"
-		#endif
+        #ifdef SGE_UNIX
+            localtime_r(&time, &t);
+        #elif defined SGE_WIN32
+            localtime_s(&t, &time);
+        #else
+            #error "No safe localtime alternative"
+        #endif
 
-		return t;
-	}
+        return t;
+    }
 
-	const char* GetMtText(sge::Log::MessageType mt)
-	{
-		switch (mt)
-		{
-		case sge::Log::MessageType::info:
-			return "INF";
-			break;
-		case sge::Log::MessageType::warning:
-			return "WRN";
-			break;
-		case sge::Log::MessageType::error:
-			return "ERR";
-			break;
-		case sge::Log::MessageType::debug:
-			return "DBG";
-			break;
-		default:
-			return "UNK";
-			break;
-		}
-	}
+    const char* GetMtText(sge::Log::MessageType mt)
+    {
+        switch (mt)
+        {
+        case sge::Log::MessageType::info:
+            return "INF";
+            break;
+        case sge::Log::MessageType::warning:
+            return "WRN";
+            break;
+        case sge::Log::MessageType::error:
+            return "ERR";
+            break;
+        case sge::Log::MessageType::debug:
+            return "DBG";
+            break;
+        default:
+            return "UNK";
+            break;
+        }
+    }
 }
 
 namespace sge
 {
-	Log Log::instance("log.txt");
+    Log Log::instance("log.txt");
 
-	Log::Log()
-		: mMt(MessageType::info), mWriteTime(false)
-	{
+    Log::Log()
+        : mMt(MessageType::info), mWriteTime(false)
+    {
 
-	}
+    }
 
-	Log::Log(const std::filesystem::path& file)
-	{
-		Open(file);
-	}
+    Log::Log(const std::filesystem::path& file)
+    {
+        Open(file);
+    }
 
-	Log::~Log()
-	{
-		Close();
-	}
+    Log::~Log()
+    {
+        Close();
+    }
 
-	Log::Log(Log&& other) noexcept
-		: mMt(other.mMt), mWriteTime(other.mWriteTime)
-	{
-		other.Close();
+    Log::Log(Log&& other) noexcept
+        : mMt(other.mMt), mWriteTime(other.mWriteTime)
+    {
+        other.Close();
 
-		mLog = std::move(other.mLog);
-	}
+        mLog = std::move(other.mLog);
+    }
 
-	Log& Log::operator=(Log&& other) noexcept
-	{
-		mMt = other.mMt;
-		mWriteTime = other.mWriteTime;
+    Log& Log::operator=(Log&& other) noexcept
+    {
+        mMt = other.mMt;
+        mWriteTime = other.mWriteTime;
 
-		other.Close();
+        other.Close();
 
-		mLog = std::move(other.mLog);
+        mLog = std::move(other.mLog);
 
-		return *this;
-	}
+        return *this;
+    }
 
-	bool Log::Open(const std::filesystem::path& file)
-	{
-		if (mLog.is_open())
-			Close();
+    bool Log::Open(const std::filesystem::path& file)
+    {
+        if (mLog.is_open())
+            Close();
 
-		mMt = MessageType::info;
-		mLog.open(file, std::ios::out | std::ios::app);
-		mWriteTime = true;
+        mMt = MessageType::info;
+        mLog.open(file, std::ios::out | std::ios::app);
+        mWriteTime = true;
 
-		std::tm t = GetLocalTime();
-		mLog << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
-			t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
-			t.tm_sec << std::endl;
+        std::tm t = GetLocalTime();
+        mLog << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
+            t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
+            t.tm_sec << std::endl;
 
-		return mLog.is_open();
-	}
+        return mLog.is_open();
+    }
 
-	void Log::Close()
-	{
-		if (!mLog.is_open())
-			return;
+    void Log::Close()
+    {
+        if (!mLog.is_open())
+            return;
 
-		if (!mWriteTime)
-			mLog << std::endl;
+        if (!mWriteTime)
+            mLog << std::endl;
 
-		mWriteTime = true;
-		mMt = MessageType::info;
+        mWriteTime = true;
+        mMt = MessageType::info;
 
-		std::tm t = GetLocalTime();
-		mLog << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
-			t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
-			t.tm_sec << std::endl;
+        std::tm t = GetLocalTime();
+        mLog << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
+            t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
+            t.tm_sec << std::endl;
 
-		mLog.close();
-	}
+        mLog.close();
+    }
 
-	Log& Log::operator<<(MessageType message)
-	{
-		mMt = message;
+    Log& Log::operator<<(MessageType message)
+    {
+        mMt = message;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(bool b)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(bool b)
+    {
+        assert(mLog.is_open());
 
-		if (mWriteTime)
-		{
-			std::tm t = GetLocalTime();
-			mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
-				t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
-				":" << t.tm_min << ":" << t.tm_sec << "] ";
+        if (mWriteTime)
+        {
+            std::tm t = GetLocalTime();
+            mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
+                t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+                ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-			mWriteTime = false;
-		}
+            mWriteTime = false;
+        }
 
-		if (b)
-			mLog << "true";
-		else
-			mLog << "false";
+        if (b)
+            mLog << "true";
+        else
+            mLog << "false";
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(signed int i)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(signed int i)
+    {
+        assert(mLog.is_open());
 
-		if (mWriteTime)
-		{
-			std::tm t = GetLocalTime();
-			mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
-				t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
-				":" << t.tm_min << ":" << t.tm_sec << "] ";
+        if (mWriteTime)
+        {
+            std::tm t = GetLocalTime();
+            mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
+                t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+                ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-			mWriteTime = false;
-		}
+            mWriteTime = false;
+        }
 
-		mLog << i;
+        mLog << i;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(unsigned int i)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(unsigned int i)
+    {
+        assert(mLog.is_open());
 
-		if (mWriteTime)
-		{
-			std::tm t = GetLocalTime();
-			mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
-				t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
-				":" << t.tm_min << ":" << t.tm_sec << "] ";
+        if (mWriteTime)
+        {
+            std::tm t = GetLocalTime();
+            mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
+                t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+                ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-			mWriteTime = false;
-		}
+            mWriteTime = false;
+        }
 
-		mLog << i;
+        mLog << i;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(float f)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(float f)
+    {
+        assert(mLog.is_open());
 
-		if (mWriteTime)
-		{
-			std::tm t = GetLocalTime();
-			mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
-				t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
-				":" << t.tm_min << ":" << t.tm_sec << "] ";
+        if (mWriteTime)
+        {
+            std::tm t = GetLocalTime();
+            mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
+                t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+                ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-			mWriteTime = false;
-		}
+            mWriteTime = false;
+        }
 
-		mLog << f;
+        mLog << f;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(double d)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(double d)
+    {
+        assert(mLog.is_open());
 
-		if (mWriteTime)
-		{
-			std::tm t = GetLocalTime();
-			mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
-				t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
-				":" << t.tm_min << ":" << t.tm_sec << "] ";
+        if (mWriteTime)
+        {
+            std::tm t = GetLocalTime();
+            mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
+                t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+                ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-			mWriteTime = false;
-		}
+            mWriteTime = false;
+        }
 
-		mLog << d;
+        mLog << d;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(std::string_view s)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(std::string_view s)
+    {
+        assert(mLog.is_open());
 
-		if (mWriteTime)
-		{
-			std::tm t = GetLocalTime();
-			mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
-				t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
-				":" << t.tm_min << ":" << t.tm_sec << "] ";
+        if (mWriteTime)
+        {
+            std::tm t = GetLocalTime();
+            mLog << "[" << GetMtText(mMt) << "][" << t.tm_mday << "/" <<
+                t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+                ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-			mWriteTime = false;
-		}
+            mWriteTime = false;
+        }
 
-		mLog << s;
+        mLog << s;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Log& Log::operator<<(Operation op)
-	{
-		assert(mLog.is_open());
+    Log& Log::operator<<(Operation op)
+    {
+        assert(mLog.is_open());
 
-		if (op == Operation::endl)
-		{
-			mLog << std::endl;
-			mWriteTime = true;
-		}
+        if (op == Operation::endl)
+        {
+            mLog << std::endl;
+            mWriteTime = true;
+        }
 
-		return *this;
-	}
+        return *this;
+    }
 }

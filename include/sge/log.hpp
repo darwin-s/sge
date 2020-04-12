@@ -22,72 +22,72 @@
 
 namespace sge
 {
-	class SGE_API Log
-	{
-	public:
+    class SGE_API Log
+    {
+    public:
 
-		enum class SGE_API MessageType
-		{
-			info,
-			warning,
-			error,
-			debug
-		};
+        enum class SGE_API MessageType
+        {
+            info,
+            warning,
+            error,
+            debug
+        };
 
-		enum class SGE_API Operation
-		{
-			endl
-		};
+        enum class SGE_API Operation
+        {
+            endl
+        };
 
-	public:
+    public:
 
-		static Log instance;
+        static Log instance;
 
-	public:
+    public:
 
-		Log();
+        Log();
 
-		Log(const std::filesystem::path& file);
+        Log(const std::filesystem::path& file);
 
-		~Log();
+        ~Log();
 
-		Log(const Log&) = delete;
+        Log(const Log&) = delete;
 
-		Log(Log&& other) noexcept;
+        Log(Log&& other) noexcept;
 
-		Log& operator=(const Log&) = delete;
+        Log& operator=(const Log&) = delete;
 
-		Log& operator=(Log&& other) noexcept;
+        Log& operator=(Log&& other) noexcept;
 
-		bool Open(const std::filesystem::path& file);
+        bool Open(const std::filesystem::path& file);
 
-		void Close();
+        void Close();
 
-		Log& operator<<(MessageType message);
+        Log& operator<<(MessageType message);
 
-		Log& operator<<(bool b);
+        Log& operator<<(bool b);
 
-		Log& operator<<(signed int i);
+        Log& operator<<(signed int i);
 
-		Log& operator<<(unsigned int i);
+        Log& operator<<(unsigned int i);
 
-		Log& operator<<(float f);
+        Log& operator<<(float f);
 
-		Log& operator<<(double d);
+        Log& operator<<(double d);
 
-		Log& operator<<(std::string_view s);
+        Log& operator<<(std::string_view s);
 
-		Log& operator<<(Operation op);
+        Log& operator<<(Operation op);
 
-	private:
+    private:
 
-		MessageType mMt;
+        MessageType mMt;
 
-		std::ofstream mLog;
+        std::ofstream mLog;
 
-		bool mWriteTime;
+        bool mWriteTime;
 
-	};
+    };
 }
 
 #endif // !__SGE_LOG_HPP__
