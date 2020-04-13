@@ -1,5 +1,8 @@
 include(FetchContent)
 
+#Force GTest not to install
+set(INSTALL_GTEST OFF CACHE INTERNAL "")
+
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
