@@ -23,45 +23,25 @@
 namespace sge {
 class SGE_API Hash {
 public:
-
   Hash();
-
   Hash(const Hash& other);
-
   Hash(Hash&& other) noexcept;
-
   explicit Hash(std::uint64_t hash);
-
   Hash(const std::uint8_t* data, std::size_t size);
-
   Hash(std::string_view s);
-
   Hash& operator=(const Hash& other);
-
   Hash& operator=(Hash&& other) noexcept;
-
   Hash& operator=(std::uint64_t hash);
-
   Hash& operator=(std::string_view s);
-
   bool operator==(const Hash& other) const;
-
   bool operator!=(const Hash& other) const;
-
   bool operator==(std::uint64_t hash) const;
-
   bool operator!=(std::uint64_t hash) const;
-
   operator std::uint64_t() const;
-
   void set(const std::uint8_t* data, std::size_t size);
-
   std::uint64_t get() const;
-
 private:
-
-  std::uint64_t mHash;
-
+  std::uint64_t m_hash;
 };
 }
 

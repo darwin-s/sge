@@ -30,85 +30,85 @@ std::uint64_t fnv(const std::uint8_t* data, const std::size_t size) {
 
 namespace sge {
 Hash::Hash()
-    : mHash(0) {
+    : m_hash(0) {
 
 }
 
 Hash::Hash(const Hash& other)
-    : mHash(other.mHash) {
+    : m_hash(other.m_hash) {
 
 }
 
 Hash::Hash(Hash&& other) noexcept
-    : mHash(other.mHash) {
-  other.mHash = 0;
+    : m_hash(other.m_hash) {
+  other.m_hash = 0;
 }
 
 Hash::Hash(const std::uint64_t hash)
-    : mHash(hash) {
+    : m_hash(hash) {
 
 }
 
 Hash::Hash(const std::uint8_t* data, const std::size_t size)
-    : mHash(fnv(data, size)) {
+    : m_hash(fnv(data, size)) {
 
 }
 
 Hash::Hash(std::string_view s)
-    : mHash(fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length())) {
+    : m_hash(fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length())) {
 
 }
 
 Hash& Hash::operator=(const Hash& other) {
-  mHash = other.mHash;
+  m_hash = other.m_hash;
 
   return *this;
 }
 
 Hash& Hash::operator=(Hash&& other) noexcept {
-  mHash = other.mHash;
-  other.mHash = 0;
+  m_hash = other.m_hash;
+  other.m_hash = 0;
 
   return *this;
 }
 
 Hash& Hash::operator=(const std::uint64_t hash) {
-  mHash = hash;
+  m_hash = hash;
 
   return *this;
 }
 
 Hash& Hash::operator=(std::string_view s) {
-  mHash = fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length());
+  m_hash = fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length());
 
   return *this;
 }
 
 bool Hash::operator==(const Hash& other) const {
-  return mHash == other.mHash;
+  return m_hash == other.m_hash;
 }
 
 bool Hash::operator!=(const Hash& other) const {
-  return mHash != other.mHash;
+  return m_hash != other.m_hash;
 }
 
 bool Hash::operator==(const std::uint64_t hash) const {
-  return mHash == hash;
+  return m_hash == hash;
 }
 
 bool Hash::operator!=(const std::uint64_t hash) const {
-  return mHash != hash;
+  return m_hash != hash;
 }
 
 Hash::operator std::uint64_t() const {
-  return mHash;
+  return m_hash;
 }
 
 void Hash::set(const std::uint8_t* data, size_t size) {
-  mHash = fnv(data, size);
+  m_hash = fnv(data, size);
 }
 
 std::uint64_t Hash::get() const {
-  return mHash;
+  return m_hash;
 }
 }
