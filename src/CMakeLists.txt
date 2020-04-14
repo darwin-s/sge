@@ -15,7 +15,7 @@ FetchContent_Declare(
 message(STATUS "Downloading glfw. Please wait")
 FetchContent_MakeAvailable(glfw)
 
-set(SGE_SRC hash.cpp log.cpp)
+set(SGE_SRC Hash.cpp Log.cpp)
 
 add_library(sge SHARED ${SGE_SRC})
 target_link_libraries(sge PRIVATE glfw)
