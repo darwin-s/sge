@@ -23,37 +23,37 @@
 namespace sge {
 class SGE_API Log {
 public:
-  enum class MessageType {
-    Info,
-    Warning,
-    Error,
-    Debug
-  };
-  enum class Operation {
-    Endl
-  };
-  Log();
-  Log(const std::filesystem::path& file);
-  ~Log();
-  Log(const Log&) = delete;
-  Log(Log&& other) noexcept;
-  Log& operator=(const Log&) = delete;
-  Log& operator=(Log&& other) noexcept;
-  Log& operator<<(MessageType message);
-  Log& operator<<(bool b);
-  Log& operator<<(signed int i);
-  Log& operator<<(unsigned int i);
-  Log& operator<<(float f);
-  Log& operator<<(double d);
-  Log& operator<<(std::string_view s);
-  Log& operator<<(Operation op);
-  bool open(const std::filesystem::path& file);
-  void close();
-  static Log instance;
+    enum class MessageType {
+        Info,
+        Warning,
+        Error,
+        Debug
+    };
+    enum class Operation {
+        Endl
+    };
+    Log();
+    explicit Log(const std::filesystem::path& file);
+    ~Log();
+    Log(const Log&) = delete;
+    Log(Log&& other) noexcept;
+    Log& operator=(const Log&) = delete;
+    Log& operator=(Log&& other) noexcept;
+    Log& operator<<(MessageType message);
+    Log& operator<<(bool b);
+    Log& operator<<(signed int i);
+    Log& operator<<(unsigned int i);
+    Log& operator<<(float f);
+    Log& operator<<(double d);
+    Log& operator<<(std::string_view s);
+    Log& operator<<(Operation op);
+    bool open(const std::filesystem::path& file);
+    void close();
+    static Log instance;
 private:
-  MessageType m_mt;
-  std::ofstream m_log;
-  bool m_writeTime;
+    MessageType m_mt;
+    std::ofstream m_log;
+    bool m_writeTime;
 };
 }
 

@@ -18,20 +18,22 @@
 
 const char* msg = "Hello, world!";
 
-TEST(Hash, Equality)
-{
+TEST(Hash, Equality) {
     sge::Hash h1(0x38d1334144987bf4);
     sge::Hash h2("Hello, world!");
-    sge::Hash h3((const uint8_t*)msg, 13);
+    sge::Hash h3((const uint8_t*) msg, 13);
+    sge::Hash h4(h1);
+    auto h5 = sge::Hash(0x38d1334144987bf4);
 
     EXPECT_EQ(h1, h2);
     EXPECT_EQ(h1, h3);
+    EXPECT_EQ(h1, h4);
+    EXPECT_EQ(h1, h5);
 }
 
-TEST(Hash, Conversion)
-{
+TEST(Hash, Conversion) {
     sge::Hash h1(0x38d1334144987bf4);
-    std::uint64_t h = h1;
+    auto h = static_cast<std::uint64_t>(h1);
 
     EXPECT_EQ(h1, h);
 }
