@@ -14,7 +14,7 @@
 
 #include <SGE/Log.hpp>
 #include <chrono>
-#include <time.h>
+#include <ctime>
 #include <cassert>
 #include <iostream>
 
@@ -51,7 +51,7 @@ const char* getMtText(sge::Log::MessageType mt) {
 }
 
 namespace sge {
-Log Log::instance("log.txt");
+Log Log::general;
 
 Log::Log()
     : m_mt(MessageType::Info), m_writeTime(false) {
@@ -83,40 +83,6 @@ Log& Log::operator=(Log&& other) noexcept {
     m_log = std::move(other.m_log);
 
     return *this;
-}
-
-bool Log::open(const std::filesystem::path& file) {
-    if (m_log.is_open())
-        close();
-
-    m_mt = MessageType::Info;
-    m_log.open(file, std::ios::out | std::ios::app);
-    m_writeTime = true;
-
-    std::tm t = getLocalTime();
-    m_log << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
-          t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
-          t.tm_sec << std::endl;
-
-    return m_log.is_open();
-}
-
-void Log::close() {
-    if (!m_log.is_open())
-        return;
-
-    if (!m_writeTime)
-        m_log << std::endl;
-
-    m_writeTime = true;
-    m_mt = MessageType::Info;
-
-    std::tm t = getLocalTime();
-    m_log << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
-          t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
-          t.tm_sec << std::endl;
-
-    m_log.close();
 }
 
 Log& Log::operator<<(MessageType message) {
@@ -239,5 +205,43 @@ Log& Log::operator<<(Operation op) {
     }
 
     return *this;
+}
+
+bool Log::open(const std::filesystem::path& file) {
+    if (m_log.is_open())
+        close();
+
+    m_mt = MessageType::Info;
+    m_log.open(file, std::ios::out | std::ios::app);
+    m_writeTime = true;
+
+    std::tm t = getLocalTime();
+    m_log << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
+          t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
+          t.tm_sec << std::endl;
+
+    return m_log.is_open();
+}
+
+void Log::close() {
+    if (!m_log.is_open())
+        return;
+
+    if (!m_writeTime)
+        m_log << std::endl;
+
+    m_writeTime = true;
+    m_mt = MessageType::Info;
+
+    std::tm t = getLocalTime();
+    m_log << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" <<
+          t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":" <<
+          t.tm_sec << std::endl;
+
+    m_log.close();
+}
+
+bool Log::isOpen() const {
+    return m_log.is_open();
 }
 }

@@ -18,11 +18,22 @@ namespace {
 constexpr uint64_t fnvPrime = 0x00000100000001B3;
 constexpr uint64_t fnvOffset = 0xcbf29ce484222325;
 
-std::uint64_t fnv(const std::uint8_t* data, const std::size_t size) {
+std::uint64_t fnv(const sge::ByteData& data) {
     uint64_t hash = fnvOffset;
 
-    for (std::size_t i = 0; i < size; i++)
-        hash = (hash ^ data[i]) * fnvPrime;
+    for(const auto& b : data) {
+        hash = (hash ^ b) * fnvPrime;
+    }
+
+    return hash;
+}
+
+std::uint64_t fnv(std::string_view s) {
+    uint64_t hash = fnvOffset;
+
+    for(const auto& b : s) {
+        hash = (hash ^ static_cast<std::uint8_t>(b)) * fnvPrime;
+    }
 
     return hash;
 }
@@ -39,13 +50,13 @@ Hash::Hash(const std::uint64_t hash)
 
 }
 
-Hash::Hash(const std::uint8_t* data, const std::size_t size)
-    : m_hash(fnv(data, size)) {
+Hash::Hash(const ByteData& data)
+    : m_hash(fnv(data)) {
 
 }
 
 Hash::Hash(std::string_view s)
-    : m_hash(fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length())) {
+    : m_hash(fnv(s)) {
 
 }
 
@@ -56,7 +67,13 @@ Hash& Hash::operator=(const std::uint64_t hash) {
 }
 
 Hash& Hash::operator=(std::string_view s) {
-    m_hash = fnv(reinterpret_cast<const std::uint8_t*>(s.data()), s.length());
+    m_hash = fnv(s);
+
+    return *this;
+}
+
+Hash& Hash::operator=(const ByteData& data) {
+    m_hash = fnv(data);
 
     return *this;
 }
@@ -79,10 +96,6 @@ bool Hash::operator!=(const std::uint64_t hash) const {
 
 Hash::operator std::uint64_t() const {
     return m_hash;
-}
-
-void Hash::set(const std::uint8_t* data, size_t size) {
-    m_hash = fnv(data, size);
 }
 
 std::uint64_t Hash::get() const {

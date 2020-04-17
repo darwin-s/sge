@@ -31,8 +31,8 @@ target_include_directories(sge PUBLIC
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>
     PRIVATE src)
-generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/sge/export.hpp
-    INCLUDE_GUARD_NAME __SGE_EXPORT_HPP__ EXPORT_MACRO_NAME SGE_API
+generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/SGE/Export.hpp
+    INCLUDE_GUARD_NAME SGE_EXPORT_HPP EXPORT_MACRO_NAME SGE_API
     NO_EXPORT_MACRO_NAME SGE_PRIVATE)
 
 if(APPLE)
