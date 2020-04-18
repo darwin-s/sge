@@ -19,7 +19,7 @@
 #include <iostream>
 
 namespace {
-std::tm getLocalTime() {
+SGE_PRIVATE std::tm getLocalTime() {
     std::tm t{};
 
     auto now = std::chrono::system_clock::now();
@@ -36,7 +36,7 @@ std::tm getLocalTime() {
     return t;
 }
 
-const char* getMtText(sge::Log::MessageType mt) {
+SGE_PRIVATE const char* getMtText(sge::Log::MessageType mt) {
     switch (mt) {
     case sge::Log::MessageType::Info:
         return "INF";
@@ -46,6 +46,8 @@ const char* getMtText(sge::Log::MessageType mt) {
         return "ERR";
     case sge::Log::MessageType::Debug:
         return "DBG";
+    default:
+        return "UNK"; // Should not reach this path, but who knows
     }
 }
 }
