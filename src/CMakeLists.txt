@@ -38,7 +38,7 @@ target_link_libraries(sge PRIVATE glfw)
 target_compile_features(sge PUBLIC cxx_std_17)
 set_target_properties(sge PROPERTIES
         PUBLIC_HEADER "${SGE_PUBLIC}"
-        FOLDER "Binaries"
+        FOLDER "Libraries"
         CXX_EXTENSIONS OFF
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN TRUE
@@ -77,7 +77,7 @@ install(TARGETS sge
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION lib
-        PUBLIC_HEADER DESTINATION include)
+        PUBLIC_HEADER DESTINATION include/SGE)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
