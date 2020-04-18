@@ -15,6 +15,6 @@ FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
 add_executable(tst test.cpp)
-target_link_libraries(tst sge gtest gmock gtest_main)
+target_link_libraries(tst SGE::sge gtest gmock gtest_main)
 set_target_properties(tst PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries)
 gtest_discover_tests(tst)

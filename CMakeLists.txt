@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 project(sge
         VERSION 0.1.0.0
         LANGUAGES CXX)
-        
-include(GenerateExportHeader)
+
 add_subdirectory(src)
 
 include(CTest)
