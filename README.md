@@ -26,7 +26,7 @@ sudo cmake --install .
 
 The library installs CMake configuration files, so after installing you can write
 a CMake based project and use ``find_package(sge)`` to find the library on the system
-adn then link your target with ``target_link_libraries(target SGE::sge)``. Here is
+and then link your target with ``target_link_libraries(target SGE::sge)``. Here is
 an example of a project:
 
 ````CMake
