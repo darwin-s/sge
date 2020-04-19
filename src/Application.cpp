@@ -43,6 +43,7 @@ Application::Application(int argc, char** argv) {
 
     sge::Log::general.open("log.txt");
 
+    glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
     if (!glfwInit())
         throw std::runtime_error("Could not initialize GLFW!");
 
