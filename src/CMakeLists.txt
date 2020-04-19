@@ -24,7 +24,8 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Types.hpp
         ${INC_PREF}/Hash.hpp
         ${INC_PREF}/Log.hpp
-        ${INC_PREF}/Application.hpp)
+        ${INC_PREF}/Application.hpp
+        ${INC_PREF}/SGE.hpp)
 set(SGE_PUBLIC ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES})
 set(SGE_PRIVATE_INCLUDES )
 set(SGE_SRC
