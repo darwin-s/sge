@@ -20,16 +20,135 @@
 #include <list>
 
 namespace sge {
+/**
+ * \brief Abstract base class for applications
+ *
+ *
+ * This class is used as a base for applications
+ * build on top of SGE. It is recommended to use
+ * this base class, as it does all the initializations
+ * needed for a properly functioning application. It
+ * opens the global log file and initializes all the needed
+ * sub-systems. A derived class should implement the onInit
+ * and onRun functions.
+ * \note Only one application can exist at a time.
+ * \note This is enforced in debug builds. In release builds it causes undefined behaviour.
+ *
+ * Usage example:
+ * \code
+ * class MyApp : public sge::Application {
+ * public:
+ *     MyApp(int argc, char** argv)
+ *         : sge::Application(argc, argv) {
+ *         // Program initialization(perquisites, custom library initialization)...
+ *     }
+ *
+ *     ~MyApp() override {
+ *         // Program termination...
+ *     }
+ * private:
+ *     sge::Application::ReturnCode onInit() override {
+ *         // Resource initialization...
+ *         return sge::Application::ReturnOk;
+ *     }
+ *
+ *     sge::Application::ReturnCode onRun() override {
+ *         // Program execution...
+ *         return sge::Application::ReturnOk;
+ *     }
+ * }
+ *
+ * int main(int argc, char** argv) {
+ *     MyApp ma(argc, argv);
+ *     return ma.run();
+ * }
+ * \endcode
+ */
 class SGE_API Application {
 public:
+    /**
+     * \brief Application return code
+     *
+     *
+     * Represents the result of an application
+     */
+    enum ReturnCode {
+        ReturnError = -1, ///< Problems were encountered
+        ReturnOk = 0 ///< Operation completed successfully
+    };
+
+    /**
+     * \brief Construct an application
+     *
+     *
+     * Constructs an application without any arguments (the argument list is empty.
+     */
+    Application();
+
+    /**
+     * \brief Construct an application
+     *
+     *
+     * Constructs an application with arguments
+     * \param argc Number of arguments
+     * \param argv Array of C-style argument strings
+     */
     Application(int argc, char** argv);
+
+    /**
+     * \brief Destruct an application
+     *
+     *
+     * Destructs an application and closes all libraries used.
+     */
     virtual ~Application();
     Application(const Application&) = delete;
+    Application(Application&&) = delete;
     Application& operator=(const Application&) = delete;
-    std::list<std::string> getArgs() const;
+    Application& operator=(Application&&) = delete;
+
+    /**
+     * \brief Run application
+     *
+     *
+     * Starts the application, first by calling Application::onInit and if succeeds
+     * it will call Application::onRun.
+     * \return Application return code
+     * \sa Application::ReturnCode
+     */
+    ReturnCode run();
+
+    /**
+     * \bried Get arguments
+     *
+     *
+     * Get the arguments used to create the current application.
+     * \return List with application arguments
+     */
+    [[nodiscard]] std::list<std::string> getArgs() const;
 private:
-    int m_argc;
-    char** m_argv;
+    /**
+     * \brief Application initialization
+     *
+     *
+     * Initialize the resources needed to start the application
+     * \note This method should be overwritten by child classes.
+     * \return Application return code
+     * \sa Application::ReturnCode
+     */
+    virtual ReturnCode onInit() = 0;
+
+    /**
+     * \brief Application execution
+     *
+     * Run the application.
+     * \note This method should be overwritten by child classes.
+     * \return Application return code
+     * \sa Application::ReturnCode
+     */
+    virtual ReturnCode onRun() = 0;
+
+    std::list<std::string> m_args;
 };
 }
 

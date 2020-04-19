@@ -13,8 +13,66 @@
 // limitations under the License.
 
 #include <SGE/Application.hpp>
+#include <SGE/Log.hpp>
+#include <cassert>
+#include <stdexcept>
+#include <GLFW/glfw3.h>
+
+namespace {
+sge::Application* current = nullptr;
+}
 
 namespace sge {
+Application::Application() {
+    assert(!current);
 
+    sge::Log::general.open("log.txt");
+
+    if (!glfwInit())
+        throw std::runtime_error("Could not initialize GLFW!");
+
+    current = this;
+}
+
+Application::Application(int argc, char** argv) {
+    assert(!current);
+
+    for (int i = 0; i < argc; i++) {
+        m_args.emplace_back(argv[i]);
+    }
+
+    sge::Log::general.open("log.txt");
+
+    if (!glfwInit())
+        throw std::runtime_error("Could not initialize GLFW!");
+
+    current = this;
+}
+
+Application::~Application() {
+    assert(current == this);
+
+    sge::Log::general.close();
+
+    glfwTerminate();
+
+    current = nullptr;
+}
+
+Application::ReturnCode Application::run() {
+    assert(current == this);
+
+    if (onInit() != ReturnOk)
+        return ReturnError;
+    if (onRun() != ReturnOk)
+        return ReturnError;
+    return ReturnError;
+}
+
+std::list<std::string> Application::getArgs() const {
+    assert(current == this);
+
+    return m_args;
+}
 }
 
