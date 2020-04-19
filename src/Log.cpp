@@ -16,10 +16,12 @@
 #include <chrono>
 #include <ctime>
 #include <cassert>
-#include <iostream>
+#include <stdexcept>
 
 namespace {
-SGE_PRIVATE std::tm getLocalTime() {
+constexpr int maxStringSize = 256;
+
+std::tm getLocalTime() {
     std::tm t{};
 
     auto now = std::chrono::system_clock::now();
@@ -36,7 +38,7 @@ SGE_PRIVATE std::tm getLocalTime() {
     return t;
 }
 
-SGE_PRIVATE const char* getMtText(sge::Log::MessageType mt) {
+const char* getMtText(sge::Log::MessageType mt) {
     switch (mt) {
     case sge::Log::MessageType::Info:
         return "INF";
@@ -50,10 +52,20 @@ SGE_PRIVATE const char* getMtText(sge::Log::MessageType mt) {
         return "UNK"; // Should not reach this path, but who knows
     }
 }
+
+bool isStringSafe(const char* s) {
+    for (int i = 0; i < maxStringSize; i++) {
+        if (s[i] == '\0')
+            return true;
+    }
+
+    return true;
+}
 }
 
 namespace sge {
 Log Log::general;
+std::mutex Log::generalMutex;
 
 Log::Log()
     : m_mt(MessageType::Info), m_writeTime(false) {
@@ -198,6 +210,29 @@ Log& Log::operator<<(std::string_view s) {
     return *this;
 }
 
+Log& Log::operator<<(const char* s) {
+    assert(m_log.is_open());
+
+    if (!s)
+        throw std::invalid_argument("Null C-style string");
+
+    if (!isStringSafe(s))
+        throw std::invalid_argument("C-style string longer than 256 characters");
+
+    if (m_writeTime) {
+        std::tm t = getLocalTime();
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" <<
+              t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour <<
+              ":" << t.tm_min << ":" << t.tm_sec << "] ";
+
+        m_writeTime = false;
+    }
+
+    m_log << s;
+
+    return *this;
+}
+
 Log& Log::operator<<(Operation op) {
     assert(m_log.is_open());
 
@@ -225,6 +260,10 @@ bool Log::open(const std::filesystem::path& file) {
     return m_log.is_open();
 }
 
+bool Log::isOpen() const {
+    return m_log.is_open();
+}
+
 void Log::close() {
     if (!m_log.is_open())
         return;
@@ -243,7 +282,7 @@ void Log::close() {
     m_log.close();
 }
 
-bool Log::isOpen() const {
-    return m_log.is_open();
+Log::MessageType Log::getMessageType() const {
+    return m_mt;
 }
 }

@@ -19,6 +19,7 @@
 #include <fstream>
 #include <filesystem>
 #include <string_view>
+#include <mutex>
 
 namespace sge {
 /**
@@ -36,6 +37,7 @@ namespace sge {
  * There is a global instance provided for convenience
  * and exceptions, but it is not opened by default. A Log
  * should be opened before you try to write to it.
+ * \note The global log instance is not thread-safe and access to it should be accessed while locking the provided mutex
  * Usage example:
  * \code
  * if (!sge::Log::general.open("log.txt")) {
@@ -193,11 +195,23 @@ public:
      *
      *
      * Writes a string to the log file.
-     * \note New-lines in messages are allowed, although highly discouraged
+     * \note New-lines in messages are allowed, although highly discouraged.
      * \param s String to write
      * \return *this
      */
     Log& operator<<(std::string_view s);
+
+    /**
+     * \brief Write a string
+     *
+     *
+     * Writes a C-style string to the log file.
+     * \note C-Style strings are limited to 256 characters for safety.
+     * \note New-lines in messages are allowed, although highly discouraged.
+     * \param s String to write
+     * \return *this
+     */
+    Log& operator<<(const char* s);
 
     /**
      * \brief Perform an operation on the Log
@@ -239,7 +253,17 @@ public:
      */
     void close();
 
+    /**
+     * \brief Get message type
+     *
+     *
+     * Returns the current set message type.
+     * \return Current message type
+     */
+    [[nodiscard]] MessageType getMessageType() const;
+
     static Log general; ///< A global Log instance for convenience (not opened by default)
+    static std::mutex generalMutex; ///< Global mutex to protect the global instance
 private:
     MessageType m_mt;
     std::ofstream m_log;
