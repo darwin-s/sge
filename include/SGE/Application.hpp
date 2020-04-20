@@ -1,4 +1,4 @@
-// Copyright 2020 Sirbu Dan
+// Copyright 2020 Dan Sirbu
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <SGE/Export.hpp>
 #include <string>
-#include <list>
+#include <vector>
 
 namespace sge {
 /**
@@ -123,9 +123,9 @@ public:
      *
      *
      * Get the arguments used to create the current application.
-     * \return List with application arguments
+     * \return Vector with application arguments
      */
-    [[nodiscard]] std::list<std::string> getArgs() const;
+    [[nodiscard]] std::vector<std::string> getArgs() const;
 private:
     /**
      * \brief Application initialization
@@ -148,7 +148,7 @@ private:
      */
     virtual ReturnCode onRun() = 0;
 
-    std::list<std::string> m_args;
+    std::vector<std::string> m_args;
 };
 }
 

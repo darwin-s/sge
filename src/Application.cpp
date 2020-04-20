@@ -1,4 +1,4 @@
-// Copyright 2020 Sirbu Dan
+// Copyright 2020 Dan Sirbu
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ Application::ReturnCode Application::run() {
     return ReturnError;
 }
 
-std::list<std::string> Application::getArgs() const {
+std::vector<std::string> Application::getArgs() const {
     assert(current == this);
 
     return m_args;
