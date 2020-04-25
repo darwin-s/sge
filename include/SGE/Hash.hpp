@@ -50,10 +50,6 @@ public:
      */
     Hash();
 
-    Hash(const Hash& other) = default;
-    Hash(Hash&& other) noexcept = default;
-    ~Hash() = default;
-
     /**
      * \brief Construct a hash from a raw value
      *
@@ -83,9 +79,6 @@ public:
      * \param s String to be hashed
      */
     explicit Hash(std::string_view s);
-
-    Hash& operator=(const Hash& other) = default;
-    Hash& operator=(Hash&& other) noexcept = default;
 
     /**
      * \brief Assign the hash value using a raw value
