@@ -20,6 +20,70 @@
 
 namespace {
 sge::Application* current = nullptr;
+
+void errorCallback(int code, const char* message) {
+    std::string msg = "GLFW error(";
+    switch (code) {
+    case GLFW_NOT_INITIALIZED:
+        msg += "NOT_INITIALIZED): ";
+        break;
+    case GLFW_NO_CURRENT_CONTEXT:
+        msg += "NO_CURRENT_CONTEXT): ";
+        break;
+    case GLFW_INVALID_ENUM:
+        msg += "INVALID_ENUM): ";
+        break;
+    case GLFW_INVALID_VALUE:
+        msg += "INVALID_VALUE): ";
+        break;
+    case GLFW_OUT_OF_MEMORY:
+        msg += "OUT_OF_MEMORY): ";
+        break;
+    case GLFW_API_UNAVAILABLE:
+        msg += "API_UNAVAILABLE): ";
+        break;
+    case GLFW_VERSION_UNAVAILABLE:
+        msg += "VERSION_UNAVAILABLE): ";
+        break;
+    case GLFW_PLATFORM_ERROR:
+        msg += "PLATFORM_ERROR): ";
+        break;
+    case GLFW_FORMAT_UNAVAILABLE:
+        msg += "FORMAT_UNAVAILABLE): ";
+        break;
+    case GLFW_NO_WINDOW_CONTEXT:
+        msg += "NO_WINDOW_CONTEXT): ";
+        break;
+    default:
+        msg += "UNK): ";
+        break;
+    }
+
+    msg += message;
+
+    {
+        std::scoped_lock l(sge::Log::generalMutex);
+        sge::Log::general << sge::Log::MessageType::Error << msg << sge::Log::Operation::Endl;
+    }
+
+    throw std::runtime_error(msg);
+}
+
+void monitorCallback(GLFWmonitor* monitor, int event) {
+    std::string msg = "Monitor \"";
+    msg += glfwGetMonitorName(monitor);
+    msg += "\" ";
+    if (event == GLFW_CONNECTED) {
+        msg += "connected";
+    } else if (event == GLFW_DISCONNECTED) {
+        msg += "disconnected";
+    }
+
+    {
+        std::scoped_lock l(sge::Log::generalMutex);
+        sge::Log::general << sge::Log::MessageType::Info << msg << sge::Log::Operation::Endl;
+    }
+}
 }
 
 namespace sge {
@@ -28,8 +92,13 @@ Application::Application() {
 
     sge::Log::general.open("log.txt");
 
+    glfwSetErrorCallback(errorCallback);
+
+    glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
     if (!glfwInit())
         throw std::runtime_error("Could not initialize GLFW!");
+
+    glfwSetMonitorCallback(monitorCallback);
 
     current = this;
 }
@@ -43,9 +112,13 @@ Application::Application(int argc, char** argv) {
 
     sge::Log::general.open("log.txt");
 
+    glfwSetErrorCallback(errorCallback);
+
     glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
     if (!glfwInit())
         throw std::runtime_error("Could not initialize GLFW!");
+
+    glfwSetMonitorCallback(monitorCallback);
 
     current = this;
 }
@@ -67,7 +140,7 @@ Application::ReturnCode Application::run() {
         return ReturnError;
     if (onRun() != ReturnOk)
         return ReturnError;
-    return ReturnError;
+    return ReturnOk;
 }
 
 std::vector<std::string> Application::getArgs() const {
