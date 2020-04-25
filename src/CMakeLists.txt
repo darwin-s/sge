@@ -8,9 +8,9 @@ set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
 set(GLFW_INSTALL OFF CACHE INTERNAL "")
 
 FetchContent_Declare(
-    glfw
-    GIT_REPOSITORY https://github.com/glfw/glfw.git
-    GIT_TAG        3.3.2
+        glfw
+        GIT_REPOSITORY https://github.com/glfw/glfw.git
+        GIT_TAG 3.3.2
 )
 
 message(STATUS "Downloading glfw. Please wait")
@@ -25,13 +25,17 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Hash.hpp
         ${INC_PREF}/Log.hpp
         ${INC_PREF}/Application.hpp
+        ${INC_PREF}/Vector2.hpp
+        ${INC_PREF}/Vector2.inl
+        ${INC_PREF}/Monitor.hpp
         ${INC_PREF}/SGE.hpp)
 set(SGE_PUBLIC ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES})
-set(SGE_PRIVATE_INCLUDES )
+set(SGE_PRIVATE_INCLUDES)
 set(SGE_SRC
         ${SRC_PREF}/Hash.cpp
         ${SRC_PREF}/Log.cpp
-        ${SRC_PREF}/Application.cpp)
+        ${SRC_PREF}/Application.cpp
+        ${SRC_PREF}/Monitor.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)
@@ -49,26 +53,26 @@ set_target_properties(sge PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../binaries)
 
 target_include_directories(sge PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
-    $<INSTALL_INTERFACE:include>
-    PRIVATE src)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
+        $<INSTALL_INTERFACE:include>
+        PRIVATE src)
 
 generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/../include/SGE/Export.hpp
-    INCLUDE_GUARD_NAME SGE_EXPORT_HPP EXPORT_MACRO_NAME SGE_API
-    NO_EXPORT_MACRO_NAME SGE_PRIVATE)
+        INCLUDE_GUARD_NAME SGE_EXPORT_HPP EXPORT_MACRO_NAME SGE_API
+        NO_EXPORT_MACRO_NAME SGE_PRIVATE)
 
-if(APPLE)
+if (APPLE)
     message(FATAL_ERROR "Apple is not supported, because of lack of OpenGL 4.5 support")
-endif()
+endif ()
 
-if(UNIX)
+if (UNIX)
     target_compile_definitions(sge PRIVATE SGE_UNIX)
-elseif(WIN32)
+elseif (WIN32)
     target_compile_definitions(sge PRIVATE SGE_WIN32)
-else()
+else ()
     message(FATAL_ERROR "OS target target not supported by GLFW")
-endif()
+endif ()
 
 target_compile_definitions(sge PRIVATE "$<$<CONFIG:DEBUG>:SGE_DEBUG>")
 

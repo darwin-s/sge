@@ -19,5 +19,7 @@
 #include <SGE/Hash.hpp>
 #include <SGE/Log.hpp>
 #include <SGE/Application.hpp>
+#include <SGE/Vector2.hpp>
+#include <SGE/Monitor.hpp>
 
 #endif //SGE_SGE_HPP
