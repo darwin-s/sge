@@ -34,6 +34,8 @@ namespace sge {
  * \note Only one application can exist at a time.
  * \note This is enforced in debug builds. In release builds it causes undefined behaviour.
  *
+ * \note An application must be created only in the main thread
+ *
  * Usage example:
  * \code
  * class MyApp : public sge::Application {
