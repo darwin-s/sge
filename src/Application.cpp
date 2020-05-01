@@ -88,7 +88,8 @@ void monitorCallback(GLFWmonitor* monitor, int event) {
 
 namespace sge {
 Application::Application() {
-    assert(!current);
+    if (current)
+        throw std::logic_error("More than one application is current");
 
     sge::Log::general.open("log.txt");
 
@@ -104,7 +105,8 @@ Application::Application() {
 }
 
 Application::Application(int argc, char** argv) {
-    assert(!current);
+    if (current)
+        throw std::logic_error("More than one application is current");
 
     for (int i = 0; i < argc; i++) {
         m_args.emplace_back(argv[i]);

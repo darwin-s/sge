@@ -32,8 +32,6 @@ namespace sge {
  * sub-systems. A derived class should implement the onInit
  * and onRun functions.
  * \note Only one application can exist at a time.
- * \note This is enforced in debug builds. In release builds it causes undefined behaviour.
- *
  * \note An application must be created only in the main thread
  *
  * Usage example:
