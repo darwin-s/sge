@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SGE_SGE_HPP
-#define SGE_SGE_HPP
-
-#include <SGE/Types.hpp>
-#include <SGE/Hash.hpp>
-#include <SGE/Log.hpp>
-#include <SGE/Application.hpp>
-#include <SGE/Vector2.hpp>
-#include <SGE/Monitor.hpp>
-#include <SGE/Keyboard.hpp>
-#include <SGE/EventHandler.hpp>
 #include <SGE/ContextSettings.hpp>
-#include <SGE/Context.hpp>
-#include <SGE/Window.hpp>
 
-#endif //SGE_SGE_HPP
+namespace sge {
+ContextSettings::ContextSettings(bool vsync, int samples, bool debugContext,
+                                 bool srgbCapable, int depthBits, int stencilBits,
+                                 int redBits, int greenBits, int blueBits, int alphaBits)
+    : vsync(vsync), samples(samples), debugContext(debugContext),
+      srgbCapable(srgbCapable), depthBits(depthBits),
+      stencilBits(stencilBits), redBits(redBits), greenBits(greenBits),
+      blueBits(blueBits), alphaBits(alphaBits) {
+#ifdef SGE_DEBUG
+    debugContext = true;
+#endif
+}
+}

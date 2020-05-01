@@ -21,6 +21,8 @@
 #include <string>
 
 namespace sge {
+class Window;
+
 /**
  * \brief Object used to represent monitors
  *
@@ -209,6 +211,7 @@ public:
      */
     void setGamma(float gamma);
 private:
+    friend class Window;
     void* m_handle;
 };
 }

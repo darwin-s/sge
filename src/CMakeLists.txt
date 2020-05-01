@@ -1,6 +1,8 @@
 include(FetchContent)
 include(GenerateExportHeader)
 
+find_package(Threads REQUIRED)
+
 #Force some GLFW parameters
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "")
@@ -28,6 +30,12 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Vector2.hpp
         ${INC_PREF}/Vector2.inl
         ${INC_PREF}/Monitor.hpp
+        ${INC_PREF}/Keyboard.hpp
+        ${INC_PREF}/Mouse.hpp
+        ${INC_PREF}/EventHandler.hpp
+        ${INC_PREF}/ContextSettings.hpp
+        ${INC_PREF}/Context.hpp
+        ${INC_PREF}/Window.hpp
         ${INC_PREF}/SGE.hpp)
 set(SGE_PUBLIC ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES})
 set(SGE_PRIVATE_INCLUDES)
@@ -35,11 +43,17 @@ set(SGE_SRC
         ${SRC_PREF}/Hash.cpp
         ${SRC_PREF}/Log.cpp
         ${SRC_PREF}/Application.cpp
-        ${SRC_PREF}/Monitor.cpp)
+        ${SRC_PREF}/Monitor.cpp
+        ${SRC_PREF}/Keyboard.cpp
+        ${SRC_PREF}/Mouse.cpp
+        ${SRC_PREF}/EventHandler.cpp
+        ${SRC_PREF}/ContextSettings.cpp
+        ${SRC_PREF}/Context.cpp
+        ${SRC_PREF}/Window.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)
-target_link_libraries(sge PRIVATE glfw)
+target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} PRIVATE glfw glad)
 target_compile_features(sge PUBLIC cxx_std_17)
 set_target_properties(sge PROPERTIES
         PUBLIC_HEADER "${SGE_PUBLIC}"
