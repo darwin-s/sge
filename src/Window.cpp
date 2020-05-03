@@ -122,16 +122,38 @@ void Window::setSize(Vector2I size) {
 
 void Window::enableFullscreen(Monitor::VideoMode videoMode, const Monitor& monitor) {
     auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    Context* active = Context::getCurrentContext();
 
     glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0,
                          videoMode.width, videoMode.height, videoMode.refreshRate);
+    m_context.setCurrent(true);
+    if (!m_context.getContextSettings().vsync) {
+        glfwSwapInterval(0);
+    } else {
+        glfwSwapInterval(1);
+    }
+    m_context.setCurrent(false);
+    if (active) {
+        active->setCurrent(true);
+    }
 }
 
 void Window::disableFullscreen() {
     auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    Context* active = Context::getCurrentContext();
 
     glfwSetWindowMonitor(win, NULL, 50, 50, 100, 100, 0);
     glfwSetWindowAttrib(win, GLFW_DECORATED, GLFW_TRUE);
+    m_context.setCurrent(true);
+    if (!m_context.getContextSettings().vsync) {
+        glfwSwapInterval(0);
+    } else {
+        glfwSwapInterval(1);
+    }
+    m_context.setCurrent(false);
+    if (active) {
+        active->setCurrent(true);
+    }
 }
 
 void Window::setSizeLimits(Vector2I minSize, Vector2I maxSize) {
@@ -202,19 +224,7 @@ void Window::enableCursor() {
 
 void Window::swapBuffers() {
     auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
-    Context* active = Context::getCurrentContext();
-
-    m_context.setCurrent(true);
-    if (!m_context.getContextSettings().vsync) {
-        glfwSwapInterval(0);
-    } else {
-        glfwSwapInterval(1);
-    }
     glfwSwapBuffers(win);
-    m_context.setCurrent(false);
-    if (active) {
-        active->setCurrent(true);
-    }
 }
 
 void Window::preventClosing() {
