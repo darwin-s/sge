@@ -36,6 +36,8 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/ContextSettings.hpp
         ${INC_PREF}/Context.hpp
         ${INC_PREF}/Window.hpp
+        ${INC_PREF}/Filesystem.hpp
+        ${INC_PREF}/InputFile.hpp
         ${INC_PREF}/SGE.hpp)
 set(SGE_PUBLIC ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES})
 set(SGE_PRIVATE_INCLUDES)
@@ -49,11 +51,13 @@ set(SGE_SRC
         ${SRC_PREF}/EventHandler.cpp
         ${SRC_PREF}/ContextSettings.cpp
         ${SRC_PREF}/Context.cpp
-        ${SRC_PREF}/Window.cpp)
+        ${SRC_PREF}/Window.cpp
+        ${SRC_PREF}/Filesystem.cpp
+        ${SRC_PREF}/InputFile.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)
-target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} PRIVATE glfw glad)
+target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} PRIVATE glfw glad physfs-static)
 target_compile_features(sge PUBLIC cxx_std_17)
 set_target_properties(sge PROPERTIES
         PUBLIC_HEADER "${SGE_PUBLIC}"

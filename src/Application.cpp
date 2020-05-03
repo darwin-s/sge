@@ -17,6 +17,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <GLFW/glfw3.h>
+#include <physfs.h>
 
 namespace {
 sge::Application* current = nullptr;
@@ -96,10 +97,22 @@ Application::Application() {
     glfwSetErrorCallback(errorCallback);
 
     glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-    if (!glfwInit())
+    if (!glfwInit()) {
         throw std::runtime_error("Could not initialize GLFW!");
+    }
 
     glfwSetMonitorCallback(monitorCallback);
+
+    if (!PHYSFS_init(NULL)) {
+        PHYSFS_ErrorCode code = PHYSFS_getLastErrorCode();
+        std::string msg = "Failed to initialize PhysFS: ";
+        if (code != PHYSFS_ERR_OK) {
+            msg += PHYSFS_getErrorByCode(code);
+        }
+        throw std::runtime_error(msg);
+    }
+
+    assert(PHYSFS_getLastErrorCode() == PHYSFS_ERR_OK);
 
     current = this;
 }
@@ -117,10 +130,22 @@ Application::Application(int argc, char** argv) {
     glfwSetErrorCallback(errorCallback);
 
     glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-    if (!glfwInit())
+    if (!glfwInit()) {
         throw std::runtime_error("Could not initialize GLFW!");
+    }
 
     glfwSetMonitorCallback(monitorCallback);
+
+    if (!PHYSFS_init(argv[0])) {
+        PHYSFS_ErrorCode code = PHYSFS_getLastErrorCode();
+        std::string msg = "Failed to initialize PhysFS: ";
+        if (code != PHYSFS_ERR_OK) {
+            msg += PHYSFS_getErrorByCode(code);
+        }
+        throw std::runtime_error(msg);
+    }
+
+    assert(PHYSFS_getLastErrorCode() == PHYSFS_ERR_OK);
 
     current = this;
 }
@@ -130,6 +155,7 @@ Application::~Application() {
 
     sge::Log::general.close();
 
+    PHYSFS_deinit();
     glfwTerminate();
 
     current = nullptr;

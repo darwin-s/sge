@@ -26,5 +26,7 @@
 #include <SGE/ContextSettings.hpp>
 #include <SGE/Context.hpp>
 #include <SGE/Window.hpp>
+#include <SGE/Filesystem.hpp>
+#include <SGE/InputFile.hpp>
 
 #endif //SGE_SGE_HPP
