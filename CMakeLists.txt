@@ -8,6 +8,3 @@ project(sge
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)
-
-include(CTest)
-add_subdirectory(test)
