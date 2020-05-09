@@ -1,11 +1,11 @@
 // Copyright 2020 Dan Sirbu
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@
 #include <SGE/Types.hpp>
 #include <SGE/Export.hpp>
 #include <string_view>
-#include <cstddef> //std::size_t
+#include <cstddef>//std::size_t
 
 namespace sge {
 /**
@@ -176,9 +176,10 @@ public:
      * \return The internal hash value
      */
     [[nodiscard]] std::uint64_t get() const;
+
 private:
     std::uint64_t m_hash;
 };
 }
 
-#endif // SGE_HASH_HPP
+#endif// SGE_HASH_HPP

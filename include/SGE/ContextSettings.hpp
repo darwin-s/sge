@@ -45,21 +45,21 @@ public:
      * \param blueBits Number of blue bits
      * \param alphaBits Number of alpha bits
      */
-    explicit ContextSettings(bool vsync = false, int samples = 0, bool debugContext = false,
-                             bool srgbCapable = false, int depthBits = 24, int stencilBits = 8,
-                             int redBits = 8, int greenBits = 8, int blueBits = 8, int alphaBits = 8);
+    explicit ContextSettings(bool vsync = false, int samples = 0, bool debugContext = false, bool srgbCapable = false,
+                             int depthBits = 24, int stencilBits = 8, int redBits = 8, int greenBits = 8,
+                             int blueBits = 8, int alphaBits = 8);
 
-    bool vsync; ///< VSync enabled
-    int samples; ///< MSAA samples
-    bool debugContext; ///< OpenGL debug context
+    bool vsync;       ///< VSync enabled
+    int samples;      ///< MSAA samples
+    bool debugContext;///< OpenGL debug context
     bool srgbCapable; ///< SRGB capable context
-    int depthBits; ///< Number of bits for the depth buffer
-    int stencilBits; ///< Number of bits for the stencil buffer
-    int redBits; ///< Number of red bits
-    int greenBits; ///< Number of green bits
-    int blueBits; ///< Number of blue bits
-    int alphaBits; ///< Number of alpha bits
+    int depthBits;    ///< Number of bits for the depth buffer
+    int stencilBits;  ///< Number of bits for the stencil buffer
+    int redBits;      ///< Number of red bits
+    int greenBits;    ///< Number of green bits
+    int blueBits;     ///< Number of blue bits
+    int alphaBits;    ///< Number of alpha bits
 };
 }
 
-#endif //SGE_CONTEXTSETTINGS_HPP
+#endif//SGE_CONTEXTSETTINGS_HPP

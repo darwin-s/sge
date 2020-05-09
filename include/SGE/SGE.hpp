@@ -29,4 +29,4 @@
 #include <SGE/Filesystem.hpp>
 #include <SGE/InputFile.hpp>
 
-#endif //SGE_SGE_HPP
+#endif//SGE_SGE_HPP

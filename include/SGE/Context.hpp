@@ -100,6 +100,7 @@ public:
      * \return Pointer to the context that is active on the current thread, nullptr if there is no active context
      */
     static Context* getCurrentContext();
+
 private:
     friend class Window;
     friend class Keyboard;
@@ -110,4 +111,4 @@ private:
 };
 }
 
-#endif //SGE_CONTEXT_HPP
+#endif//SGE_CONTEXT_HPP

@@ -73,8 +73,8 @@ public:
      * Represents the result of an application
      */
     enum ReturnCode {
-        ReturnError = -1, ///< Problems were encountered
-        ReturnOk = 0 ///< Operation completed successfully
+        ReturnError = -1,///< Problems were encountered
+        ReturnOk = 0     ///< Operation completed successfully
     };
 
     /**
@@ -126,6 +126,7 @@ public:
      * \return Vector with application arguments
      */
     [[nodiscard]] std::vector<std::string> getArgs() const;
+
 private:
     /**
      * \brief Application initialization
@@ -141,6 +142,7 @@ private:
     /**
      * \brief Application execution
      *
+     *
      * Run the application.
      * \note This method should be overwritten by child classes.
      * \return Application return code
@@ -152,4 +154,4 @@ private:
 };
 }
 
-#endif //SGE_APPLICATION_HPP
+#endif//SGE_APPLICATION_HPP

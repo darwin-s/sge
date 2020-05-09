@@ -16,79 +16,60 @@
 
 namespace sge {
 void EventHandler::windowCloseEvent() {
-
 }
 
 void EventHandler::windowResizeEvent(Vector2I size) {
-
 }
 
 void EventHandler::windowFramebufferResizeEvent(Vector2I size) {
-
 }
 
 void EventHandler::windowContentScaleEvent(Vector2F scale) {
-
 }
 
 void EventHandler::windowPositionEvent(Vector2I pos) {
-
 }
 
 void EventHandler::windowMinimizeEvent() {
-
 }
 
 void EventHandler::windowUnminimizeEvent() {
-
 }
 
 void EventHandler::windowMaximizeEvent() {
-
 }
 
 void EventHandler::windowUnmaximizeEvent() {
-
 }
 
 void EventHandler::windowGainedFocusEvent() {
-
 }
 
 void EventHandler::windowLostFocusEvent() {
-
 }
 
 void EventHandler::windowRefreshEvent() {
-
 }
 
 void EventHandler::keyboardEvent(Keyboard::KeyboardEvent event) {
-
 }
 
 void EventHandler::textInputEvent(unsigned int codePoint) {
-
 }
 
 void EventHandler::cursorPositionEvent(Vector2D pos) {
-
 }
 
 void EventHandler::cursorEnterEvent() {
-
 }
 
 void EventHandler::cursorLeaveEvent() {
-
 }
 
 void EventHandler::mouseButtonEvent(Mouse::MouseButtonEvent event) {
-
 }
 
 void EventHandler::scrollEvent(Vector2D scroll) {
-
 }
 
 }

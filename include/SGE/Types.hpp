@@ -22,4 +22,4 @@ namespace sge {
 typedef std::vector<std::uint8_t> ByteData;
 }
 
-#endif //SGE_TYPES_HPP
+#endif//SGE_TYPES_HPP

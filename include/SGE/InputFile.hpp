@@ -35,7 +35,7 @@ namespace sge {
  */
 class SGE_API InputFile {
 public:
-    static constexpr std::size_t defaultBufferSize = 65536; ///< Default internal buffer size
+    static constexpr std::size_t defaultBufferSize = 65536;///< Default internal buffer size
 
     /**
      * \brief Create file
@@ -150,9 +150,10 @@ public:
      * Closes the file handle.
      */
     void close();
+
 private:
     void* m_handle;
 };
 }
 
-#endif //SGE_INPUTFILE_HPP
+#endif//SGE_INPUTFILE_HPP

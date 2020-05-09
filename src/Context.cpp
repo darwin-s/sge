@@ -103,8 +103,8 @@ const char* severityToString(GLenum severity) {
     }
 }
 
-void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
-                                GLsizei length, const GLchar* message, const void* userParam) {
+void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                                const GLchar* message, const void* userParam) {
     std::string msg = "OpenGL message: source - ";
     msg += sourceToString(source);
     msg += "; type - ";
@@ -126,8 +126,7 @@ void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 }
 
 namespace sge {
-Context::Context(ContextSettings settings)
-    : m_handle(nullptr) {
+Context::Context(ContextSettings settings) : m_handle(nullptr) {
     create(GLFW_DONT_CARE, settings);
 }
 
@@ -204,8 +203,7 @@ void Context::create(int refreshRate, const ContextSettings& settings) {
         if (sharedCount == 0) {
             m_handle = glfwCreateWindow(1, 1, "hidden", NULL, NULL);
         } else {
-            m_handle = glfwCreateWindow(1, 1, "hidden", NULL,
-                                        reinterpret_cast<GLFWwindow*>(shared->m_handle));
+            m_handle = glfwCreateWindow(1, 1, "hidden", NULL, reinterpret_cast<GLFWwindow*>(shared->m_handle));
         }
     }
     glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(m_handle));
@@ -233,18 +231,18 @@ void Context::create(int refreshRate, const ContextSettings& settings) {
     m_settings.debugContext = settings.debugContext;
     m_settings.srgbCapable = settings.srgbCapable;
     glGetIntegerv(GL_SAMPLES, &m_settings.samples);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT,
-                                          GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE, &m_settings.redBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT,
-                                          GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE, &m_settings.greenBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT,
-                                          GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE, &m_settings.blueBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT,
-                                          GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE, &m_settings.alphaBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH,
-                                          GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &m_settings.depthBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_STENCIL,
-                                          GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE, &m_settings.stencilBits);
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE,
+                                          &m_settings.redBits);
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE,
+                                          &m_settings.greenBits);
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE,
+                                          &m_settings.blueBits);
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE,
+                                          &m_settings.alphaBits);
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE,
+                                          &m_settings.depthBits);
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_STENCIL, GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
+                                          &m_settings.stencilBits);
 
     if (active) {
         glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(active->m_handle));
@@ -253,4 +251,3 @@ void Context::create(int refreshRate, const ContextSettings& settings) {
     }
 }
 }
-

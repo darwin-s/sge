@@ -18,19 +18,16 @@
 #include <physfs.h>
 
 namespace sge {
-InputFile::InputFile()
-    : m_handle(nullptr) {
+InputFile::InputFile() : m_handle(nullptr) {
     assert(PHYSFS_isInit());
 }
 
-InputFile::InputFile(const std::filesystem::path& path, std::size_t bufferSize)
-    : m_handle(nullptr) {
+InputFile::InputFile(const std::filesystem::path& path, std::size_t bufferSize) : m_handle(nullptr) {
     assert(PHYSFS_isInit());
     open(path, bufferSize);
 }
 
-InputFile::InputFile(InputFile&& other) noexcept
-    : m_handle(other.m_handle) {
+InputFile::InputFile(InputFile&& other) noexcept : m_handle(other.m_handle) {
     assert(PHYSFS_isInit());
     other.m_handle = nullptr;
 }
@@ -95,8 +92,8 @@ ByteData InputFile::read(std::size_t bytes) {
     if (!file) {
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened" <<
-                         Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened"
+                         << Log::Operation::Endl;
         }
         return ByteData();
     }
@@ -124,8 +121,7 @@ bool InputFile::eof() const {
     if (!file) {
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "Called eof() on unopened file" <<
-                         Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << "Called eof() on unopened file" << Log::Operation::Endl;
         }
         return true;
     }
@@ -140,8 +136,7 @@ std::size_t InputFile::tell() const {
     if (file) {
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "Called tell() on unpened file" <<
-                         Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << "Called tell() on unpened file" << Log::Operation::Endl;
         }
         return 0;
     }
@@ -169,8 +164,7 @@ bool InputFile::seekg(std::size_t seekPosition) {
     if (!file) {
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "Called seekg() on unopened file"
-                         << Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << "Called seekg() on unopened file" << Log::Operation::Endl;
         }
         return false;
     }
@@ -206,4 +200,3 @@ void InputFile::close() {
     m_handle = nullptr;
 }
 }
-

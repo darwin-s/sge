@@ -72,8 +72,7 @@ public:
      * \param size Size of the window
      * \param contextSettings Settings for the underlying context
      */
-    Window(std::string_view title, Vector2I size,
-           ContextSettings contextSettings = ContextSettings());
+    Window(std::string_view title, Vector2I size, ContextSettings contextSettings = ContextSettings());
 
     /**
      * \brief Create window
@@ -198,7 +197,7 @@ public:
      * \param videoMode Video mode to be set
      * \param monitor Monitor on which the window will be fullscreen
      */
-    void enableFullscreen(Monitor::VideoMode videoMode, const  Monitor& monitor);
+    void enableFullscreen(Monitor::VideoMode videoMode, const Monitor& monitor);
 
     /**
      * \brief Disable fullscreen window
@@ -358,6 +357,7 @@ public:
      * \return 2D vector with the window scaling factors
      */
     [[nodiscard]] Vector2F getContentScale() const;
+
 private:
     SGE_PRIVATE void setCallbacks();
     static SGE_PRIVATE void closeCallback(void* window);
@@ -381,4 +381,4 @@ private:
 };
 }
 
-#endif //SGE_WINDOW_HPP
+#endif//SGE_WINDOW_HPP

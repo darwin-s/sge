@@ -15,13 +15,10 @@
 #include <SGE/ContextSettings.hpp>
 
 namespace sge {
-ContextSettings::ContextSettings(bool vsync, int samples, bool debugContext,
-                                 bool srgbCapable, int depthBits, int stencilBits,
-                                 int redBits, int greenBits, int blueBits, int alphaBits)
-    : vsync(vsync), samples(samples), debugContext(debugContext),
-      srgbCapable(srgbCapable), depthBits(depthBits),
-      stencilBits(stencilBits), redBits(redBits), greenBits(greenBits),
-      blueBits(blueBits), alphaBits(alphaBits) {
+ContextSettings::ContextSettings(bool vsync, int samples, bool debugContext, bool srgbCapable, int depthBits,
+                                 int stencilBits, int redBits, int greenBits, int blueBits, int alphaBits)
+    : vsync(vsync), samples(samples), debugContext(debugContext), srgbCapable(srgbCapable), depthBits(depthBits),
+      stencilBits(stencilBits), redBits(redBits), greenBits(greenBits), blueBits(blueBits), alphaBits(alphaBits) {
 #ifdef SGE_DEBUG
     debugContext = true;
 #endif

@@ -38,8 +38,7 @@ namespace sge {
  * sge::Vector2F res = v1 + v2;
  * \endcode
  */
-template<typename T>
-class Vector2 {
+template<typename T> class Vector2 {
 public:
     /**
      * \brief First vector component
@@ -85,8 +84,7 @@ public:
      * \tparam U Type of the other vector
      * \param vec The other vector
      */
-    template<typename U>
-    explicit Vector2(const Vector2<U>& vec);
+    template<typename U> explicit Vector2(const Vector2<U>& vec);
 
     /**
      * \brief Negate vector
@@ -201,4 +199,4 @@ typedef Vector2<float> Vector2F;
 typedef Vector2<double> Vector2D;
 }
 
-#endif //SGE_VECTOR2_HPP
+#endif//SGE_VECTOR2_HPP

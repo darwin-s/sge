@@ -52,12 +52,12 @@ public:
      * Represents a video mode for a monitor.
      */
     struct VideoMode {
-        int width; ///< Width in virtual units
-        int height; ///< Height in virtual units
-        int redBits; ///< Number of red bits
-        int greenBits; ///< Number of green bits
-        int blueBits; ///< Number of blue bits
-        int refreshRate; ///< Refresh rate of the monitor
+        int width;      ///< Width in virtual units
+        int height;     ///< Height in virtual units
+        int redBits;    ///< Number of red bits
+        int greenBits;  ///< Number of green bits
+        int blueBits;   ///< Number of blue bits
+        int refreshRate;///< Refresh rate of the monitor
     };
 
     /**
@@ -67,9 +67,9 @@ public:
      * Represents the available screen space on the current system (space no occupied by taskbars, etc.).
      */
     struct WorkArea {
-        Vector2I pos; ///< Starting position of the free area
-        int width; ///< Width of the free area in virtual units
-        int height; ///< Height of the free area in virtual units
+        Vector2I pos;///< Starting position of the free area
+        int width;   ///< Width of the free area in virtual units
+        int height;  ///< Height of the free area in virtual units
     };
 
     /**
@@ -80,10 +80,10 @@ public:
      * \note Windows only supports a gamma ramp with a size of 256
      */
     struct GammaRamp {
-        std::vector<unsigned short> red; ///< Gamma ramp for red pixels
-        std::vector<unsigned short> green; ///< Gamma ramp for green pixels
+        std::vector<unsigned short> red;  ///< Gamma ramp for red pixels
+        std::vector<unsigned short> green;///< Gamma ramp for green pixels
         std::vector<unsigned short> blue; ///< Gamma ramp for blue pixels
-        std::size_t size; ///< Size of the gamma ramp
+        std::size_t size;                 ///< Size of the gamma ramp
     };
 
     /**
@@ -210,10 +210,11 @@ public:
      * \param gamma Gamma value
      */
     void setGamma(float gamma);
+
 private:
     friend class Window;
     void* m_handle;
 };
 }
 
-#endif //SGE_MONITOR_HPP
+#endif//SGE_MONITOR_HPP

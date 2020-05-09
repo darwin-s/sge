@@ -476,4 +476,3 @@ Keyboard::KeyState Keyboard::getKeyState(const Window& window, const Key key) {
     }
 }
 }
-

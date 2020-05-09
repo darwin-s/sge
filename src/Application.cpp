@@ -177,4 +177,3 @@ std::vector<std::string> Application::getArgs() const {
     return m_args;
 }
 }
-

@@ -17,8 +17,7 @@
 #include <cassert>
 
 namespace sge {
-Monitor::Monitor(void* handle)
-    : m_handle(handle) {
+Monitor::Monitor(void* handle) : m_handle(handle) {
 #ifdef SGE_DEBUG
     int monCount = 0;
     GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
@@ -65,14 +64,7 @@ Monitor::VideoMode Monitor::getCurrentVideoMode() const {
 #endif
     auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
     const GLFWvidmode* mode = glfwGetVideoMode(mon);
-    VideoMode m{
-        mode->width,
-        mode->height,
-        mode->redBits,
-        mode->greenBits,
-        mode->blueBits,
-        mode->refreshRate
-    };
+    VideoMode m{mode->width, mode->height, mode->redBits, mode->greenBits, mode->blueBits, mode->refreshRate};
 
     return m;
 }
@@ -96,14 +88,8 @@ std::vector<Monitor::VideoMode> Monitor::getSupportedVideoModes() const {
     std::vector<Monitor::VideoMode> m(modeCount);
 
     for (int i = 0; i < modeCount; i++) {
-        VideoMode mod{
-            modes[i].width,
-            modes[i].height,
-            modes[i].redBits,
-            modes[i].greenBits,
-            modes[i].blueBits,
-            modes[i].refreshRate
-        };
+        VideoMode mod{modes[i].width,     modes[i].height,   modes[i].redBits,
+                      modes[i].greenBits, modes[i].blueBits, modes[i].refreshRate};
         m.emplace_back(mod);
     }
 
@@ -307,4 +293,3 @@ void Monitor::setGamma(float gamma) {
     glfwSetGamma(mon, gamma);
 }
 }
-

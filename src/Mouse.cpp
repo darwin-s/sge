@@ -103,4 +103,3 @@ bool Mouse::isRawInputSupported() {
     return glfwRawMouseMotionSupported() == GLFW_TRUE;
 }
 }
-

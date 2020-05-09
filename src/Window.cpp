@@ -20,8 +20,7 @@ sge::EventHandler defaultHandler;
 }
 
 namespace sge {
-Window::Window(ContextSettings contextSettings)
-    : m_context(contextSettings), m_eventHandler(&defaultHandler) {
+Window::Window(ContextSettings contextSettings) : m_context(contextSettings), m_eventHandler(&defaultHandler) {
     auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowUserPointer(win, this);
@@ -58,8 +57,8 @@ Window::Window(std::string_view title, Monitor::VideoMode videoMode, const Monit
     glfwSetWindowUserPointer(win, this);
     glfwSetWindowTitle(win, title.data());
     glfwSetWindowSize(win, videoMode.width, videoMode.height);
-    glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0,
-                         videoMode.width, videoMode.height, videoMode.refreshRate);
+    glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0, videoMode.width, videoMode.height,
+                         videoMode.refreshRate);
     setCallbacks();
 }
 
@@ -124,8 +123,8 @@ void Window::enableFullscreen(Monitor::VideoMode videoMode, const Monitor& monit
     auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
     Context* active = Context::getCurrentContext();
 
-    glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0,
-                         videoMode.width, videoMode.height, videoMode.refreshRate);
+    glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0, videoMode.width, videoMode.height,
+                         videoMode.refreshRate);
     m_context.setCurrent(true);
     if (!m_context.getContextSettings().vsync) {
         glfwSwapInterval(0);
@@ -447,4 +446,3 @@ void Window::scrollCallback(void* window, double xOffset, double yOffset) {
     win->m_eventHandler->scrollEvent(Vector2D(xOffset, yOffset));
 }
 }
-

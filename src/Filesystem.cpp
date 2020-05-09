@@ -83,8 +83,8 @@ bool Filesystem::mount(const std::filesystem::path& archive, const std::filesyst
             if (!std::filesystem::exists(realname)) {
                 {
                     std::scoped_lock sl(Log::generalMutex);
-                    Log::general << Log::MessageType::Warning << "File mounting unsuccessful: non-existent archive" <<
-                                 Log::Operation::Endl;
+                    Log::general << Log::MessageType::Warning << "File mounting unsuccessful: non-existent archive"
+                                 << Log::Operation::Endl;
                 }
                 return false;
             }
@@ -123,8 +123,8 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
             if (!std::filesystem::exists(realname)) {
                 {
                     std::scoped_lock sl(Log::generalMutex);
-                    Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive" <<
-                                 Log::Operation::Endl;
+                    Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
+                                 << Log::Operation::Endl;
                 }
                 return;
             }
@@ -142,4 +142,3 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
     }
 }
 }
-

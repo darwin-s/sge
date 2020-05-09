@@ -1,11 +1,11 @@
 // Copyright 2020 Dan Sirbu
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,10 +58,10 @@ public:
      * message will influence only the next message (the next one after an Operation::Endl).
      */
     enum class MessageType {
-        Info, ///< Purely informational message (status updates, general info, etc.)
-        Warning, ///< A warning, that is not critical, but the user should be wary
-        Error, ///< An error, that needs to be immediately addressed
-        Debug ///< Debug information
+        Info,   ///< Purely informational message (status updates, general info, etc.)
+        Warning,///< A warning, that is not critical, but the user should be wary
+        Error,  ///< An error, that needs to be immediately addressed
+        Debug   ///< Debug information
     };
 
     /**
@@ -71,7 +71,7 @@ public:
      * Represents the operation to be performed on the Log object.
      */
     enum class Operation {
-        Endl ///< End the current message and start a new one
+        Endl///< End the current message and start a new one
     };
 
     /**
@@ -262,8 +262,8 @@ public:
      */
     [[nodiscard]] MessageType getMessageType() const;
 
-    static Log general; ///< A global Log instance for convenience (not opened by default)
-    static std::mutex generalMutex; ///< Global mutex to protect the global instance
+    static Log general;            ///< A global Log instance for convenience (not opened by default)
+    static std::mutex generalMutex;///< Global mutex to protect the global instance
 private:
     MessageType m_mt;
     std::ofstream m_log;
@@ -271,4 +271,4 @@ private:
 };
 }
 
-#endif // SGE_LOG_HPP
+#endif// SGE_LOG_HPP

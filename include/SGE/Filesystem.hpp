@@ -49,9 +49,9 @@ public:
      * Indicates the type of a file.
      */
     enum class FileType {
-        Regular, ///< Regular file
-        Directory, ///< Directory
-        Other ///< Other files (device files, etc)
+        Regular,  ///< Regular file
+        Directory,///< Directory
+        Other     ///< Other files (device files, etc)
     };
 
     /**
@@ -120,4 +120,4 @@ public:
 };
 }
 
-#endif //SGE_FILESYSTEM_HPP
+#endif//SGE_FILESYSTEM_HPP

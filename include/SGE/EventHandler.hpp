@@ -191,4 +191,4 @@ public:
 };
 }
 
-#endif //SGE_EVENTHANDLER_HPP
+#endif//SGE_EVENTHANDLER_HPP

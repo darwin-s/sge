@@ -1,11 +1,11 @@
 // Copyright 2020 Dan Sirbu
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ constexpr uint64_t fnvOffset = 0xcbf29ce484222325;
 std::uint64_t fnv(const sge::ByteData& data) {
     uint64_t hash = fnvOffset;
 
-    for(const auto& b : data) {
+    for (const auto& b : data) {
         hash = (hash ^ b) * fnvPrime;
     }
 
@@ -31,7 +31,7 @@ std::uint64_t fnv(const sge::ByteData& data) {
 std::uint64_t fnv(std::string_view s) {
     uint64_t hash = fnvOffset;
 
-    for(const auto& b : s) {
+    for (const auto& b : s) {
         hash = (hash ^ static_cast<std::uint8_t>(b)) * fnvPrime;
     }
 
@@ -40,24 +40,16 @@ std::uint64_t fnv(std::string_view s) {
 }
 
 namespace sge {
-Hash::Hash()
-    : m_hash(0) {
-
+Hash::Hash() : m_hash(0) {
 }
 
-Hash::Hash(const std::uint64_t hash)
-    : m_hash(hash) {
-
+Hash::Hash(const std::uint64_t hash) : m_hash(hash) {
 }
 
-Hash::Hash(const ByteData& data)
-    : m_hash(fnv(data)) {
-
+Hash::Hash(const ByteData& data) : m_hash(fnv(data)) {
 }
 
-Hash::Hash(std::string_view s)
-    : m_hash(fnv(s)) {
-
+Hash::Hash(std::string_view s) : m_hash(fnv(s)) {
 }
 
 Hash& Hash::operator=(const std::uint64_t hash) {
