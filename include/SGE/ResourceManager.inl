@@ -38,8 +38,7 @@ template<typename T> std::shared_ptr<T> ResourceManager::getResource(const std::
 template<typename T> std::shared_ptr<T> ResourceManager::getResource(std::uint64_t id) {
     static_assert(std::is_base_of_v<Resource, T>, "Type must be derived from sge::Resource!");
     static_assert(std::is_default_constructible_v<T>, "Resource type must be default constructible!");
-    uint64_t hash = static_cast<std::uint64_t>(Hash(path.generic_u8string()));
-    auto it = m_map.find(hash);
+    auto it = m_map.find(id);
 
     if (it != m_map.end()) {
         if (!it->second.expired()) {

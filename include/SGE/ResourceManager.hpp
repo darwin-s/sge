@@ -17,6 +17,7 @@
 
 #include <SGE/Export.hpp>
 #include <SGE/Resource.hpp>
+#include <SGE/Hash.hpp>
 #include <unordered_map>
 #include <memory>
 #include <thread>
