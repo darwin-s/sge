@@ -38,6 +38,9 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Window.hpp
         ${INC_PREF}/Filesystem.hpp
         ${INC_PREF}/InputFile.hpp
+        ${INC_PREF}/Resource.hpp
+        ${INC_PREF}/ResourceManager.hpp
+        ${INC_PREF}/ResourceManager.inl
         ${INC_PREF}/SGE.hpp)
 set(SGE_PUBLIC ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES})
 set(SGE_PRIVATE_INCLUDES)
@@ -53,7 +56,9 @@ set(SGE_SRC
         ${SRC_PREF}/Context.cpp
         ${SRC_PREF}/Window.cpp
         ${SRC_PREF}/Filesystem.cpp
-        ${SRC_PREF}/InputFile.cpp)
+        ${SRC_PREF}/InputFile.cpp
+        ${SRC_PREF}/Resource.cpp
+        ${SRC_PREF}/ResourceManager.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)

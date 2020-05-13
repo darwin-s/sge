@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SGE_SGE_HPP
-#define SGE_SGE_HPP
-
-#include <SGE/Types.hpp>
-#include <SGE/Hash.hpp>
-#include <SGE/Log.hpp>
-#include <SGE/Application.hpp>
-#include <SGE/Vector2.hpp>
-#include <SGE/Monitor.hpp>
-#include <SGE/Keyboard.hpp>
-#include <SGE/EventHandler.hpp>
-#include <SGE/ContextSettings.hpp>
-#include <SGE/Context.hpp>
-#include <SGE/Window.hpp>
-#include <SGE/Filesystem.hpp>
-#include <SGE/InputFile.hpp>
-#include <SGE/Resource.hpp>
 #include <SGE/ResourceManager.hpp>
+#include <SGE/Hash.hpp>
+namespace sge {
+ResourceManager& ResourceManager::instance() {
+    static ResourceManager rm;
+    return rm;
+}
 
-#endif//SGE_SGE_HPP
+void ResourceManager::loadResource(std::shared_ptr<Resource> r, const std::filesystem::path& path, std::uint64_t hash) {
+    auto loaderThread = [](std::shared_ptr<sge::Resource> r, const std::filesystem::path& path) -> void {
+      r->loadFromFile(path);
+      r->setReady(true);
+    };
+    std::thread th(loaderThread, r, path);
+    th.detach();
+    r->m_id = hash;
+}
+}
