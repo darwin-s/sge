@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Sirbu
+// Copyright 2020 Sirbu Dan
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SGE_SGE_HPP
-#define SGE_SGE_HPP
-
-#include <SGE/Types.hpp>
-#include <SGE/Hash.hpp>
-#include <SGE/Log.hpp>
-#include <SGE/Application.hpp>
-#include <SGE/Vector2.hpp>
-#include <SGE/Monitor.hpp>
-#include <SGE/Keyboard.hpp>
-#include <SGE/EventHandler.hpp>
-#include <SGE/ContextSettings.hpp>
-#include <SGE/Context.hpp>
-#include <SGE/Window.hpp>
-#include <SGE/Filesystem.hpp>
-#include <SGE/InputFile.hpp>
-#include <SGE/Resource.hpp>
-#include <SGE/ResourceManager.hpp>
 #include <SGE/VBO.hpp>
+#include <SGE/Context.hpp>
+#include <cassert>
+#include <glad.h>
 
-#endif//SGE_SGE_HPP
+namespace sge {
+VBO::VBO() {
+    assert(Context::getCurrentContext());
+    glCreateBuffers(1, &m_id);
+}
+
+VBO::VBO(VBO&& other) noexcept : m_id(other.m_id) {
+    other.m_id = 0;
+}
+
+VBO::~VBO() {
+    glDeleteBuffers(1, &m_id);
+}
+
+VBO& VBO::operator=(VBO&& other) noexcept {
+    m_id = other.m_id;
+    other.m_id = 0;
+
+    return *this;
+}
+
+void VBO::setData(std::size_t size, const void* data) {
+    glNamedBufferData(m_id, size, data, GL_STATIC_DRAW);
+}
+}
