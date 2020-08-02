@@ -12,27 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SGE_SGE_HPP
-#define SGE_SGE_HPP
+#ifndef SGE_VERTEX_HPP
+#define SGE_VERTEX_HPP
 
+#include <SGE/Export.hpp>
 #include <SGE/Types.hpp>
-#include <SGE/Hash.hpp>
-#include <SGE/Log.hpp>
-#include <SGE/Application.hpp>
 #include <SGE/Vector2.hpp>
-#include <SGE/Monitor.hpp>
-#include <SGE/Keyboard.hpp>
-#include <SGE/EventHandler.hpp>
-#include <SGE/ContextSettings.hpp>
-#include <SGE/Context.hpp>
-#include <SGE/Window.hpp>
-#include <SGE/Filesystem.hpp>
-#include <SGE/InputFile.hpp>
-#include <SGE/Resource.hpp>
-#include <SGE/ResourceManager.hpp>
-#include <SGE/VBO.hpp>
-#include <SGE/Vertex.hpp>
-#include <SGE/VAO.hpp>
-#include <SGE/Shader.hpp>
 
-#endif//SGE_SGE_HPP
+namespace sge {
+/**
+ * \brief Vertex Object
+ *
+ *
+ * Object representing a single vertex, used for drawing.
+ */
+struct SGE_API Vertex {
+    float x;
+    float y;
+    std::uint8_t tintRed;
+    std::uint8_t tintGreen;
+    std::uint8_t tintBlue;
+    float u;
+    float v;
+};
+}
+
+#endif//SGE_VERTEX_HPP

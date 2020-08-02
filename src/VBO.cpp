@@ -28,6 +28,7 @@ VBO::VBO(VBO&& other) noexcept : m_id(other.m_id) {
 }
 
 VBO::~VBO() {
+    assert(Context::getCurrentContext());
     glDeleteBuffers(1, &m_id);
 }
 
@@ -38,7 +39,8 @@ VBO& VBO::operator=(VBO&& other) noexcept {
     return *this;
 }
 
-void VBO::setData(std::size_t size, const void* data) {
+void VBO::setData(std::size_t size, const void* data) const {
+    assert(Context::getCurrentContext());
     glNamedBufferData(m_id, size, data, GL_STATIC_DRAW);
 }
 }

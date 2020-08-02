@@ -19,6 +19,8 @@
 #include <SGE/Types.hpp>
 
 namespace sge {
+class VAO;
+
 /**
  * \brief Vertex Buffer Object
  * 
@@ -67,10 +69,12 @@ public:
      * \param size Size of the data
      * \param data Pointer to the data
      */
-    void setData(std::size_t size, const void* data);
+    void setData(std::size_t size, const void* data) const;
 
 private:
     unsigned int m_id;
+
+    friend class VAO;
 };
 }
 
