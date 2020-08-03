@@ -81,11 +81,9 @@ bool Filesystem::mount(const std::filesystem::path& archive, const std::filesyst
         if (!std::filesystem::exists(realname)) {
             realname.replace_extension(".7z");
             if (!std::filesystem::exists(realname)) {
-                {
-                    std::scoped_lock sl(Log::generalMutex);
-                    Log::general << Log::MessageType::Warning << "File mounting unsuccessful: non-existent archive"
-                                 << Log::Operation::Endl;
-                }
+                std::scoped_lock sl(Log::generalMutex);
+                Log::general << Log::MessageType::Warning << "File mounting unsuccessful: non-existent archive"
+                             << Log::Operation::Endl;
                 return false;
             }
         }
@@ -95,10 +93,10 @@ bool Filesystem::mount(const std::filesystem::path& archive, const std::filesyst
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "File mounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+
         return false;
     }
 
@@ -121,11 +119,9 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
         if (!std::filesystem::exists(realname)) {
             realname.replace_extension(".7z");
             if (!std::filesystem::exists(realname)) {
-                {
-                    std::scoped_lock sl(Log::generalMutex);
-                    Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
-                                 << Log::Operation::Endl;
-                }
+                std::scoped_lock sl(Log::generalMutex);
+                Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
+                             << Log::Operation::Endl;
                 return;
             }
         }
@@ -135,10 +131,9 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "File unmounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
     }
 }
 }

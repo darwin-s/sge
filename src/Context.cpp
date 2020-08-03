@@ -156,8 +156,7 @@ void Context::setCurrent(bool current) {
     if (current) {
         if (active == this) {
             return;
-        }
-        if (active && active != this) {
+        } else if (active) {
             active->setCurrent(false);
         }
         glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(m_handle));

@@ -55,8 +55,9 @@ const char* getMtText(sge::Log::MessageType mt) {
 
 bool isStringSafe(const char* s) {
     for (int i = 0; i < maxStringSize; i++) {
-        if (s[i] == '\0')
+        if (s[i] == '\0') {
             return true;
+        }
     }
 
     return true;
@@ -112,10 +113,11 @@ Log& Log::operator<<(bool b) {
         m_writeTime = false;
     }
 
-    if (b)
+    if (b) {
         m_log << "true";
-    else
+    } else {
         m_log << "false";
+    }
 
     return *this;
 }
@@ -203,11 +205,13 @@ Log& Log::operator<<(std::string_view s) {
 Log& Log::operator<<(const char* s) {
     assert(m_log.is_open());
 
-    if (!s)
+    if (!s) {
         throw std::invalid_argument("Null C-style string");
+    }
 
-    if (!isStringSafe(s))
+    if (!isStringSafe(s)) {
         throw std::invalid_argument("C-style string longer than 256 characters");
+    }
 
     if (m_writeTime) {
         std::tm t = getLocalTime();
@@ -234,8 +238,9 @@ Log& Log::operator<<(Operation op) {
 }
 
 bool Log::open(const std::filesystem::path& file) {
-    if (m_log.is_open())
+    if (m_log.is_open()) {
         close();
+    }
 
     m_mt = MessageType::Info;
     m_log.open(file, std::ios::out | std::ios::app);
@@ -253,11 +258,13 @@ bool Log::isOpen() const {
 }
 
 void Log::close() {
-    if (!m_log.is_open())
+    if (!m_log.is_open()) {
         return;
+    }
 
-    if (!m_writeTime)
+    if (!m_writeTime) {
         m_log << std::endl;
+    }
 
     m_writeTime = true;
     m_mt = MessageType::Info;

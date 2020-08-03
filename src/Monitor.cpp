@@ -24,8 +24,9 @@ Monitor::Monitor(void* handle) : m_handle(handle) {
     GLFWmonitor* mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (handle == monitorHandles[i])
+        if (handle == monitorHandles[i]) {
             mon = monitorHandles[i];
+        }
     }
 
     assert(mon != nullptr);
@@ -56,8 +57,9 @@ Monitor::VideoMode Monitor::getCurrentVideoMode() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -76,8 +78,9 @@ std::vector<Monitor::VideoMode> Monitor::getSupportedVideoModes() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -103,8 +106,9 @@ Vector2I Monitor::getPhysicalSizeMm() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -125,8 +129,9 @@ Vector2F Monitor::getContentScale() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -147,8 +152,9 @@ Vector2I Monitor::getVirtualPosition() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -169,8 +175,9 @@ Monitor::WorkArea Monitor::getAvailableWorkArea() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -193,8 +200,9 @@ std::string Monitor::getName() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -212,8 +220,9 @@ Monitor::GammaRamp Monitor::getCurrentGammaRamp() const {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -246,8 +255,9 @@ void Monitor::setGammaRamp(const GammaRamp& ramp) {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);
@@ -282,8 +292,9 @@ void Monitor::setGamma(float gamma) {
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
-        if (m_handle == monitorHandles[i])
+        if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
+        }
     }
 
     assert(glfw_mon != nullptr);

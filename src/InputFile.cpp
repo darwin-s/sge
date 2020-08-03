@@ -57,10 +57,10 @@ bool InputFile::open(const std::filesystem::path& path, std::size_t bufferSize) 
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "File opening unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+
         return false;
     }
 
@@ -68,10 +68,10 @@ bool InputFile::open(const std::filesystem::path& path, std::size_t bufferSize) 
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "Buffer setting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+
         PHYSFS_close(reinterpret_cast<PHYSFS_File*>(m_handle));
         m_handle = nullptr;
         return false;
@@ -90,11 +90,10 @@ ByteData InputFile::read(std::size_t bytes) {
     auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
 
     if (!file) {
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened"
-                         << Log::Operation::Endl;
-        }
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened"
+                     << Log::Operation::Endl;
+
         return ByteData();
     }
 
@@ -103,10 +102,10 @@ ByteData InputFile::read(std::size_t bytes) {
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "File reading unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+
         return ByteData();
     }
     ret.resize(read);
@@ -119,10 +118,9 @@ bool InputFile::eof() const {
     auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
 
     if (!file) {
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "Called eof() on unopened file" << Log::Operation::Endl;
-        }
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << "Called eof() on unopened file" << Log::Operation::Endl;
+
         return true;
     }
 
@@ -134,10 +132,9 @@ std::size_t InputFile::tell() const {
     auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
 
     if (file) {
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "Called tell() on unpened file" << Log::Operation::Endl;
-        }
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << "Called tell() on unpened file" << Log::Operation::Endl;
+        
         return 0;
     }
 
@@ -146,11 +143,10 @@ std::size_t InputFile::tell() const {
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "Position tell unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
-
+        
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        
         return 0;
     }
 
@@ -162,10 +158,9 @@ bool InputFile::seekg(std::size_t seekPosition) {
     auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
 
     if (!file) {
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << "Called seekg() on unopened file" << Log::Operation::Endl;
-        }
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << "Called seekg() on unopened file" << Log::Operation::Endl;
+        
         return false;
     }
 
@@ -173,10 +168,10 @@ bool InputFile::seekg(std::size_t seekPosition) {
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "File seeking unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+        
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        
         return false;
     }
 
@@ -191,10 +186,9 @@ void InputFile::close() {
         PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
         std::string msg = "File seeking unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
-        }
+        
+        std::scoped_lock sl(Log::generalMutex);
+        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
     }
 
     m_handle = nullptr;
