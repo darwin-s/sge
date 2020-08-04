@@ -15,8 +15,7 @@
 #include <SGE/Color.hpp>
 
 namespace sge {
-Color::Color(std::uint8_t red, std::uint8_t green, std::uint8_t blue, std::uint8_t alpha) 
-	: red(red), green(green), blue(blue), alpha(alpha) {
-
+Color::Color(std::uint8_t red, std::uint8_t green, std::uint8_t blue, std::uint8_t alpha)
+    : red(red), green(green), blue(blue), alpha(alpha) {
 }
 }

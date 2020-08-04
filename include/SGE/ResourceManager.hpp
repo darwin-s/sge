@@ -77,7 +77,7 @@ public:
     std::shared_ptr<T> getResource(std::uint64_t id);
 private:
     ResourceManager() = default;
-    void loadResource(std::shared_ptr<Resource> r, const std::filesystem::path& path, std::uint64_t hash);
+    SGE_PRIVATE void loadResource(std::shared_ptr<Resource> r, const std::filesystem::path& path, std::uint64_t hash);
     std::unordered_map<std::uint64_t, std::weak_ptr<Resource>> m_map;
 };
 

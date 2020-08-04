@@ -13,17 +13,39 @@
 // limitations under the License.
 
 #ifndef SGE_RENDERSTATE_HPP
+#define SGE_RENDERSTATE_HPP
 
 #include <SGE/Export.hpp>
 #include <SGE/Shader.hpp>
 
 namespace sge {
+/**
+ * \brief Render state
+ *
+ *
+ * Object that represents the current state of rendering
+ */
 class SGE_API RenderState {
 public:
-    RenderState(Shader* shader);
-    Shader* getShader() const;
+    /**
+     * \brief Construct render state
+     * \param shader Shader program to be used for rendering
+     */
+    explicit RenderState(Shader* shader);
 
-    static RenderState defaultState;
+    /**
+     * \brief Get shader program used for rendering
+     * \return Shader program
+     */
+    [[nodiscard]] Shader* getShader() const;
+
+    /**
+     * \brief Set shader program
+     * \param shader Shader
+     */
+    void setShader(Shader* shader);
+
+    static RenderState defaultState; ///< Default rendering state
 
 private:
     Shader* m_shader;

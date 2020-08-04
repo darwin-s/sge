@@ -105,7 +105,7 @@ private:
     friend class Window;
     friend class Keyboard;
     friend class Mouse;
-    void SGE_PRIVATE create(int refreshRate, const ContextSettings& settings);
+    SGE_PRIVATE void create(int refreshRate, const ContextSettings& settings);
     ContextSettings m_settings;
     void* m_handle;
 };

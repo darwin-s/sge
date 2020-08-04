@@ -18,10 +18,13 @@ namespace sge {
 RenderState RenderState::defaultState = RenderState(nullptr);
 
 RenderState::RenderState(Shader* shader) : m_shader(shader) {
-
 }
 
 Shader* RenderState::getShader() const {
     return m_shader;
+}
+
+void RenderState::setShader(Shader* shader) {
+    m_shader = shader;
 }
 }
