@@ -36,5 +36,8 @@
 #include <SGE/Shader.hpp>
 #include <SGE/RenderState.hpp>
 #include <SGE/Color.hpp>
+#include <SGE/Drawable.hpp>
+#include <SGE/RenderTarget.hpp>
+#include <SGE/RenderWindow.hpp>
 
 #endif//SGE_SGE_HPP
