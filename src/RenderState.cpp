@@ -12,29 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SGE_SGE_HPP
-#define SGE_SGE_HPP
-
-#include <SGE/Types.hpp>
-#include <SGE/Hash.hpp>
-#include <SGE/Log.hpp>
-#include <SGE/Application.hpp>
-#include <SGE/Vector2.hpp>
-#include <SGE/Monitor.hpp>
-#include <SGE/Keyboard.hpp>
-#include <SGE/EventHandler.hpp>
-#include <SGE/ContextSettings.hpp>
-#include <SGE/Context.hpp>
-#include <SGE/Window.hpp>
-#include <SGE/Filesystem.hpp>
-#include <SGE/InputFile.hpp>
-#include <SGE/Resource.hpp>
-#include <SGE/ResourceManager.hpp>
-#include <SGE/VBO.hpp>
-#include <SGE/Vertex.hpp>
-#include <SGE/VAO.hpp>
-#include <SGE/Shader.hpp>
 #include <SGE/RenderState.hpp>
-#include <SGE/Color.hpp>
 
-#endif//SGE_SGE_HPP
+namespace sge {
+RenderState RenderState::defaultState = RenderState(nullptr);
+
+RenderState::RenderState(Shader* shader) : m_shader(shader) {
+
+}
+
+Shader* RenderState::getShader() const {
+    return m_shader;
+}
+}
