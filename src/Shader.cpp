@@ -91,7 +91,7 @@ bool Shader::link() const {
 
     glLinkProgram(m_id);
 
-    glGetProgramiv(m_id, GL_COMPILE_STATUS, &success);
+    glGetProgramiv(m_id, GL_LINK_STATUS, &success);
     if (success == GL_FALSE) {
         GLint logLength;
         glGetProgramiv(m_id, GL_LINK_STATUS, &logLength);
