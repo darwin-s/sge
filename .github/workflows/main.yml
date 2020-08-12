@@ -2,9 +2,9 @@ name: CMake Build
 
 on:
     push:
-        branches: [ master ]
+        branches: [ master, no-multithreading-resources ]
     pull_request:
-        branches: [ master ]
+        branches: [ master, no-multithreading-resources ]
 
 jobs:
     build-ubuntu:
