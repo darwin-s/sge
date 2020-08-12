@@ -28,7 +28,6 @@
 #include <SGE/Filesystem.hpp>
 #include <SGE/InputFile.hpp>
 #include <SGE/Resource.hpp>
-#include <SGE/ResourceManager.hpp>
 #include <SGE/VBO.hpp>
 #include <SGE/Vertex.hpp>
 #include <SGE/VAO.hpp>
