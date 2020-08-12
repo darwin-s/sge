@@ -22,7 +22,7 @@
 namespace {
 sge::Application* current = nullptr;
 
-void errorCallback(int code, const char* message) {
+void errorCallback(const int code, const char* message) {
     std::string msg = "GLFW error(";
     switch (code) {
     case GLFW_NOT_INITIALIZED:
@@ -70,7 +70,7 @@ void errorCallback(int code, const char* message) {
     throw std::runtime_error(msg);
 }
 
-void monitorCallback(GLFWmonitor* monitor, int event) {
+void monitorCallback(GLFWmonitor* monitor, const int event) {
     std::string msg = "Monitor \"";
     msg += glfwGetMonitorName(monitor);
     msg += "\" ";
@@ -89,23 +89,23 @@ void monitorCallback(GLFWmonitor* monitor, int event) {
 
 namespace sge {
 Application::Application() {
-    if (current) {
+    if (current != nullptr) {
         throw std::logic_error("More than one application is current");
     }
 
-    sge::Log::general.open("log.txt");
+    Log::general.open("log.txt");
 
     glfwSetErrorCallback(errorCallback);
 
     glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-    if (!glfwInit()) {
+    if (glfwInit() != GLFW_TRUE) {
         throw std::runtime_error("Could not initialize GLFW!");
     }
 
     glfwSetMonitorCallback(monitorCallback);
 
-    if (!PHYSFS_init(NULL)) {
-        PHYSFS_ErrorCode code = PHYSFS_getLastErrorCode();
+    if (PHYSFS_init(NULL) == 0) {
+        const auto code = PHYSFS_getLastErrorCode();
         std::string msg = "Failed to initialize PhysFS: ";
         if (code != PHYSFS_ERR_OK) {
             msg += PHYSFS_getErrorByCode(code);
@@ -118,28 +118,28 @@ Application::Application() {
     current = this;
 }
 
-Application::Application(int argc, char** argv) {
-    if (current) {
+Application::Application(const int argc, char** argv) {
+    if (current != nullptr) {
         throw std::logic_error("More than one application is current");
     }
 
-    for (int i = 0; i < argc; i++) {
+    for (auto i = 0; i < argc; i++) {
         m_args.emplace_back(argv[i]);
     }
 
-    sge::Log::general.open("log.txt");
+    Log::general.open("log.txt");
 
     glfwSetErrorCallback(errorCallback);
 
     glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-    if (!glfwInit()) {
+    if (glfwInit() != GLFW_TRUE) {
         throw std::runtime_error("Could not initialize GLFW!");
     }
 
     glfwSetMonitorCallback(monitorCallback);
 
-    if (!PHYSFS_init(argv[0])) {
-        PHYSFS_ErrorCode code = PHYSFS_getLastErrorCode();
+    if (PHYSFS_init(argv[0]) == 0) {
+        const auto code = PHYSFS_getLastErrorCode();
         std::string msg = "Failed to initialize PhysFS: ";
         if (code != PHYSFS_ERR_OK) {
             msg += PHYSFS_getErrorByCode(code);
@@ -155,7 +155,7 @@ Application::Application(int argc, char** argv) {
 Application::~Application() {
     assert(current == this);
 
-    sge::Log::general.close();
+    Log::general.close();
 
     PHYSFS_deinit();
     glfwTerminate();

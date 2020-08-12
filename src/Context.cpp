@@ -22,6 +22,9 @@
 #include <GLFW/glfw3.h>
 
 namespace {
+constexpr int openGlVersionMajor = 4;
+constexpr int openGlVersionMinor = 6;
+
 thread_local sge::Context* active = nullptr;
 sge::Context* shared = nullptr;
 int sharedCount = 0;
@@ -29,7 +32,7 @@ std::recursive_mutex sharedMutex;
 bool loadedGL = false;
 std::mutex loadedMutex;
 
-void setHints(int refreshRate, const sge::ContextSettings& settings) {
+void setHints(const int refreshRate, const sge::ContextSettings& settings) {
     glfwDefaultWindowHints();
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_RED_BITS, settings.redBits);
@@ -41,13 +44,13 @@ void setHints(int refreshRate, const sge::ContextSettings& settings) {
     glfwWindowHint(GLFW_SAMPLES, settings.samples);
     glfwWindowHint(GLFW_REFRESH_RATE, refreshRate);
     glfwWindowHint(GLFW_SRGB_CAPABLE, settings.srgbCapable ? GLFW_TRUE : GLFW_FALSE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGlVersionMajor);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGlVersionMinor);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, settings.debugContext ? GLFW_TRUE : GLFW_FALSE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-const char* sourceToString(GLenum source) {
+const char* sourceToString(const GLenum source) {
     switch (source) {
     case GL_DEBUG_SOURCE_API:
         return "API";
@@ -65,7 +68,7 @@ const char* sourceToString(GLenum source) {
     }
 }
 
-const char* typeToString(GLenum type) {
+const char* typeToString(const GLenum type) {
     switch (type) {
     case GL_DEBUG_TYPE_ERROR:
         return "Error";
@@ -89,7 +92,7 @@ const char* typeToString(GLenum type) {
     }
 }
 
-const char* severityToString(GLenum severity) {
+const char* severityToString(const GLenum severity) {
     switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:
         return "High";
@@ -103,8 +106,9 @@ const char* severityToString(GLenum severity) {
     }
 }
 
-void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                const GLchar* message, const void* userParam) {
+void GLAPIENTRY messageCallback(const GLenum source, const GLenum type, const GLuint id, const GLenum severity, 
+                                [[maybe_unused]] const GLsizei length, const GLchar* message, 
+                                [[maybe_unused]] const void* userParam) {
     std::string msg = "OpenGL message: source - ";
     msg += sourceToString(source);
     msg += "; type - ";
@@ -126,7 +130,7 @@ void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 }
 
 namespace sge {
-Context::Context(ContextSettings settings) : m_handle(nullptr) {
+Context::Context(const ContextSettings settings) : m_handle(nullptr) {
     create(GLFW_DONT_CARE, settings);
 }
 
@@ -135,7 +139,7 @@ Context::~Context() {
         setCurrent(false);
     }
     assert(active == nullptr);
-    glfwDestroyWindow(reinterpret_cast<GLFWwindow*>(m_handle));
+    glfwDestroyWindow(static_cast<GLFWwindow*>(m_handle));
     {
         std::scoped_lock sl(sharedMutex);
         if (sharedCount > 0) {
@@ -152,14 +156,15 @@ const ContextSettings& Context::getContextSettings() const {
     return m_settings;
 }
 
-void Context::setCurrent(bool current) {
+void Context::setCurrent(const bool current) {
     if (current) {
         if (active == this) {
             return;
-        } else if (active) {
+        }
+        if (active != nullptr) {
             active->setCurrent(false);
         }
-        glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(m_handle));
+        glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
         active = this;
     } else {
         if (active != this) {
@@ -170,11 +175,11 @@ void Context::setCurrent(bool current) {
     }
 }
 
-bool Context::isExtensionAvailable(std::string_view extensionName) const {
-    glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(m_handle));
-    bool supported = glfwExtensionSupported(extensionName.data()) == GLFW_TRUE;
-    if (active) {
-        glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(active->m_handle));
+bool Context::isExtensionAvailable(const std::string_view extensionName) const {
+    glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
+    const auto supported = glfwExtensionSupported(extensionName.data()) == GLFW_TRUE;
+    if (active != nullptr) {
+        glfwMakeContextCurrent(static_cast<GLFWwindow*>(active->m_handle));
     } else {
         glfwMakeContextCurrent(NULL);
     }
@@ -185,14 +190,14 @@ Context* Context::getCurrentContext() {
     return active;
 }
 
-void Context::create(int refreshRate, const ContextSettings& settings) {
+void Context::create(const int refreshRate, const ContextSettings& settings) {
     {
         std::scoped_lock sl(sharedMutex);
         if (sharedCount == 0) {
 #ifdef SGE_DEBUG
-            ContextSettings s(false, 0, true, false);
+            const ContextSettings s(false, 0, true, false);
 #else
-            ContextSettings s(false, 0, false, false);
+            const ContextSettings s(false, 0, false, false);
 #endif
             sharedCount--;
             shared = new Context(s);
@@ -202,14 +207,14 @@ void Context::create(int refreshRate, const ContextSettings& settings) {
         if (sharedCount == 0) {
             m_handle = glfwCreateWindow(1, 1, "hidden", NULL, NULL);
         } else {
-            m_handle = glfwCreateWindow(1, 1, "hidden", NULL, reinterpret_cast<GLFWwindow*>(shared->m_handle));
+            m_handle = glfwCreateWindow(1, 1, "hidden", NULL, static_cast<GLFWwindow*>(shared->m_handle));
         }
     }
-    glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(m_handle));
+    glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
     {
         std::scoped_lock sl(loadedMutex);
         if (!loadedGL) {
-            if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+            if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)) == 0) {
                 throw std::runtime_error("Could not load OpenGL function pointers");
             }
             loadedGL = true;
@@ -243,8 +248,8 @@ void Context::create(int refreshRate, const ContextSettings& settings) {
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_STENCIL, GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
                                           &m_settings.stencilBits);
 
-    if (active) {
-        glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(active->m_handle));
+    if (active != nullptr) {
+        glfwMakeContextCurrent(static_cast<GLFWwindow*>(active->m_handle));
     } else {
         glfwMakeContextCurrent(NULL);
     }

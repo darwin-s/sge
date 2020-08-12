@@ -24,7 +24,8 @@ namespace sge {
  * \brief Vertex Array Object
  *
  *
- * Class representing an OpenGL VAO.
+ * Class representing an OpenGL VAO. It is used to hold vertex attributes
+ * for rendering.
  */
 class SGE_API VAO {
 public:
@@ -34,7 +35,7 @@ public:
      *
      * Represents the data type of the vertex attribute
      */
-    enum class DataType {
+    enum class Data {
         Byte, ///< Byte size integer
         Short, ///< Short (16-bit) integer
         Int, ///< Integer (32-bit)
@@ -105,7 +106,7 @@ public:
      * \param normalized Whether the data is normalized (between 0 and 1)
      * \param relativeOffset Relative offset of the element
      */
-    void setAttributeFormat(unsigned int index, int size, DataType type, bool normalized, unsigned int relativeOffset) const;
+    void setAttributeFormat(unsigned int index, int size, Data type, bool normalized, unsigned int relativeOffset) const;
 
     /**
      * \brief Bind Attribute to VBO binding

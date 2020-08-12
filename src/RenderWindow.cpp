@@ -15,22 +15,22 @@
 #include <SGE/RenderWindow.hpp>
 
 namespace sge {
-RenderWindow::RenderWindow(ContextSettings contextSettings) : Window(contextSettings) {
+RenderWindow::RenderWindow(const ContextSettings contextSettings) : Window(contextSettings) {
 }
 
-RenderWindow::RenderWindow(std::string_view title, ContextSettings contextSettings) : Window(title, contextSettings) {
+RenderWindow::RenderWindow(const std::string_view title, const ContextSettings contextSettings) : Window(title, contextSettings) {
 }
 
-RenderWindow::RenderWindow(std::string_view title, Vector2I size, ContextSettings contextSettings)
+RenderWindow::RenderWindow(const std::string_view title, const Vector2I size, const ContextSettings contextSettings)
     : Window(title, size, contextSettings) {
 }
 
-RenderWindow::RenderWindow(std::string_view title, Monitor::VideoMode videoMode, const Monitor& monitor,
-                           ContextSettings contextSettings)
+RenderWindow::RenderWindow(const std::string_view title, const Monitor::VideoMode videoMode, const Monitor& monitor,
+                           const ContextSettings contextSettings)
     : Window(title, videoMode, monitor, contextSettings) {
 }
 
-Context& RenderWindow::getContext() {
-    return Window::getContext();
+Context& RenderWindow::getRenderingContext() {
+    return getContext();
 }
 }

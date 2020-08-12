@@ -19,7 +19,7 @@
 #include <vector>
 
 namespace sge {
-typedef std::vector<std::uint8_t> ByteData;
+using ByteData = std::vector<std::uint8_t>;
 }
 
 #endif//SGE_TYPES_HPP

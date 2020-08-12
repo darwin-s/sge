@@ -22,7 +22,7 @@ InputFile::InputFile() : m_handle(nullptr) {
     assert(PHYSFS_isInit());
 }
 
-InputFile::InputFile(const std::filesystem::path& path, std::size_t bufferSize) : m_handle(nullptr) {
+InputFile::InputFile(const std::filesystem::path& path, const std::size_t bufferSize) : m_handle(nullptr) {
     assert(PHYSFS_isInit());
     open(path, bufferSize);
 }
@@ -34,7 +34,11 @@ InputFile::InputFile(InputFile&& other) noexcept : m_handle(other.m_handle) {
 
 InputFile::~InputFile() {
     assert(PHYSFS_isInit());
-    close();
+    auto* file = static_cast<PHYSFS_File*>(m_handle);
+
+    if (file != nullptr) {
+        PHYSFS_close(file);
+    }
 }
 
 InputFile& InputFile::operator=(InputFile&& other) noexcept {
@@ -45,7 +49,7 @@ InputFile& InputFile::operator=(InputFile&& other) noexcept {
     return *this;
 }
 
-bool InputFile::open(const std::filesystem::path& path, std::size_t bufferSize) {
+bool InputFile::open(const std::filesystem::path& path, const std::size_t bufferSize) {
     assert(PHYSFS_isInit());
 
     if (isOpen()) {
@@ -53,8 +57,8 @@ bool InputFile::open(const std::filesystem::path& path, std::size_t bufferSize) 
     }
 
     m_handle = PHYSFS_openRead(path.generic_u8string().c_str());
-    if (!m_handle) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+    if (m_handle == nullptr) {
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "File opening unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
@@ -64,15 +68,15 @@ bool InputFile::open(const std::filesystem::path& path, std::size_t bufferSize) 
         return false;
     }
 
-    if (!PHYSFS_setBuffer(reinterpret_cast<PHYSFS_File*>(m_handle), bufferSize)) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+    if (PHYSFS_setBuffer(static_cast<PHYSFS_File*>(m_handle), bufferSize) == 0) {
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "Buffer setting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
 
-        PHYSFS_close(reinterpret_cast<PHYSFS_File*>(m_handle));
+        PHYSFS_close(static_cast<PHYSFS_File*>(m_handle));
         m_handle = nullptr;
         return false;
     }
@@ -84,12 +88,12 @@ bool InputFile::isOpen() const {
     return m_handle != nullptr;
 }
 
-ByteData InputFile::read(std::size_t bytes) {
+ByteData InputFile::read(const std::size_t bytes) const {
     assert(PHYSFS_isInit());
     ByteData ret(bytes);
-    auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
+    auto* file = static_cast<PHYSFS_File*>(m_handle);
 
-    if (!file) {
+    if (file == nullptr) {
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened"
                      << Log::Operation::Endl;
@@ -97,9 +101,9 @@ ByteData InputFile::read(std::size_t bytes) {
         return ByteData();
     }
 
-    std::int64_t read = PHYSFS_readBytes(file, ret.data(), bytes);
+    const auto read = PHYSFS_readBytes(file, ret.data(), bytes);
     if (read < 0) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "File reading unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
@@ -115,9 +119,9 @@ ByteData InputFile::read(std::size_t bytes) {
 
 bool InputFile::eof() const {
     assert(PHYSFS_isInit());
-    auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
+    auto* file = static_cast<PHYSFS_File*>(m_handle);
 
-    if (!file) {
+    if (file == nullptr) {
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << "Called eof() on unopened file" << Log::Operation::Endl;
 
@@ -129,18 +133,18 @@ bool InputFile::eof() const {
 
 std::size_t InputFile::tell() const {
     assert(PHYSFS_isInit());
-    auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
+    auto* file = static_cast<PHYSFS_File*>(m_handle);
 
-    if (file) {
+    if (file == nullptr) {
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << "Called tell() on unpened file" << Log::Operation::Endl;
         
         return 0;
     }
 
-    std::int64_t t = PHYSFS_tell(file);
+    const auto t = PHYSFS_tell(file);
     if (t < 0) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "Position tell unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
         
@@ -153,19 +157,19 @@ std::size_t InputFile::tell() const {
     return t;
 }
 
-bool InputFile::seekg(std::size_t seekPosition) {
+bool InputFile::seekg(const std::size_t seekPosition) {
     assert(PHYSFS_isInit());
-    auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
+    auto* file = static_cast<PHYSFS_File*>(m_handle);
 
-    if (!file) {
+    if (file == nullptr) {
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << "Called seekg() on unopened file" << Log::Operation::Endl;
         
         return false;
     }
 
-    if (!PHYSFS_seek(file, seekPosition)) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+    if (PHYSFS_seek(file, seekPosition) == 0) {
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "File seeking unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
         
@@ -180,11 +184,11 @@ bool InputFile::seekg(std::size_t seekPosition) {
 
 void InputFile::close() {
     assert(PHYSFS_isInit());
-    auto* file = reinterpret_cast<PHYSFS_File*>(m_handle);
+    auto* file = static_cast<PHYSFS_File*>(m_handle);
 
-    if (file && !PHYSFS_close(file)) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
-        std::string msg = "File seeking unsuccessful: ";
+    if (file != nullptr && PHYSFS_close(file) == 0) {
+        const auto ec = PHYSFS_getLastErrorCode();
+        std::string msg = "File closing unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
         
         std::scoped_lock sl(Log::generalMutex);

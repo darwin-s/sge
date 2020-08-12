@@ -42,16 +42,16 @@ Shader& Shader::operator=(Shader&& other) noexcept {
     return *this;
 }
 
-bool Shader::load(const std::filesystem::path& file, Type type) const {
+bool Shader::load(const std::filesystem::path& file, const Type type) const {
     assert(Context::getCurrentContext());
-    std::size_t shaderSize = Filesystem::getFileSize(file);
-    InputFile shader(file);
-    ByteData shaderData = shader.read(shaderSize);
+    const auto shaderSize = Filesystem::getFileSize(file);
+    const InputFile shader(file);
+    auto shaderData = shader.read(shaderSize);
 
     return load(shaderSize, shaderData.data(), type);
 }
 
-bool Shader::load(std::size_t size, const void* data, Type type) const {
+bool Shader::load(const std::size_t size, const void* data, const Type type) const {
     assert(Context::getCurrentContext());
     GLuint shader;
     GLint success;

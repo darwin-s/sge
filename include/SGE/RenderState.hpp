@@ -23,7 +23,8 @@ namespace sge {
  * \brief Render state
  *
  *
- * Object that represents the current state of rendering
+ * Object that represents the current state of rendering, such as
+ * the currently used shader, texture, etc.
  */
 class SGE_API RenderState {
 public:

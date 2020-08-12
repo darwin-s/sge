@@ -19,14 +19,14 @@
 
 namespace sge {
 void RenderTarget::clear(const Color& clearColor) {
-    Context* active = Context::getCurrentContext();
+    auto* active = Context::getCurrentContext();
 
-    getContext().setCurrent(true);
-    glClearColor((float) clearColor.red / 255, (float) clearColor.green / 255, (float) clearColor.blue / 255,
-                 (float) clearColor.alpha / 255);
+    getRenderingContext().setCurrent(true);
+    glClearColor(static_cast<GLfloat>(clearColor.red) / 255, static_cast<GLfloat>(clearColor.green) / 255,
+                 static_cast<GLfloat>(clearColor.blue) / 255, static_cast<GLfloat>(clearColor.alpha) / 255);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    if (active) {
+    if (active != nullptr) {
         active->setCurrent(true);
     }
 }
@@ -35,30 +35,30 @@ void RenderTarget::draw(const Drawable& drawable, const RenderState& renderState
     drawable.draw(*this, renderState);
 }
 
-void RenderTarget::drawTriangles(const VAO& vao, std::size_t firstVertex, std::size_t vertexCount,
+void RenderTarget::drawTriangles(const VAO& vao, const std::size_t firstVertex, const std::size_t vertexCount,
                                  const RenderState& renderState) {
-    Context* active = Context::getCurrentContext();
+    auto* active = Context::getCurrentContext();
 
-    getContext().setCurrent(true);
-    Shader* sh = renderState.getShader();
-    if (sh) {
+    getRenderingContext().setCurrent(true);
+    auto* sh = renderState.getShader();
+    if (sh != nullptr) {
         sh->use();
     }
     vao.bind();
     glDrawArrays(GL_TRIANGLES, firstVertex, vertexCount);
 
-    if (active) {
+    if (active != nullptr) {
         active->setCurrent(true);
     }
 }
 
-void RenderTarget::setViewportSize(Vector2I size) {
-    Context* active = Context::getCurrentContext();
+void RenderTarget::setViewportSize(const Vector2I size) {
+    auto* active = Context::getCurrentContext();
 
-    getContext().setCurrent(true);
+    getRenderingContext().setCurrent(true);
     glViewport(0, 0, size.x, size.y);
 
-    if (active) {
+    if (active != nullptr) {
         active->setCurrent(true);
     }
 }

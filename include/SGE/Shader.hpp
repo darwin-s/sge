@@ -23,7 +23,9 @@ namespace sge {
  * \brief Object representing a shader program
  *
  *
- * This object is used to represent an OpenGL shader.
+ * This object is used to represent an OpenGL shader program used for drawing.
+ * The shaders are assumed to have a "main()" entry point.
+ * \note This object does not work with GLSL shaders, it only loads SPIR-V binaries
  * Usage example:
  * \code
  * sge::Shader s;
@@ -92,7 +94,7 @@ public:
      * \param type Shader type
      * \return true on success, false otherwise
      */
-    bool load(const std::filesystem::path& file, Type type) const;
+    [[nodiscard]] bool load(const std::filesystem::path& file, Type type) const;
 
     /**
      * \brief Load shader
@@ -104,7 +106,7 @@ public:
      * \param type Shader type
      * \return true on success, false otherwise
      */
-    bool load(std::size_t size, const void* data, Type type) const;
+    [[nodiscard]] bool load(std::size_t size, const void* data, Type type) const;
 
     /**
      * \brief Link shader program
@@ -113,7 +115,7 @@ public:
      * Link shader program after loading all the shaders.
      * \return true on success, false otherwise
      */
-    bool link() const;
+    [[nodiscard]] bool link() const;
 
     /**
      * \brief Use shader program

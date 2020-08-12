@@ -25,16 +25,21 @@ class RenderTarget;
  * \brief Drawable base object
  *
  *
- * Base for all objects that can be drawn on the screen
+ * Base for all objects that can be drawn on the screen using a render target.
+ * Any drawable object must override the draw method of this class.
  */
 class SGE_API Drawable {
+public:
+    virtual ~Drawable() = default;
+
 protected:
     friend class RenderTarget;
 
     /**
      * \brief Draw object
      *
-     * Override this function to draw your object onto a render target
+     * Override this function to draw your object onto a render target. The render state can be modified
+     * if needed, or it can be used to implement special functionality based on those states.
      * \param target Render target to draw to
      * \param renderState Rendering state given by the render target
      */

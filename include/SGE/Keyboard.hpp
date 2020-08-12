@@ -223,7 +223,7 @@ public:
      *
      * Returns the human-readable name of a key using it's platform-specific scancode
      * \note This only works for alphanumeric keys and grammar signs + the arithmetic operation signs.
-     * \param key Key scancode
+     * \param scancode Key scancode
      * \return String containing the key name
      */
     static std::string getKeyName(int scancode);

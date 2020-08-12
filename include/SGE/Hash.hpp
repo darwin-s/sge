@@ -18,7 +18,6 @@
 #include <SGE/Types.hpp>
 #include <SGE/Export.hpp>
 #include <string_view>
-#include <cstddef>//std::size_t
 
 namespace sge {
 /**

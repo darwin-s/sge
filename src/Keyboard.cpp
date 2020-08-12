@@ -452,18 +452,18 @@ int Keyboard::getKeyScancode(const Key key) {
 }
 
 std::string Keyboard::getKeyName(const Key key) {
-    const char* name = glfwGetKeyName(getCodeFromKey(key), GLFW_KEY_UNKNOWN);
-    return name ? std::string(name) : "unknown";
+    const auto* name = glfwGetKeyName(getCodeFromKey(key), GLFW_KEY_UNKNOWN);
+    return name != nullptr ? std::string(name) : "unknown";
 }
 
 std::string Keyboard::getKeyName(const int scancode) {
-    const char* name = glfwGetKeyName(GLFW_KEY_UNKNOWN, scancode);
-    return name ? std::string(name) : "unknown";
+    const auto* name = glfwGetKeyName(GLFW_KEY_UNKNOWN, scancode);
+    return name != nullptr ? std::string(name) : "unknown";
 }
 
 Keyboard::KeyState Keyboard::getKeyState(const Window& window, const Key key) {
-    auto* win = reinterpret_cast<GLFWwindow*>(window.getContext().m_handle);
-    int state = glfwGetKey(win, getCodeFromKey(key));
+    auto* win = static_cast<GLFWwindow*>(window.getContext().m_handle);
+    const auto state = glfwGetKey(win, getCodeFromKey(key));
 
     switch (state) {
     case GLFW_PRESS:

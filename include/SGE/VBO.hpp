@@ -25,7 +25,8 @@ class VAO;
  * \brief Vertex Buffer Object
  * 
  * 
- * Object representing a vertex buffer
+ * Object representing a vertex buffer. It is used to hold vertex data
+ * for drawing.
  */
 class SGE_API VBO {
 public:

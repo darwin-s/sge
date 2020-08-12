@@ -20,8 +20,8 @@ sge::EventHandler defaultHandler;
 }
 
 namespace sge {
-Window::Window(ContextSettings contextSettings) : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+Window::Window(const ContextSettings contextSettings) : m_context(contextSettings), m_eventHandler(&defaultHandler) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowUserPointer(win, this);
     glfwSetWindowTitle(win, "SGE");
@@ -29,9 +29,9 @@ Window::Window(ContextSettings contextSettings) : m_context(contextSettings), m_
     setCallbacks();
 }
 
-Window::Window(std::string_view title, ContextSettings contextSettings)
+Window::Window(const std::string_view title, const ContextSettings contextSettings)
     : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowUserPointer(win, this);
     glfwSetWindowTitle(win, title.data());
@@ -39,9 +39,9 @@ Window::Window(std::string_view title, ContextSettings contextSettings)
     setCallbacks();
 }
 
-Window::Window(std::string_view title, Vector2I size, ContextSettings contextSettings)
+Window::Window(const std::string_view title, const Vector2I size, const ContextSettings contextSettings)
     : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowUserPointer(win, this);
     glfwSetWindowTitle(win, title.data());
@@ -49,34 +49,34 @@ Window::Window(std::string_view title, Vector2I size, ContextSettings contextSet
     setCallbacks();
 }
 
-Window::Window(std::string_view title, Monitor::VideoMode videoMode, const Monitor& monitor,
-               ContextSettings contextSettings)
+Window::Window(const std::string_view title, const Monitor::VideoMode videoMode, const Monitor& monitor,
+               const ContextSettings contextSettings)
     : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowUserPointer(win, this);
     glfwSetWindowTitle(win, title.data());
     glfwSetWindowSize(win, videoMode.width, videoMode.height);
-    glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0, videoMode.width, videoMode.height,
+    glfwSetWindowMonitor(win, static_cast<GLFWmonitor*>(monitor.m_handle), 0, 0, videoMode.width, videoMode.height,
                          videoMode.refreshRate);
     setCallbacks();
 }
 
 Window::~Window() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     m_eventHandler = &defaultHandler;
     glfwSetWindowShouldClose(win, GLFW_TRUE);
 }
 
 void Window::show() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwShowWindow(win);
 }
 
 bool Window::isOpen() const {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     return glfwWindowShouldClose(win) == GLFW_FALSE;
 }
@@ -101,29 +101,29 @@ void Window::processEvents() {
     glfwPollEvents();
 }
 
-void Window::setTitle(std::string_view title) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+void Window::setTitle(const std::string_view title) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowTitle(win, title.data());
 }
 
-void Window::setPosition(Vector2I pos) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+void Window::setPosition(const Vector2I pos) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowPos(win, pos.x, pos.y);
 }
 
-void Window::setSize(Vector2I size) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+void Window::setSize(const Vector2I size) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowSize(win, size.x, size.y);
 }
 
-void Window::enableFullscreen(Monitor::VideoMode videoMode, const Monitor& monitor) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
-    Context* active = Context::getCurrentContext();
+void Window::enableFullscreen(const Monitor::VideoMode videoMode, const Monitor& monitor) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
+    auto* active = Context::getCurrentContext();
 
-    glfwSetWindowMonitor(win, reinterpret_cast<GLFWmonitor*>(monitor.m_handle), 0, 0, videoMode.width, videoMode.height,
+    glfwSetWindowMonitor(win, static_cast<GLFWmonitor*>(monitor.m_handle), 0, 0, videoMode.width, videoMode.height,
                          videoMode.refreshRate);
     m_context.setCurrent(true);
     if (!m_context.getContextSettings().vsync) {
@@ -132,14 +132,14 @@ void Window::enableFullscreen(Monitor::VideoMode videoMode, const Monitor& monit
         glfwSwapInterval(1);
     }
     m_context.setCurrent(false);
-    if (active) {
+    if (active != nullptr) {
         active->setCurrent(true);
     }
 }
 
 void Window::disableFullscreen() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
-    Context* active = Context::getCurrentContext();
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
+    auto* active = Context::getCurrentContext();
 
     glfwSetWindowMonitor(win, NULL, 50, 50, 100, 100, 0);
     glfwSetWindowAttrib(win, GLFW_DECORATED, GLFW_TRUE);
@@ -150,96 +150,97 @@ void Window::disableFullscreen() {
         glfwSwapInterval(1);
     }
     m_context.setCurrent(false);
-    if (active) {
+    if (active != nullptr) {
         active->setCurrent(true);
     }
 }
 
-void Window::setSizeLimits(Vector2I minSize, Vector2I maxSize) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+void Window::setSizeLimits(const Vector2I minSize, const Vector2I maxSize) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowSizeLimits(win, minSize.x, minSize.y, maxSize.x, maxSize.y);
 }
 
-void Window::setAspectRatio(int numer, int denom) {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+void Window::setAspectRatio(const int numer, const int denom) {
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowAspectRatio(win, numer, denom);
 }
 
 void Window::minimize() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwIconifyWindow(win);
 }
 
 void Window::maximize() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwMaximizeWindow(win);
 }
 
 void Window::restore() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwRestoreWindow(win);
 }
 
 void Window::requestAttention() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwRequestWindowAttention(win);
 }
 
 void Window::enableRawInput() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetInputMode(win, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 }
 
 void Window::disableRawInput() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetInputMode(win, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 }
 
 void Window::disableCursor() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Window::hideCursor() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void Window::enableCursor() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void Window::swapBuffers() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
+
     glfwSwapBuffers(win);
 }
 
 void Window::preventClosing() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowShouldClose(win, GLFW_FALSE);
 }
 
 void Window::close() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowShouldClose(win, GLFW_TRUE);
 }
 
 Vector2I Window::getPosition() const {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2I ret;
 
     glfwGetWindowPos(win, &ret.x, &ret.y);
@@ -248,7 +249,7 @@ Vector2I Window::getPosition() const {
 }
 
 Vector2I Window::getSize() const {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2I ret;
 
     glfwGetWindowSize(win, &ret.x, &ret.y);
@@ -257,7 +258,7 @@ Vector2I Window::getSize() const {
 }
 
 Vector2I Window::getFramebufferSize() const {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2I ret;
 
     glfwGetFramebufferSize(win, &ret.x, &ret.y);
@@ -266,7 +267,7 @@ Vector2I Window::getFramebufferSize() const {
 }
 
 Vector2F Window::getContentScale() const {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2F ret;
 
     glfwGetWindowContentScale(win, &ret.x, &ret.y);
@@ -275,7 +276,7 @@ Vector2F Window::getContentScale() const {
 }
 
 void Window::setCallbacks() {
-    auto* win = reinterpret_cast<GLFWwindow*>(m_context.m_handle);
+    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowCloseCallback(win, reinterpret_cast<GLFWwindowclosefun>(closeCallback));
     glfwSetWindowSizeCallback(win, reinterpret_cast<GLFWwindowsizefun>(resizeCallback));
@@ -295,67 +296,67 @@ void Window::setCallbacks() {
 }
 
 void Window::closeCallback(void* window) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->windowCloseEvent();
 }
 
-void Window::resizeCallback(void* window, int width, int height) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::resizeCallback(void* window, const int width, const int height) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->windowResizeEvent(Vector2I(width, height));
 }
 
-void Window::framebufferResizeCallback(void* window, int width, int height) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::framebufferResizeCallback(void* window, const int width, const int height) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->windowFramebufferResizeEvent(Vector2I(width, height));
 }
 
-void Window::contentScaleCallback(void* window, float xScale, float yScale) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::contentScaleCallback(void* window, const float xScale, const float yScale) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->windowContentScaleEvent(Vector2F(xScale, yScale));
 }
 
-void Window::positionCallback(void* window, int xPos, int yPos) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::positionCallback(void* window, const int xPos, const int yPos) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->windowPositionEvent(Vector2I(xPos, yPos));
 }
 
-void Window::minimizeCallback(void* window, int minimized) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::minimizeCallback(void* window, const int minimized) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-    if (minimized) {
+    if (minimized != 0) {
         win->m_eventHandler->windowMinimizeEvent();
     } else {
         win->m_eventHandler->windowUnminimizeEvent();
     }
 }
 
-void Window::maximizeCallback(void* window, int maximized) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::maximizeCallback(void* window, const int maximized) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-    if (maximized) {
+    if (maximized != 0) {
         win->m_eventHandler->windowMaximizeEvent();
     } else {
         win->m_eventHandler->windowUnmaximizeEvent();
     }
 }
 
-void Window::focusCallback(void* window, int focused) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::focusCallback(void* window, const int focused) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-    if (focused) {
+    if (focused != 0) {
         win->m_eventHandler->windowGainedFocusEvent();
     } else {
         win->m_eventHandler->windowLostFocusEvent();
@@ -363,15 +364,15 @@ void Window::focusCallback(void* window, int focused) {
 }
 
 void Window::refreshCallback(void* window) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->windowRefreshEvent();
 }
 
-void Window::keyboardCallback(void* window, int key, int scancode, int action, int mods) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::keyboardCallback(void* window, const int key, const int scancode, const int action, const int mods) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
     Keyboard::KeyboardEvent kbe{};
 
     kbe.key = Keyboard::getKeyFromInternal(key);
@@ -383,44 +384,44 @@ void Window::keyboardCallback(void* window, int key, int scancode, int action, i
         kbe.state = Keyboard::KeyState::Released;
     }
     kbe.scancode = scancode;
-    kbe.ctrl = mods & GLFW_MOD_CONTROL;
-    kbe.shift = mods & GLFW_MOD_SHIFT;
-    kbe.alt = mods & GLFW_MOD_ALT;
-    kbe.system = mods & GLFW_MOD_SUPER;
-    kbe.capsLock = mods & GLFW_MOD_CAPS_LOCK;
-    kbe.numLock = mods & GLFW_MOD_NUM_LOCK;
+    kbe.ctrl = (mods & GLFW_MOD_CONTROL) != 0;
+    kbe.shift = (mods & GLFW_MOD_SHIFT) != 0;
+    kbe.alt = (mods & GLFW_MOD_ALT) != 0;
+    kbe.system = (mods & GLFW_MOD_SUPER) != 0;
+    kbe.capsLock = (mods & GLFW_MOD_CAPS_LOCK) != 0;
+    kbe.numLock = (mods & GLFW_MOD_NUM_LOCK) != 0;
 
     win->m_eventHandler->keyboardEvent(kbe);
 }
 
-void Window::textInputCallback(void* window, unsigned int codePoint) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::textInputCallback(void* window, const unsigned int codePoint) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->textInputEvent(codePoint);
 }
 
-void Window::cursorPositionCallback(void* window, double xPos, double yPos) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::cursorPositionCallback(void* window, const double xPos, const double yPos) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->cursorPositionEvent(Vector2D(xPos, yPos));
 }
 
-void Window::cursorEnterCallback(void* window, int entered) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::cursorEnterCallback(void* window, const int entered) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-    if (entered) {
+    if (entered != 0) {
         win->m_eventHandler->cursorEnterEvent();
     } else {
         win->m_eventHandler->cursorLeaveEvent();
     }
 }
 
-void Window::mouseButtonCallback(void* window, int button, int action, int mods) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::mouseButtonCallback(void* window, const int button, const int action, const int mods) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
     Mouse::MouseButtonEvent mbe{};
 
     mbe.button = Mouse::getButtonFromInternal(button);
@@ -429,19 +430,20 @@ void Window::mouseButtonCallback(void* window, int button, int action, int mods)
     } else {
         mbe.state = Mouse::ButtonState::Released;
     }
-    mbe.ctrl = mods & GLFW_MOD_CONTROL;
-    mbe.shift = mods & GLFW_MOD_SHIFT;
-    mbe.alt = mods & GLFW_MOD_ALT;
-    mbe.system = mods & GLFW_MOD_SUPER;
-    mbe.capsLock = mods & GLFW_MOD_CAPS_LOCK;
-    mbe.numLock = mods & GLFW_MOD_NUM_LOCK;
+
+    mbe.ctrl = (mods & GLFW_MOD_CONTROL) != 0;
+    mbe.shift = (mods & GLFW_MOD_SHIFT) != 0;
+    mbe.alt = (mods & GLFW_MOD_ALT) != 0;
+    mbe.system = (mods & GLFW_MOD_SUPER) != 0;
+    mbe.capsLock = (mods & GLFW_MOD_CAPS_LOCK) != 0;
+    mbe.numLock = (mods & GLFW_MOD_NUM_LOCK) != 0;
 
     win->m_eventHandler->mouseButtonEvent(mbe);
 }
 
-void Window::scrollCallback(void* window, double xOffset, double yOffset) {
-    auto* handle = reinterpret_cast<GLFWwindow*>(window);
-    auto* win = reinterpret_cast<Window*>(glfwGetWindowUserPointer(handle));
+void Window::scrollCallback(void* window, const double xOffset, const double yOffset) {
+    auto* handle = static_cast<GLFWwindow*>(window);
+    auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
     win->m_eventHandler->scrollEvent(Vector2D(xOffset, yOffset));
 }

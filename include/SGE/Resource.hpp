@@ -42,6 +42,8 @@ public:
      */
     Resource();
 
+    virtual ~Resource() = default;
+
     /**
      * \brief Load resource
      *

@@ -34,6 +34,8 @@ namespace sge {
  */
 class SGE_API EventHandler {
 public:
+    virtual ~EventHandler() = default;
+
     /**
      * \brief Handle window closing
      *

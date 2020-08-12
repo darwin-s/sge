@@ -18,7 +18,7 @@
 #include <glad.h>
 
 namespace sge {
-VAO::VAO() {
+VAO::VAO() : m_id(0) {
     assert(Context::getCurrentContext());
     glCreateVertexArrays(1, &m_id);
 }
@@ -39,55 +39,57 @@ VAO& VAO::operator=(VAO&& other) noexcept {
     return *this;
 }
 
-void VAO::bindVBO(const VBO& vbo, unsigned int bindingIndex, std::int64_t offset, std::size_t stride) const {
+void VAO::bindVBO(const VBO& vbo, const unsigned int bindingIndex, const std::int64_t offset, 
+                  const std::size_t stride) const {
     assert(Context::getCurrentContext());
     glVertexArrayVertexBuffer(m_id, bindingIndex, vbo.m_id, offset, stride);
 }
 
-void VAO::enableAttribute(unsigned int index) const {
+void VAO::enableAttribute(const unsigned int index) const {
     assert(Context::getCurrentContext());
     glEnableVertexArrayAttrib(m_id, index);
 }
 
-void VAO::setAttributeFormat(unsigned int index, int size, DataType type, bool normalized, unsigned int relativeOffset) const {
+void VAO::setAttributeFormat(const unsigned int index, const int size, const Data type, const bool normalized, 
+                             const unsigned int relativeOffset) const {
     assert(Context::getCurrentContext());
     GLuint dataType = 0;
     switch (type) {
-    case DataType::Byte:
+    case Data::Byte:
         dataType = GL_BYTE;
         break;
-    case DataType::Short:
+    case Data::Short:
         dataType = GL_SHORT;
         break;
-    case DataType::Int:
+    case Data::Int:
         dataType = GL_INT;
         break;
-    case DataType::Fixed:
+    case Data::Fixed:
         dataType = GL_FIXED;
         break;
-    case DataType::Float:
+    case Data::Float:
         dataType = GL_FLOAT;
         break;
-    case DataType::HalfFloat:
+    case Data::HalfFloat:
         dataType = GL_HALF_FLOAT;
         break;
-    case DataType::Double:
+    case Data::Double:
         dataType = GL_DOUBLE;
         break;
-    case DataType::UnsignedByte:
+    case Data::UnsignedByte:
         dataType = GL_UNSIGNED_BYTE;
         break;
-    case DataType::UnsignedShort:
+    case Data::UnsignedShort:
         dataType = GL_UNSIGNED_SHORT;
         break;
-    case DataType::UnsignedInt:
+    case Data::UnsignedInt:
         dataType = GL_UNSIGNED_INT;
         break;
     }
-    glVertexArrayAttribFormat(m_id, index, size, dataType, normalized, relativeOffset);
+    glVertexArrayAttribFormat(m_id, index, size, dataType, normalized ? GL_TRUE : GL_FALSE, relativeOffset);
 }
 
-void VAO::setAttributeBinding(unsigned int index, unsigned int bindingIndex) const {
+void VAO::setAttributeBinding(const unsigned int index, const unsigned int bindingIndex) const {
     assert(Context::getCurrentContext());
     glVertexArrayAttribBinding(m_id, index, bindingIndex);
 }

@@ -18,7 +18,7 @@
 #include <glad.h>
 
 namespace sge {
-VBO::VBO() {
+VBO::VBO() : m_id(0) {
     assert(Context::getCurrentContext());
     glCreateBuffers(1, &m_id);
 }
@@ -39,7 +39,7 @@ VBO& VBO::operator=(VBO&& other) noexcept {
     return *this;
 }
 
-void VBO::setData(std::size_t size, const void* data) const {
+void VBO::setData(const std::size_t size, const void* data) const {
     assert(Context::getCurrentContext());
     glNamedBufferData(m_id, size, data, GL_STATIC_DRAW);
 }

@@ -28,7 +28,7 @@ std::size_t Filesystem::getFileSize(const std::filesystem::path& path) {
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
-    if (!PHYSFS_stat(path.generic_u8string().c_str(), &st)) {
+    if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
         return 0;
     }
 
@@ -39,7 +39,7 @@ bool Filesystem::isFileReadOnly(const std::filesystem::path& path) {
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
-    if (!PHYSFS_stat(path.generic_u8string().c_str(), &st)) {
+    if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
         return true;
     }
 
@@ -50,7 +50,7 @@ Filesystem::FileType Filesystem::getFileType(const std::filesystem::path& path) 
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
-    if (!PHYSFS_stat(path.generic_u8string().c_str(), &st)) {
+    if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
         return FileType::Other;
     }
 
@@ -74,13 +74,13 @@ bool Filesystem::mount(const std::filesystem::path& archive, const std::filesyst
     }
 #endif
 
-    std::filesystem::path realname = archive;
+    auto realName = archive;
 
-    if (!std::filesystem::exists(realname)) {
-        realname.replace_extension(".zip");
-        if (!std::filesystem::exists(realname)) {
-            realname.replace_extension(".7z");
-            if (!std::filesystem::exists(realname)) {
+    if (!std::filesystem::exists(realName)) {
+        realName.replace_extension(".zip");
+        if (!std::filesystem::exists(realName)) {
+            realName.replace_extension(".7z");
+            if (!std::filesystem::exists(realName)) {
                 std::scoped_lock sl(Log::generalMutex);
                 Log::general << Log::MessageType::Warning << "File mounting unsuccessful: non-existent archive"
                              << Log::Operation::Endl;
@@ -89,8 +89,8 @@ bool Filesystem::mount(const std::filesystem::path& archive, const std::filesyst
         }
     }
 
-    if (!PHYSFS_mount(realname.u8string().c_str(), mountPoint.generic_u8string().c_str(), 0)) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+    if (PHYSFS_mount(realName.u8string().c_str(), mountPoint.generic_u8string().c_str(), 0) == 0) {
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "File mounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
@@ -112,13 +112,13 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
     }
 #endif
 
-    std::filesystem::path realname = archive;
+    auto realName = archive;
 
-    if (!std::filesystem::exists(realname)) {
-        realname.replace_extension(".zip");
-        if (!std::filesystem::exists(realname)) {
-            realname.replace_extension(".7z");
-            if (!std::filesystem::exists(realname)) {
+    if (!std::filesystem::exists(realName)) {
+        realName.replace_extension(".zip");
+        if (!std::filesystem::exists(realName)) {
+            realName.replace_extension(".7z");
+            if (!std::filesystem::exists(realName)) {
                 std::scoped_lock sl(Log::generalMutex);
                 Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
                              << Log::Operation::Endl;
@@ -127,8 +127,8 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
         }
     }
 
-    if (!PHYSFS_unmount(realname.u8string().c_str())) {
-        PHYSFS_ErrorCode ec = PHYSFS_getLastErrorCode();
+    if (PHYSFS_unmount(realName.u8string().c_str()) == 0) {
+        const auto ec = PHYSFS_getLastErrorCode();
         std::string msg = "File unmounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 

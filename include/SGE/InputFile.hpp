@@ -112,7 +112,7 @@ public:
      * \param bytes Number of bytes to read
      * \return the std::vector containing the data.
      */
-    ByteData read(std::size_t bytes);
+    [[nodiscard]] ByteData read(std::size_t bytes) const;
 
     /**
      * \brief End of File

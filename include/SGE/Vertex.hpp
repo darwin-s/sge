@@ -27,13 +27,13 @@ namespace sge {
  * Object representing a single vertex, used for drawing.
  */
 struct SGE_API Vertex {
-    float x;
-    float y;
-    std::uint8_t tintRed;
-    std::uint8_t tintGreen;
-    std::uint8_t tintBlue;
-    float u;
-    float v;
+    float x; ///< X position
+    float y; ///< Y position
+    std::uint8_t tintRed; ///< Red tint
+    std::uint8_t tintGreen; ///< Green tint
+    std::uint8_t tintBlue; ///< Blue tind
+    float u; ///< U texture position
+    float v; ///< V texture position
 };
 }
 

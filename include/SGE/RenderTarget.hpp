@@ -34,12 +34,13 @@ class VAO;
  */
 class SGE_API RenderTarget {
 public:
+    virtual ~RenderTarget() = default;
 
     /**
      * \brief Get rendering context
      * \return Reference to the rendering context
      */
-    virtual Context& getContext() = 0;
+    virtual Context& getRenderingContext() = 0;
 
     /**
      * \brief Clear the framebuffer
@@ -59,6 +60,7 @@ public:
      * \param vao VAO for drawing
      * \param firstVertex Index of first vertex
      * \param vertexCount Number of vertices
+     * \param renderState Current rendering state
      */
     void drawTriangles(const VAO& vao, std::size_t firstVertex, std::size_t vertexCount,
                        const RenderState& renderState = RenderState::defaultState);

@@ -40,23 +40,9 @@ namespace sge {
  */
 template<typename T> class Vector2 {
 public:
-    /**
-     * \brief First vector component
-     */
-    union {
-        T x;
-        T r;
-        T u;
-    };
+    T x; ///< First vector component
 
-    /**
-     * \brief Second vector component
-     */
-    union {
-        T y;
-        T g;
-        T v;
-    };
+    T y; ///< Second vector component
 
     /**
      * \brief Default-construct a vector

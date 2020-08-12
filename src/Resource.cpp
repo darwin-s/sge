@@ -34,7 +34,7 @@ bool Resource::isFailed() const {
     return m_failed;
 }
 
-void Resource::fail(std::string_view reason) {
+void Resource::fail(const std::string_view reason) {
     std::string msg = "Resource loading failed: ";
     msg += reason;
     std::scoped_lock sl(Log::generalMutex);
@@ -42,7 +42,7 @@ void Resource::fail(std::string_view reason) {
     m_failed = true;
 }
 
-void Resource::setReady(bool ready) {
+void Resource::setReady(const bool ready) {
     std::scoped_lock s(m_readyMutex);
     m_ready = ready;
 }

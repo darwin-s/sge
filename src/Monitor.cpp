@@ -19,11 +19,11 @@
 namespace sge {
 Monitor::Monitor(void* handle) : m_handle(handle) {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (handle == monitorHandles[i]) {
             mon = monitorHandles[i];
         }
@@ -38,12 +38,12 @@ Monitor Monitor::getPrimaryMonitor() {
 }
 
 std::vector<Monitor> Monitor::getMonitors() {
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     std::vector<Monitor> monitors;
 
     monitors.reserve(monCount);
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         monitors.emplace_back(monitorHandles[i]);
     }
 
@@ -52,8 +52,8 @@ std::vector<Monitor> Monitor::getMonitors() {
 
 Monitor::VideoMode Monitor::getCurrentVideoMode() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
     for (int i = 0; i < monCount; i++) {
@@ -64,20 +64,20 @@ Monitor::VideoMode Monitor::getCurrentVideoMode() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    const GLFWvidmode* mode = glfwGetVideoMode(mon);
-    VideoMode m{mode->width, mode->height, mode->redBits, mode->greenBits, mode->blueBits, mode->refreshRate};
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    const auto* mode = glfwGetVideoMode(mon);
+    const VideoMode m{mode->width, mode->height, mode->redBits, mode->greenBits, mode->blueBits, mode->refreshRate};
 
     return m;
 }
 
 std::vector<Monitor::VideoMode> Monitor::getSupportedVideoModes() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -85,12 +85,12 @@ std::vector<Monitor::VideoMode> Monitor::getSupportedVideoModes() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    int modeCount = 0;
-    const GLFWvidmode* modes = glfwGetVideoModes(mon, &modeCount);
-    std::vector<Monitor::VideoMode> m(modeCount);
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    auto modeCount = 0;
+    const auto* modes = glfwGetVideoModes(mon, &modeCount);
+    std::vector<VideoMode> m(modeCount);
 
-    for (int i = 0; i < modeCount; i++) {
+    for (auto i = 0; i < modeCount; i++) {
         VideoMode mod{modes[i].width,     modes[i].height,   modes[i].redBits,
                       modes[i].greenBits, modes[i].blueBits, modes[i].refreshRate};
         m.emplace_back(mod);
@@ -101,11 +101,11 @@ std::vector<Monitor::VideoMode> Monitor::getSupportedVideoModes() const {
 
 Vector2I Monitor::getPhysicalSizeMm() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -113,9 +113,9 @@ Vector2I Monitor::getPhysicalSizeMm() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    int widthMm = 0;
-    int heightMm = 0;
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    auto widthMm = 0;
+    auto heightMm = 0;
 
     glfwGetMonitorPhysicalSize(mon, &widthMm, &heightMm);
 
@@ -124,11 +124,11 @@ Vector2I Monitor::getPhysicalSizeMm() const {
 
 Vector2F Monitor::getContentScale() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -136,9 +136,9 @@ Vector2F Monitor::getContentScale() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    float xScale = 0.0f;
-    float yScale = 0.0f;
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    auto xScale = 0.0f;
+    auto yScale = 0.0f;
 
     glfwGetMonitorContentScale(mon, &xScale, &yScale);
 
@@ -147,11 +147,11 @@ Vector2F Monitor::getContentScale() const {
 
 Vector2I Monitor::getVirtualPosition() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -159,9 +159,9 @@ Vector2I Monitor::getVirtualPosition() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    int xPos = 0;
-    int yPos = 0;
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    auto xPos = 0;
+    auto yPos = 0;
 
     glfwGetMonitorPos(mon, &xPos, &yPos);
 
@@ -170,11 +170,11 @@ Vector2I Monitor::getVirtualPosition() const {
 
 Monitor::WorkArea Monitor::getAvailableWorkArea() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -182,11 +182,11 @@ Monitor::WorkArea Monitor::getAvailableWorkArea() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    int xPos = 0;
-    int yPos = 0;
-    int width = 0;
-    int height = 0;
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    auto xPos = 0;
+    auto yPos = 0;
+    auto width = 0;
+    auto height = 0;
 
     glfwGetMonitorWorkarea(mon, &xPos, &yPos, &width, &height);
 
@@ -195,11 +195,11 @@ Monitor::WorkArea Monitor::getAvailableWorkArea() const {
 
 std::string Monitor::getName() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -207,19 +207,19 @@ std::string Monitor::getName() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    const char* name = glfwGetMonitorName(mon);
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    const auto* name = glfwGetMonitorName(mon);
 
     return std::string(name);
 }
 
 Monitor::GammaRamp Monitor::getCurrentGammaRamp() const {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -227,9 +227,9 @@ Monitor::GammaRamp Monitor::getCurrentGammaRamp() const {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
-    const GLFWgammaramp* rmp = glfwGetGammaRamp(mon);
-    GammaRamp ramp;
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
+    const auto* rmp = glfwGetGammaRamp(mon);
+    GammaRamp ramp{};
     ramp.size = rmp->size;
     ramp.red.resize(ramp.size);
     ramp.green.resize(ramp.size);
@@ -250,11 +250,11 @@ Monitor::GammaRamp Monitor::getCurrentGammaRamp() const {
 
 void Monitor::setGammaRamp(const GammaRamp& ramp) {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -262,7 +262,7 @@ void Monitor::setGammaRamp(const GammaRamp& ramp) {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
     GLFWgammaramp rmp{};
     rmp.size = ramp.size;
     rmp.red = new unsigned short[rmp.size];
@@ -285,13 +285,13 @@ void Monitor::setGammaRamp(const GammaRamp& ramp) {
     delete[] rmp.blue;
 }
 
-void Monitor::setGamma(float gamma) {
+void Monitor::setGamma(const float gamma) {
 #ifdef SGE_DEBUG
-    int monCount = 0;
-    GLFWmonitor** monitorHandles = glfwGetMonitors(&monCount);
+    auto monCount = 0;
+    auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }
@@ -299,7 +299,7 @@ void Monitor::setGamma(float gamma) {
 
     assert(glfw_mon != nullptr);
 #endif
-    auto* mon = reinterpret_cast<GLFWmonitor*>(m_handle);
+    auto* mon = static_cast<GLFWmonitor*>(m_handle);
 
     glfwSetGamma(mon, gamma);
 }

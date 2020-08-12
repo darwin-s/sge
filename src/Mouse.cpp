@@ -40,7 +40,7 @@ Mouse::Button Mouse::getButtonFromInternal(int button) {
     }
 }
 
-int Mouse::getCodeFromButton(Button button) {
+int Mouse::getCodeFromButton(const Button button) {
     switch (button) {
     case Button::Left:
         return GLFW_MOUSE_BUTTON_1;
@@ -63,7 +63,7 @@ int Mouse::getCodeFromButton(Button button) {
     }
 }
 
-std::string Mouse::getButtonName(Button button) {
+std::string Mouse::getButtonName(const Button button) {
     switch (button) {
     case Button::Left:
         return "LMB";
@@ -86,9 +86,9 @@ std::string Mouse::getButtonName(Button button) {
     }
 }
 
-Mouse::ButtonState Mouse::getButtonState(const Window& window, Button button) {
-    auto* win = reinterpret_cast<GLFWwindow*>(window.getContext().m_handle);
-    int state = glfwGetMouseButton(win, getCodeFromButton(button));
+Mouse::ButtonState Mouse::getButtonState(const Window& window, const Button button) {
+    auto* win = static_cast<GLFWwindow*>(window.getContext().m_handle);
+    const auto state = glfwGetMouseButton(win, getCodeFromButton(button));
 
     switch (state) {
     case GLFW_PRESS:

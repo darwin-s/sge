@@ -19,7 +19,7 @@ constexpr uint64_t fnvPrime = 0x00000100000001B3;
 constexpr uint64_t fnvOffset = 0xcbf29ce484222325;
 
 std::uint64_t fnv(const sge::ByteData& data) {
-    uint64_t hash = fnvOffset;
+    auto hash = fnvOffset;
 
     for (const auto& b : data) {
         hash = (hash ^ b) * fnvPrime;
@@ -28,11 +28,11 @@ std::uint64_t fnv(const sge::ByteData& data) {
     return hash;
 }
 
-std::uint64_t fnv(std::string_view s) {
-    uint64_t hash = fnvOffset;
+std::uint64_t fnv(const std::string_view s) {
+    auto hash = fnvOffset;
 
     for (const auto& b : s) {
-        hash = (hash ^ static_cast<std::uint8_t>(b)) * fnvPrime;
+        hash = (hash ^ static_cast<const std::uint8_t>(b)) * fnvPrime;
     }
 
     return hash;
@@ -49,7 +49,7 @@ Hash::Hash(const std::uint64_t hash) : m_hash(hash) {
 Hash::Hash(const ByteData& data) : m_hash(fnv(data)) {
 }
 
-Hash::Hash(std::string_view s) : m_hash(fnv(s)) {
+Hash::Hash(const std::string_view s) : m_hash(fnv(s)) {
 }
 
 Hash& Hash::operator=(const std::uint64_t hash) {
@@ -58,7 +58,7 @@ Hash& Hash::operator=(const std::uint64_t hash) {
     return *this;
 }
 
-Hash& Hash::operator=(std::string_view s) {
+Hash& Hash::operator=(const std::string_view s) {
     m_hash = fnv(s);
 
     return *this;

@@ -77,7 +77,7 @@ public:
     RenderWindow(std::string_view title, Monitor::VideoMode videoMode, const Monitor& monitor,
         ContextSettings contextSettings = ContextSettings());
 
-    Context& getContext() override;
+    Context& getRenderingContext() override;
 };
 }
 
