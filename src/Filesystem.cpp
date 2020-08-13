@@ -16,6 +16,7 @@
 #include <SGE/Log.hpp>
 #include <string>
 #include <cassert>
+#include <stdexcept>
 #include <physfs.h>
 
 namespace sge {
@@ -29,7 +30,16 @@ std::size_t Filesystem::getFileSize(const std::filesystem::path& path) {
     PHYSFS_Stat st;
 
     if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        return 0;
+        const auto ec = PHYSFS_getLastErrorCode();
+        std::string msg = "Could not get file size: ";
+        msg += PHYSFS_getErrorByCode(ec);
+
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        }
+
+        throw std::runtime_error("Failed to get file size");
     }
 
     return st.filesize;
@@ -40,7 +50,16 @@ bool Filesystem::isFileReadOnly(const std::filesystem::path& path) {
     PHYSFS_Stat st;
 
     if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        return true;
+        const auto ec = PHYSFS_getLastErrorCode();
+        std::string msg = "Could not find if file is read-only: ";
+        msg += PHYSFS_getErrorByCode(ec);
+
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        }
+
+        throw std::runtime_error("Failed to get file read-only property");
     }
 
     return st.readonly != 0;
@@ -51,7 +70,16 @@ Filesystem::FileType Filesystem::getFileType(const std::filesystem::path& path) 
     PHYSFS_Stat st;
 
     if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        return FileType::Other;
+        const auto ec = PHYSFS_getLastErrorCode();
+        std::string msg = "Could not get file type: ";
+        msg += PHYSFS_getErrorByCode(ec);
+
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        }
+
+        throw std::runtime_error("Failed to get file type");
     }
 
     switch (st.filetype) {
@@ -119,10 +147,12 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
         if (!std::filesystem::exists(realName)) {
             realName.replace_extension(".7z");
             if (!std::filesystem::exists(realName)) {
-                std::scoped_lock sl(Log::generalMutex);
-                Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
-                             << Log::Operation::Endl;
-                return;
+                {
+                    std::scoped_lock sl(Log::generalMutex);
+                    Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
+                                 << Log::Operation::Endl;
+                }
+                throw std::runtime_error("Failed to unmount archive");
             }
         }
     }
@@ -132,8 +162,12 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
         std::string msg = "File unmounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        }
+
+        throw std::runtime_error("Failed to unmount archive");
     }
 }
 }

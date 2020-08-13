@@ -50,6 +50,7 @@ public:
      *
      *
      * Creates a file and immediately opens it.
+     * \throws std::runtime_error
      * \param path Path to the virtual file
      * \param bufferSize Internal buffer size
      */
@@ -109,6 +110,7 @@ public:
      *
      *
      * Reads a number of bytes from the file and returns it as a std::vector.
+     * \throws std::runtime_error
      * \param bytes Number of bytes to read
      * \return the std::vector containing the data.
      */
@@ -119,6 +121,7 @@ public:
      *
      *
      * Returns whether the end of file was reached.
+     * \throws std::runtime_error
      * \return true if EOF was reached, false otherwise.
      */
     [[nodiscard]] bool eof() const;
@@ -128,6 +131,7 @@ public:
      *
      *
      * Returns the current position in the file, relative to it's beginning.
+     * \throws std::runtime_error
      * \return The byte number at which this handle is set
      */
     [[nodiscard]] std::size_t tell() const;
@@ -137,11 +141,10 @@ public:
      *
      *
      * Seeks to a certain position in the file, relative to the beginning.
-     * \note If seeking fails, then the the position may be in an undefined state.
+     * \throws std::runtime_error
      * \param seekPosition Position to seek to.
-     * \return true on success, false otherwise.
      */
-    [[nodiscard]] bool seekg(std::size_t seekPosition);
+    [[nodiscard]] void seekg(std::size_t seekPosition);
 
     /**
      * \brief Close file

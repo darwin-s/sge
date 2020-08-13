@@ -55,6 +55,17 @@ public:
     virtual bool loadFromFile(const std::filesystem::path& path) = 0;
 
     /**
+     * \brief Load resource
+     *
+     *
+     * Loads the resource for memory
+     * \param size Size of data buffer
+     * \param data Pointer to buffer containing the data
+     * \return true on success, false otherwise
+     */
+    virtual bool loadFromMemory(std::size_t size, const void* data) = 0;
+
+    /**
      * \brief Get file id
      *
      *

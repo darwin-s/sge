@@ -56,7 +56,7 @@ Monitor::VideoMode Monitor::getCurrentVideoMode() const {
     auto** monitorHandles = glfwGetMonitors(&monCount);
     GLFWmonitor* glfw_mon = nullptr;
 
-    for (int i = 0; i < monCount; i++) {
+    for (auto i = 0; i < monCount; i++) {
         if (m_handle == monitorHandles[i]) {
             glfw_mon = monitorHandles[i];
         }

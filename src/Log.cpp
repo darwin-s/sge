@@ -54,7 +54,7 @@ const char* getMtText(const sge::Log::MessageType mt) {
 }
 
 bool isStringSafe(const char* s) {
-    for (int i = 0; i < maxStringSize; i++) {
+    for (auto i = 0; i < maxStringSize; i++) {
         if (s[i] == '\0') {
             return true;
         }
@@ -72,7 +72,9 @@ Log::Log() : m_mt(MessageType::Info), m_writeTime(false) {
 }
 
 Log::Log(const std::filesystem::path& file) : m_mt(MessageType::Info), m_writeTime(true) {
-    open(file);
+    if (!open(file)) {
+        throw std::runtime_error("Failed to open log");
+    }
 }
 
 Log::~Log() {

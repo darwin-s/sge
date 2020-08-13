@@ -88,6 +88,7 @@ public:
      *
      * Creates a Log object and opens the log file.
      * \note If the file already exists, the Log object will append to it.
+     * \throws std::runtime_error
      * \param file Path to the log file to be opened
      */
     explicit Log(const std::filesystem::path& file);

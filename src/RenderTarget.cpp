@@ -15,6 +15,7 @@
 #include <SGE/RenderTarget.hpp>
 #include <SGE/Drawable.hpp>
 #include <SGE/VAO.hpp>
+#include <cassert>
 #include <glad.h>
 
 namespace sge {

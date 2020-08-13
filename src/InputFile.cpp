@@ -14,6 +14,7 @@
 
 #include <SGE/InputFile.hpp>
 #include <SGE/Log.hpp>
+#include <stdexcept>
 #include <cassert>
 #include <physfs.h>
 
@@ -24,7 +25,9 @@ InputFile::InputFile() : m_handle(nullptr) {
 
 InputFile::InputFile(const std::filesystem::path& path, const std::size_t bufferSize) : m_handle(nullptr) {
     assert(PHYSFS_isInit());
-    open(path, bufferSize);
+    if (!open(path, bufferSize)) {
+        throw std::runtime_error("Failed to open file");
+    }
 }
 
 InputFile::InputFile(InputFile&& other) noexcept : m_handle(other.m_handle) {
@@ -94,11 +97,13 @@ ByteData InputFile::read(const std::size_t bytes) const {
     auto* file = static_cast<PHYSFS_File*>(m_handle);
 
     if (file == nullptr) {
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened"
-                     << Log::Operation::Endl;
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << "File reading unsuccessful: file not opened"
+                         << Log::Operation::Endl;
+        }
 
-        return ByteData();
+        throw std::runtime_error("Failed to read file");
     }
 
     const auto read = PHYSFS_readBytes(file, ret.data(), bytes);
@@ -107,11 +112,29 @@ ByteData InputFile::read(const std::size_t bytes) const {
         std::string msg = "File reading unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        }
 
-        return ByteData();
+        throw std::runtime_error("Failed to read file");
     }
+
+    if (read < bytes) {
+        const auto ec = PHYSFS_getLastErrorCode();
+        if (ec != PHYSFS_ERR_OK) {
+            std::string msg = "File reading unsuccessful: ";
+            msg += PHYSFS_getErrorByCode(ec);
+
+            {
+                std::scoped_lock sl(Log::generalMutex);
+                Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+            }
+
+            throw std::runtime_error("Failed to read file");
+        }
+    }
+
     ret.resize(read);
 
     return ret;
@@ -122,10 +145,12 @@ bool InputFile::eof() const {
     auto* file = static_cast<PHYSFS_File*>(m_handle);
 
     if (file == nullptr) {
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << "Called eof() on unopened file" << Log::Operation::Endl;
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << "Called eof() on unopened file" << Log::Operation::Endl;
+        }
 
-        return true;
+        throw std::runtime_error("Failed to get eof property of file");
     }
 
     return PHYSFS_eof(file) != 0;
@@ -136,10 +161,12 @@ std::size_t InputFile::tell() const {
     auto* file = static_cast<PHYSFS_File*>(m_handle);
 
     if (file == nullptr) {
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << "Called tell() on unpened file" << Log::Operation::Endl;
-        
-        return 0;
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << "Called tell() on unpened file" << Log::Operation::Endl;
+        }
+
+        throw std::runtime_error("Failed to tell on file");
     }
 
     const auto t = PHYSFS_tell(file);
@@ -151,21 +178,23 @@ std::size_t InputFile::tell() const {
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
         
-        return 0;
+        throw std::runtime_error("Failed to tell on file");
     }
 
     return t;
 }
 
-bool InputFile::seekg(const std::size_t seekPosition) {
+void InputFile::seekg(const std::size_t seekPosition) {
     assert(PHYSFS_isInit());
     auto* file = static_cast<PHYSFS_File*>(m_handle);
 
     if (file == nullptr) {
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << "Called seekg() on unopened file" << Log::Operation::Endl;
-        
-        return false;
+        {
+            std::scoped_lock sl(Log::generalMutex);
+            Log::general << Log::MessageType::Warning << "Called seekg() on unopened file" << Log::Operation::Endl;
+        }
+
+        throw std::runtime_error("Failed to seek in file");
     }
 
     if (PHYSFS_seek(file, seekPosition) == 0) {
@@ -176,10 +205,8 @@ bool InputFile::seekg(const std::size_t seekPosition) {
         std::scoped_lock sl(Log::generalMutex);
         Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
         
-        return false;
+        throw std::runtime_error("Failed to seek in file");
     }
-
-    return true;
 }
 
 void InputFile::close() {

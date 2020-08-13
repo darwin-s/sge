@@ -87,16 +87,6 @@ public:
     };
 
     /**
-     * \brief Create monitor from a handle
-     *
-     *
-     * Creates a monitor object from an internal handle pointer.
-     * \note This constructor is used only internally in the library. It should not be used by users
-     * \param handle Internal handle of the monitor
-     */
-    SGE_PRIVATE explicit Monitor(void* handle);
-
-    /**
      * \brief Get primary monitor
      *
      *
@@ -212,6 +202,8 @@ public:
     void setGamma(float gamma);
 
 private:
+    SGE_PRIVATE explicit Monitor(void* handle);
+
     friend class Window;
     void* m_handle;
 };
