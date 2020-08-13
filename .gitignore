@@ -120,13 +120,19 @@ $RECYCLE.BIN/
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
-#CMake Tools build directory
+# CMake Tools build directory
 build
 
-#Visual Studio Code directory
+# Visual Studio Code directory
 .vscode
 
-#Visual Studio
+# Visual Studio
 .vs
 CMakeSettings.json
 out
+
+# IDEA
+.idea
+
+# CMake Build
+cmake-build-*
