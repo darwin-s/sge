@@ -33,7 +33,7 @@ namespace sge {
  * uses stream insert operators (<<) to write.
  * A message end with an Operation::Endl. Each
  * message is prepended with the Log::MessageType and
- * the current time and date (dd/mm/yyyy@hh:mm:ss).
+ * the current time and date (dd/mm/yyyy@@hh:mm:ss).
  * There is a global instance provided for convenience
  * and exceptions, but it is not opened by default. A Log
  * should be opened before you try to write to it.

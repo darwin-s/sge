@@ -119,7 +119,7 @@ public:
     ReturnCode run();
 
     /**
-     * \bried Get arguments
+     * \brief Get arguments
      *
      *
      * Get the arguments used to create the current application.

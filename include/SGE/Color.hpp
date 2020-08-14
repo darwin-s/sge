@@ -39,7 +39,7 @@ public:
     std::uint8_t red; ///< Red value
     std::uint8_t green; ///< Green value
     std::uint8_t blue; ///< Blue value
-    std::uint8_t alpha; /// Alpha value
+    std::uint8_t alpha; ///< Alpha value
 };
 }
 

@@ -39,5 +39,6 @@
 #include <SGE/Drawable.hpp>
 #include <SGE/RenderTarget.hpp>
 #include <SGE/RenderWindow.hpp>
+#include <SGE/Image.hpp>
 
 #endif//SGE_SGE_HPP
