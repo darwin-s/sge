@@ -130,7 +130,7 @@ void GLAPIENTRY messageCallback(const GLenum source, const GLenum type, const GL
 }
 
 namespace sge {
-Context::Context(const ContextSettings settings) : m_handle(nullptr) {
+Context::Context(const ContextSettings& settings) : m_handle(nullptr) {
     create(GLFW_DONT_CARE, settings);
 }
 

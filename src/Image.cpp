@@ -86,7 +86,7 @@ unsigned char* Image::getPixelData() const {
     return m_data;
 }
 
-Vector2I Image::getSize() const {
+const Vector2I& Image::getSize() const {
     return m_size;
 }
 

@@ -16,7 +16,9 @@
 #define SGE_SHADER_HPP
 
 #include <SGE/Export.hpp>
+#include <SGE/Matrix.hpp>
 #include <filesystem>
+#include <string_view>
 
 namespace sge {
 /**
@@ -124,6 +126,16 @@ public:
      * Use this shader program to draw geometry.
      */
     void use() const;
+
+    /**
+     * \brief Set shader uniform
+     *
+     *
+     * Sets a matrix shader uniform.
+     * \param name Name of the uniform
+     * \param mat Matrix to assign
+     */
+    void setUniform(std::string_view name, const Matrix& mat);
 
 private:
     unsigned int m_id;

@@ -40,5 +40,7 @@
 #include <SGE/RenderTarget.hpp>
 #include <SGE/RenderWindow.hpp>
 #include <SGE/Image.hpp>
+#include <SGE/Matrix.hpp>
+#include <SGE/Transformable.hpp>
 
 #endif//SGE_SGE_HPP

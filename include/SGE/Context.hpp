@@ -47,7 +47,7 @@ public:
      * \note The context settings may not be respected exactly. Check the settings after creating the context.
      * \param settings Settings for the context
      */
-    explicit Context(ContextSettings settings = ContextSettings());
+    explicit Context(const ContextSettings& settings = ContextSettings());
 
     /**
      * \brief Destroy context

@@ -51,7 +51,7 @@ public:
      * This event is called when the window is being resized on the screen.
      * \param size The new size of the window in virtual units
      */
-    virtual void windowResizeEvent(Vector2I size);
+    virtual void windowResizeEvent(const Vector2I& size);
 
     /**
      * \brief Handle framebuffer resizing
@@ -60,7 +60,7 @@ public:
      * This event is called when the window's framebuffer is resized.
      * \param size The new size of the framebuffer in pixels
      */
-    virtual void windowFramebufferResizeEvent(Vector2I size);
+    virtual void windowFramebufferResizeEvent(const Vector2I& size);
 
     /**
      * \brief Handle DPI scale change
@@ -69,7 +69,7 @@ public:
      * This event is called when the window's DPI scale is changed.
      * \param scale The new DPI scale
      */
-    virtual void windowContentScaleEvent(Vector2F scale);
+    virtual void windowContentScaleEvent(const Vector2F& scale);
 
     /**
      * \brief Handle window positioning
@@ -78,7 +78,7 @@ public:
      * This event is called when the window changes position on the screen.
      * \param pos New window position in virtual units
      */
-    virtual void windowPositionEvent(Vector2I pos);
+    virtual void windowPositionEvent(const Vector2I& pos);
 
     /**
      * \brief Handle window minimization
@@ -158,7 +158,7 @@ public:
      * This event is called when the cursor changes position relative to the window.
      * \param pos New position of the cursor relative to the window's top left corner
      */
-    virtual void cursorPositionEvent(Vector2D pos);
+    virtual void cursorPositionEvent(const Vector2D& pos);
 
     /**
      * \brief Handle cursor leaving
@@ -189,7 +189,7 @@ public:
      * This event is called when the mouse scroll wheel is used.
      * \param scroll The scroll offset (x - horizontal scroll, y - vertical scroll)
      */
-    virtual void scrollEvent(Vector2D scroll);
+    virtual void scrollEvent(const Vector2D& scroll);
 };
 }
 

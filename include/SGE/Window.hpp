@@ -49,7 +49,7 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param contextSettings Settings for the underlying context
      */
-    explicit Window(ContextSettings contextSettings = ContextSettings());
+    explicit Window(const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create window
@@ -60,7 +60,7 @@ public:
      * \param title Title of the window
      * \param contextSettings Settings for the underlying context
      */
-    explicit Window(std::string_view title, ContextSettings contextSettings = ContextSettings());
+    explicit Window(std::string_view title, const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create window
@@ -72,7 +72,7 @@ public:
      * \param size Size of the window
      * \param contextSettings Settings for the underlying context
      */
-    Window(std::string_view title, Vector2I size, ContextSettings contextSettings = ContextSettings());
+    Window(std::string_view title, const Vector2I& size, const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create window
@@ -85,8 +85,8 @@ public:
      * \param monitor Monitor on which to make the window fullscreen
      * \param contextSettings Settings for the underlying context
      */
-    Window(std::string_view title, Monitor::VideoMode videoMode, const Monitor& monitor,
-           ContextSettings contextSettings = ContextSettings());
+    Window(std::string_view title, const Monitor::VideoMode& videoMode, const Monitor& monitor,
+           const ContextSettings& contextSettings = ContextSettings());
     Window(const Window&) = delete;
     Window(Window&&) noexcept = delete;
     Window& operator=(const Window&) = delete;
@@ -178,7 +178,7 @@ public:
      * Sets a new position for the window.
      * \param pos New position of the window in virtual units
      */
-    void setPosition(Vector2I pos);
+    void setPosition(const Vector2I& pos);
 
     /**
      * \brief Set window size
@@ -187,7 +187,7 @@ public:
      * Sets the size of the window.
      * \param size New size of the window in virtual units.
      */
-    void setSize(Vector2I size);
+    void setSize(const Vector2I& size);
 
     /**
      * \brief Make the window fullscreen
@@ -197,7 +197,7 @@ public:
      * \param videoMode Video mode to be set
      * \param monitor Monitor on which the window will be fullscreen
      */
-    void enableFullscreen(Monitor::VideoMode videoMode, const Monitor& monitor);
+    void enableFullscreen(const Monitor::VideoMode& videoMode, const Monitor& monitor);
 
     /**
      * \brief Disable fullscreen window
@@ -214,7 +214,7 @@ public:
      * \param minSize Minimal window size in virtual units
      * \param maxSize Maximal window size in virtual units
      */
-    void setSizeLimits(Vector2I minSize, Vector2I maxSize);
+    void setSizeLimits(const Vector2I& minSize, const Vector2I& maxSize);
 
     /**
      * \brief Set window aspect ratio

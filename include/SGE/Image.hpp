@@ -141,7 +141,7 @@ public:
      * Returns the size in pixels of the image.
      * \returns Vector containing the image's size
      */
-    Vector2I getSize() const;
+    const Vector2I& getSize() const;
 
     /**
      * \brief Get number of channels

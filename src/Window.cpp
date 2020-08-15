@@ -20,7 +20,7 @@ sge::EventHandler defaultHandler;
 }
 
 namespace sge {
-Window::Window(const ContextSettings contextSettings) : m_context(contextSettings), m_eventHandler(&defaultHandler) {
+Window::Window(const ContextSettings& contextSettings) : m_context(contextSettings), m_eventHandler(&defaultHandler) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowUserPointer(win, this);
@@ -29,7 +29,7 @@ Window::Window(const ContextSettings contextSettings) : m_context(contextSetting
     setCallbacks();
 }
 
-Window::Window(const std::string_view title, const ContextSettings contextSettings)
+Window::Window(const std::string_view title, const ContextSettings& contextSettings)
     : m_context(contextSettings), m_eventHandler(&defaultHandler) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
@@ -39,7 +39,7 @@ Window::Window(const std::string_view title, const ContextSettings contextSettin
     setCallbacks();
 }
 
-Window::Window(const std::string_view title, const Vector2I size, const ContextSettings contextSettings)
+Window::Window(const std::string_view title, const Vector2I& size, const ContextSettings& contextSettings)
     : m_context(contextSettings), m_eventHandler(&defaultHandler) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
@@ -49,8 +49,8 @@ Window::Window(const std::string_view title, const Vector2I size, const ContextS
     setCallbacks();
 }
 
-Window::Window(const std::string_view title, const Monitor::VideoMode videoMode, const Monitor& monitor,
-               const ContextSettings contextSettings)
+Window::Window(const std::string_view title, const Monitor::VideoMode& videoMode, const Monitor& monitor,
+               const ContextSettings& contextSettings)
     : m_context(contextSettings), m_eventHandler(&defaultHandler) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
@@ -107,19 +107,19 @@ void Window::setTitle(const std::string_view title) {
     glfwSetWindowTitle(win, title.data());
 }
 
-void Window::setPosition(const Vector2I pos) {
+void Window::setPosition(const Vector2I& pos) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowPos(win, pos.x, pos.y);
 }
 
-void Window::setSize(const Vector2I size) {
+void Window::setSize(const Vector2I& size) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowSize(win, size.x, size.y);
 }
 
-void Window::enableFullscreen(const Monitor::VideoMode videoMode, const Monitor& monitor) {
+void Window::enableFullscreen(const Monitor::VideoMode& videoMode, const Monitor& monitor) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     auto* active = Context::getCurrentContext();
 
@@ -155,7 +155,7 @@ void Window::disableFullscreen() {
     }
 }
 
-void Window::setSizeLimits(const Vector2I minSize, const Vector2I maxSize) {
+void Window::setSizeLimits(const Vector2I& minSize, const Vector2I& maxSize) {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
 
     glfwSetWindowSizeLimits(win, minSize.x, minSize.y, maxSize.x, maxSize.y);

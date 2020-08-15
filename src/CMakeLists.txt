@@ -51,6 +51,8 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/RenderTarget.hpp
         ${INC_PREF}/RenderWindow.hpp
         ${INC_PREF}/Image.hpp
+        ${INC_PREF}/Matrix.hpp
+        ${INC_PREF}/Transformable.hpp
         ${INC_PREF}/SGE.hpp)
 set(SGE_PUBLIC ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES})
 set(SGE_PRIVATE_INCLUDES)
@@ -76,7 +78,9 @@ set(SGE_SRC
         ${SRC_PREF}/Color.cpp
         ${SRC_PREF}/RenderTarget.cpp
         ${SRC_PREF}/RenderWindow.cpp
-        ${SRC_PREF}/Image.cpp)
+        ${SRC_PREF}/Image.cpp
+        ${SRC_PREF}/Matrix.cpp
+        ${SRC_PREF}/Transformable.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)
