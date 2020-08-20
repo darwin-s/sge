@@ -42,5 +42,6 @@
 #include <SGE/Image.hpp>
 #include <SGE/Matrix.hpp>
 #include <SGE/Transformable.hpp>
+#include <SGE/Camera.hpp>
 
 #endif//SGE_SGE_HPP

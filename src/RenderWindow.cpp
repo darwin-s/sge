@@ -33,4 +33,9 @@ RenderWindow::RenderWindow(const std::string_view title, const Monitor::VideoMod
 Context& RenderWindow::getRenderingContext() {
     return getContext();
 }
+
+Vector2U RenderWindow::getPhysicalSize() const {
+    return getFramebufferSize();
+}
+
 }

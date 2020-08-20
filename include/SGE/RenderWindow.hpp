@@ -38,7 +38,7 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param contextSettings Settings for the underlying context
      */
-    RenderWindow(ContextSettings contextSettings = ContextSettings());
+    explicit RenderWindow(ContextSettings contextSettings = ContextSettings());
 
     /**
      * \brief Create render window
@@ -78,6 +78,8 @@ public:
         ContextSettings contextSettings = ContextSettings());
 
     Context& getRenderingContext() override;
+
+    Vector2U getPhysicalSize() const override;
 };
 }
 

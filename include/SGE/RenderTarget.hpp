@@ -21,6 +21,7 @@
 #include <SGE/Color.hpp>
 #include <SGE/Types.hpp>
 #include <SGE/Vector2.hpp>
+#include <SGE/Camera.hpp>
 
 namespace sge {
 class Drawable;
@@ -34,13 +35,71 @@ class VAO;
  */
 class SGE_API RenderTarget {
 public:
+    RenderTarget();
+
     virtual ~RenderTarget() = default;
 
     /**
      * \brief Get rendering context
      * \return Reference to the rendering context
      */
-    virtual Context& getRenderingContext() = 0;
+    [[nodiscard]] virtual Context& getRenderingContext() = 0;
+
+    /**
+     * \brief Get physical size
+     *
+     *
+     * Get the physical size in pixels of the rendering target.
+     * \return 
+     */
+    [[nodiscard]] virtual Vector2U getPhysicalSize() const = 0;
+
+    /**
+     * \brief Set camera
+     *
+     *
+     * Sets the camera to be used with the current render target
+     * \param camera Camera to be used with this target
+     */
+    void setCamera(const Camera& camera);
+
+    /**
+     * \brief Get camera
+     * \return Currently used camera for this target
+     */
+    [[nodiscard]] const Camera& getCamera() const;
+
+    /**
+     * \brief Get viewport dimensions
+     *
+     *
+     * Get the dimensions in pixels of a camera's viewport
+     * \param cam Camera
+     * \return Viewport rectangle
+     */
+    RectangleInt getViewport(const Camera& cam) const;
+
+    /**
+     * \brief Map pixel position to world coordinates
+     *
+     *
+     * Maps a pixel on screen to the corresponding world coordinate.
+     * \param pixel Pixel position
+     * \param cam Camera used to reference the view
+     * \return World coordinates
+     */
+    Vector2F pixelToCoordinates(const Vector2I& pixel, const Camera& cam) const;
+
+    /**
+     * \brief Map world coordinates to pixel
+     *
+     *
+     * Maps a world coordinate to the respective pixel position on screen.
+     * \param coordinate World coordinates
+     * \param cam Camera used to reference the view
+     * \return Pixel coordinates
+     */
+    Vector2I coordinatesToPixel(const Vector2F& coordinate, const Camera& cam) const;
 
     /**
      * \brief Clear the framebuffer
@@ -65,14 +124,11 @@ public:
     void drawTriangles(const VAO& vao, std::size_t firstVertex, std::size_t vertexCount,
                        const RenderState& renderState = RenderState::defaultState);
 
-    /**
-     * \brief Set viewport size
-     *
-     *
-     * Sets the size of the OpenGL viewport
-     * \param size Size of viewport
-     */
-    void setViewportSize(Vector2I size);
+    static const Camera defaultCamera; ///< Default camera for render targets
+
+private:
+    bool m_cameraChanged;
+    Camera m_camera;
 };
 }
 

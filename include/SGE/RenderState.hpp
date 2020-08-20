@@ -17,6 +17,7 @@
 
 #include <SGE/Export.hpp>
 #include <SGE/Shader.hpp>
+#include <SGE/Transformable.hpp>
 
 namespace sge {
 /**
@@ -35,21 +36,15 @@ public:
     explicit RenderState(Shader* shader);
 
     /**
-     * \brief Get shader program used for rendering
-     * \return Shader program
+     * \brief Construct render state
+     * \param transform Transform to be passed to shader program
      */
-    [[nodiscard]] Shader* getShader() const;
-
-    /**
-     * \brief Set shader program
-     * \param shader Shader
-     */
-    void setShader(Shader* shader);
+    explicit RenderState(const Matrix& transform);
 
     static RenderState defaultState; ///< Default rendering state
 
-private:
-    Shader* m_shader;
+    Shader* shader;
+    Matrix transform;
 };
 }
 
