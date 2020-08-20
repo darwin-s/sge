@@ -16,6 +16,7 @@
 #define SGE_MOUSE_HPP
 
 #include <SGE/Export.hpp>
+#include <SGE/Vector2.hpp>
 #include <string>
 
 namespace sge {
@@ -76,7 +77,7 @@ public:
      * \param button The internal code of the button
      * \return Mouse::Button type
      */
-    static Button getButtonFromInternal(int button);
+    [[nodiscard]] static Button getButtonFromInternal(int button);
 
     /**
      * \brief Get the internal representation of a mouse button
@@ -86,7 +87,7 @@ public:
      * \param button Mouse::Button type
      * \return Integer used to represent the button
      */
-    static int getCodeFromButton(Button button);
+    [[nodiscard]] static int getCodeFromButton(Button button);
 
     /**
      * \brief Get mouse button name
@@ -96,7 +97,7 @@ public:
      * \param button Mouse::Button type
      * \return String containing the button name
      */
-    static std::string getButtonName(Button button);
+    [[nodiscard]] static std::string getButtonName(Button button);
 
     /**
      * \brief Get button state
@@ -107,7 +108,18 @@ public:
      * \param button The Mouse::Button type
      * \return State of the mouse button
      */
-    static ButtonState getButtonState(const Window& window, Button button);
+    [[nodiscard]] static ButtonState getButtonState(const Window& window, Button button);
+
+    /**
+     * \brief Get mouse position
+     *
+     *
+     * Get the cursor's position in virtual units, relative to the window's
+     * top left corner.
+     * \param window Window to get position from
+     * \return Vector containing the mouse position
+     */
+    [[nodiscard]] static Vector2D getMousePosition(const Window& window);
 
     /**
      * \brief Quarry for raw mouse input support

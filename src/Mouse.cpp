@@ -17,7 +17,7 @@
 #include <GLFW/glfw3.h>
 
 namespace sge {
-Mouse::Button Mouse::getButtonFromInternal(int button) {
+Mouse::Button Mouse::getButtonFromInternal(const int button) {
     switch (button) {
     case GLFW_MOUSE_BUTTON_1:
         return Button::Left;
@@ -97,6 +97,15 @@ Mouse::ButtonState Mouse::getButtonState(const Window& window, const Button butt
     default:
         return ButtonState::Released;
     }
+}
+
+Vector2D Mouse::getMousePosition(const Window& window) {
+    auto* win = static_cast<GLFWwindow*>(window.getContext().m_handle);
+    Vector2D ret;
+
+    glfwGetCursorPos(win, &ret.x, &ret.y);
+
+    return ret;
 }
 
 bool Mouse::isRawInputSupported() {
