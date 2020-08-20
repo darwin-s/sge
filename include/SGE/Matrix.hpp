@@ -16,6 +16,8 @@
 #define SGE_MATRIX_HPP
 
 #include <SGE/Export.hpp>
+#include <SGE/Vector2.hpp>
+#include <SGE/Rectangle.hpp>
 
 namespace sge {
 /**
@@ -66,6 +68,14 @@ public:
      */
     [[nodiscard]] const float* getData() const;
 
+    /**
+     * \brief Get inverse matrix
+     *
+     *
+     * Get the inverted version of the matrix.
+     * \return Inverse matrix
+     */
+    [[nodiscard]] Matrix getInverse() const;
 
     /**
      * \brief Matrix multiplication
@@ -77,6 +87,26 @@ public:
      */
     Matrix operator*(const Matrix& other) const;
 
+    /**
+     * \brief Matrix multiplication
+     *
+     *
+     * Multiply the matrix with a vector and get the result.
+     * \param vec Vector to transform
+     * \return Resulting vector
+     */
+    Vector2F operator*(const Vector2F& vec) const;
+
+    /**
+     * \brief Matrix multiplication
+     *
+     *
+     * Multiply the matrix with a rectangle and get the resulting axis aligned bounding box
+     * of the transformed rectangle.
+     * \param rect Rectangle to transform
+     * \return Resulting bounding box
+     */
+    RectangleFloat operator*(const RectangleFloat& rect) const;
 
     /**
      * \brief Matrix multiplication
@@ -87,7 +117,6 @@ public:
      * \return *this
      */
     Matrix& operator*=(const Matrix& other);
-
 
     /**
      * \brief Matrix comparison
