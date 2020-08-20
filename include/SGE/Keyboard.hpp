@@ -184,7 +184,7 @@ public:
      * \param keyCode The internal code of the key
      * \return Key type
      */
-    static Key getKeyFromInternal(int keyCode);
+    [[nodiscard]] static Key getKeyFromInternal(int keyCode);
 
     /**
      * \brief Get the internal representation of a key
@@ -194,7 +194,7 @@ public:
      * \param key Keyboard::Key type
      * \return Integer used to represent the key
      */
-    static int getCodeFromKey(Key key);
+    [[nodiscard]] static int getCodeFromKey(Key key);
 
     /**
      * \brief Get key scancode
@@ -204,7 +204,7 @@ public:
      * \param key Keyboard::Key type
      * \return Scancode of the key
      */
-    static int getKeyScancode(Key key);
+    [[nodiscard]] static int getKeyScancode(Key key);
 
     /**
      * \brief Get key name
@@ -215,7 +215,7 @@ public:
      * \param key Keyboard::Key type
      * \return String containing the key name
      */
-    static std::string getKeyName(Key key);
+    [[nodiscard]] static std::string getKeyName(Key key);
 
     /**
      * \brief Get key name
@@ -226,7 +226,7 @@ public:
      * \param scancode Key scancode
      * \return String containing the key name
      */
-    static std::string getKeyName(int scancode);
+    [[nodiscard]] static std::string getKeyName(int scancode);
 
     /**
      * \brief Get key state
@@ -237,7 +237,7 @@ public:
      * \param key The Keyboard::Key type
      * \return State of the key
      */
-    static KeyState getKeyState(const Window& window, Key key);
+    [[nodiscard]] static KeyState getKeyState(const Window& window, Key key);
 };
 }
 
