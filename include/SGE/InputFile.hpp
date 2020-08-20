@@ -144,7 +144,7 @@ public:
      * \throws std::runtime_error
      * \param seekPosition Position to seek to.
      */
-    [[nodiscard]] void seekg(std::size_t seekPosition);
+    void seekg(std::size_t seekPosition);
 
     /**
      * \brief Close file
