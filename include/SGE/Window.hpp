@@ -347,7 +347,7 @@ public:
      * Returns the current window framebuffer size.
      * \return 2D vector with the size of the framebuffer in pixels
      */
-    [[nodiscard]] Vector2I getFramebufferSize() const;
+    [[nodiscard]] Vector2U getFramebufferSize() const;
 
     /**
      * \brief Get window DPI scale

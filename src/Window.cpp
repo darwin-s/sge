@@ -257,13 +257,13 @@ Vector2I Window::getSize() const {
     return ret;
 }
 
-Vector2I Window::getFramebufferSize() const {
+Vector2U Window::getFramebufferSize() const {
     auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2I ret;
 
     glfwGetFramebufferSize(win, &ret.x, &ret.y);
 
-    return ret;
+    return Vector2U(ret);
 }
 
 Vector2F Window::getContentScale() const {
@@ -313,7 +313,7 @@ void Window::framebufferResizeCallback(void* window, const int width, const int 
     auto* handle = static_cast<GLFWwindow*>(window);
     auto* win = static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-    win->m_eventHandler->windowFramebufferResizeEvent(Vector2I(width, height));
+    win->m_eventHandler->windowFramebufferResizeEvent(Vector2U(width, height));
 }
 
 void Window::contentScaleCallback(void* window, const float xScale, const float yScale) {

@@ -60,7 +60,7 @@ public:
      * This event is called when the window's framebuffer is resized.
      * \param size The new size of the framebuffer in pixels
      */
-    virtual void windowFramebufferResizeEvent(const Vector2I& size);
+    virtual void windowFramebufferResizeEvent(const Vector2U& size);
 
     /**
      * \brief Handle DPI scale change

@@ -21,7 +21,7 @@ void EventHandler::windowCloseEvent() {
 void EventHandler::windowResizeEvent(const Vector2I& size) {
 }
 
-void EventHandler::windowFramebufferResizeEvent(const Vector2I& size) {
+void EventHandler::windowFramebufferResizeEvent(const Vector2U& size) {
 }
 
 void EventHandler::windowContentScaleEvent(const Vector2F& scale) {
