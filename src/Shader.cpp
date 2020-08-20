@@ -114,6 +114,10 @@ void Shader::use() const {
     glUseProgram(m_id);
 }
 
+bool Shader::hasUniform(const std::string_view name) {
+    return glGetUniformLocation(m_id, name.data()) != -1;
+}
+
 void Shader::setUniform(const std::string_view name, const Matrix& mat) {
     glProgramUniformMatrix4fv(m_id, glGetUniformLocation(m_id, name.data()), 1, GL_FALSE, mat.getData());
 }

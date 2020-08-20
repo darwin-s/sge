@@ -127,6 +127,17 @@ public:
      */
     void use() const;
 
+
+    /**
+     * \brief Shader has uniform
+     *
+     *
+     * Returns whether the shader contains a uniform,
+     * \param name Uniform name
+     * \return true if shader contains uniform, false otherwise
+     */
+    [[nodiscard]] bool hasUniform(std::string_view name);
+
     /**
      * \brief Set shader uniform
      *
