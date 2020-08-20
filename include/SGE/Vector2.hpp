@@ -26,9 +26,10 @@ namespace sge {
  * can be referred to by different names (x, r or u for the first element and y, g or v for the second one).
  * This class allows basic operations on vectors (addition, subtraction, scalar multiplication, etc.) The
  * most commonly used specializations are already typedeffed:
- * \li typedef Vector2<int> Vector2I;
- * \li typedef Vector2<float> Vector2F;
- * \li typedef Vector2<double> Vector2D;
+ * \li using Vector2I = Vector2<int>;
+ * \li using Vector2F = Vector2<float>;
+ * \li using Vector2D = Vector2<double>;
+ * \li using Vector2U = Vector2<unsigned int>;
  * \tparam T Underlying type of components
  *
  * Usage example:
@@ -180,9 +181,10 @@ public:
 
 #include <SGE/Vector2.inl>
 
-typedef Vector2<int> Vector2I;
-typedef Vector2<float> Vector2F;
-typedef Vector2<double> Vector2D;
+using Vector2I = Vector2<int>;
+using Vector2F = Vector2<float>;
+using Vector2D = Vector2<double>;
+using Vector2U = Vector2<unsigned int>;
 }
 
 #endif//SGE_VECTOR2_HPP
