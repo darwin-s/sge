@@ -16,10 +16,12 @@
 #define SGE_RENDERSTATE_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Shader.hpp>
-#include <SGE/Transformable.hpp>
+#include <SGE/Matrix.hpp>
 
 namespace sge {
+class Shader;
+class Texture;
+
 /**
  * \brief Render state
  *
@@ -41,10 +43,17 @@ public:
      */
     explicit RenderState(const Matrix& transform);
 
+    /**
+     * \brief Construct render state
+     * \param texture Texture to be used for rendering
+     */
+    explicit RenderState(Texture* texture);
+
     static RenderState defaultState; ///< Default rendering state
 
     Shader* shader;
     Matrix transform;
+    Texture* texture;
 };
 }
 

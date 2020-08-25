@@ -43,5 +43,6 @@
 #include <SGE/Matrix.hpp>
 #include <SGE/Transformable.hpp>
 #include <SGE/Camera.hpp>
+#include <SGE/Texture.hpp>
 
 #endif//SGE_SGE_HPP
