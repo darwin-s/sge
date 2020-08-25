@@ -37,7 +37,7 @@ Image::Image(const std::size_t size, const void* data) : m_data(nullptr), m_chan
 
 Image::Image(Image&& other) noexcept : m_data(other.m_data), m_size(other.m_size), m_channels(other.m_channels) {
     other.m_data = nullptr;
-    other.m_size = Vector2I(0, 0);
+    other.m_size = Vector2U(0, 0);
     other.m_channels = 0;
 }
 
@@ -54,7 +54,7 @@ Image& Image::operator=(Image&& other) noexcept {
     m_channels = other.m_channels;
 
     other.m_data = nullptr;
-    other.m_size = Vector2I(0, 0);
+    other.m_size = Vector2U(0, 0);
     other.m_channels = 0;
 
     return *this;
@@ -75,9 +75,16 @@ bool Image::loadFromMemory(const std::size_t size, const void* data) {
     }
 
     stbi_set_flip_vertically_on_load(true);
-
-    m_data = stbi_load_from_memory(static_cast<const stbi_uc*>(data), size, &m_size.x, &m_size.y, &m_channels,
+    int x, y;
+    m_data = stbi_load_from_memory(static_cast<const stbi_uc*>(data), size, &x, &y, &m_channels,
                                    STBI_rgb_alpha);
+
+    if (x < 0 || y < 0) {
+        return false;
+    }
+
+    m_size.x = static_cast<unsigned int>(x);
+    m_size.y = static_cast<unsigned int>(y);
 
     return m_data != nullptr;
 }
@@ -86,7 +93,7 @@ unsigned char* Image::getPixelData() const {
     return m_data;
 }
 
-const Vector2I& Image::getSize() const {
+const Vector2U& Image::getSize() const {
     return m_size;
 }
 

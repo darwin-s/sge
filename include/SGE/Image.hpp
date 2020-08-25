@@ -141,7 +141,7 @@ public:
      * Returns the size in pixels of the image.
      * \returns Vector containing the image's size
      */
-    const Vector2I& getSize() const;
+    const Vector2U& getSize() const;
 
     /**
      * \brief Get number of channels
@@ -154,7 +154,7 @@ public:
 
 private:
     unsigned char* m_data;
-    Vector2I m_size;
+    Vector2U m_size;
     int m_channels;
 };
 }
