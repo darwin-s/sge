@@ -15,6 +15,7 @@
 #include <SGE/RenderTarget.hpp>
 #include <SGE/Drawable.hpp>
 #include <SGE/VAO.hpp>
+#include <SGE/Shader.hpp>
 #include <cmath>
 #include <glad.h>
 
