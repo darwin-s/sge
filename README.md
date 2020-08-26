@@ -2,7 +2,7 @@
 
 SGE or Sauce Game Engine is a small hobbyist 2D game engine written in C++.
 It's main goal is for me to improve my skills, be a part of my portfolio and maybe become a small reference for those starting out.
-SGE officially supports only 64-bit machines, with OpenGL 4.6 support. It is based on C++17 standart, and requires a compiler that supports it.
+SGE officially supports only 64-bit machines, with OpenGL 4.6 support. It is based on C++17 standard, and requires a compiler that supports it.
 
 ## Authors
 
@@ -11,7 +11,7 @@ SGE officially supports only 64-bit machines, with OpenGL 4.6 support. It is bas
 ## Installation
 
 Use CMake to build and install the library. 
-If you downloaded the source in a folder named "sge" then and 
+If you downloaded the source in a folder named "sge" and 
 you want to build a release build, then the installation will
 look like this:
 
