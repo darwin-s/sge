@@ -49,7 +49,8 @@ public:
      * \param title Title of the window
      * \param contextSettings Settings for the underlying context
      */
-    explicit RenderWindow(std::string_view title, ContextSettings contextSettings = ContextSettings());
+    explicit RenderWindow(std::string_view title,
+                          ContextSettings contextSettings = ContextSettings());
 
     /**
      * \brief Create render window
@@ -61,7 +62,9 @@ public:
      * \param size Size of the window
      * \param contextSettings Settings for the underlying context
      */
-    RenderWindow(std::string_view title, Vector2I size, ContextSettings contextSettings = ContextSettings());
+    RenderWindow(std::string_view title,
+                 Vector2I size,
+                 ContextSettings contextSettings = ContextSettings());
 
     /**
      * \brief Create render window
@@ -74,8 +77,10 @@ public:
      * \param monitor Monitor on which to make the window fullscreen
      * \param contextSettings Settings for the underlying context
      */
-    RenderWindow(std::string_view title, Monitor::VideoMode videoMode, const Monitor& monitor,
-        ContextSettings contextSettings = ContextSettings());
+    RenderWindow(std::string_view title,
+                 Monitor::VideoMode videoMode,
+                 const Monitor& monitor,
+                 ContextSettings contextSettings = ContextSettings());
 
     Context& getRenderingContext() override;
 

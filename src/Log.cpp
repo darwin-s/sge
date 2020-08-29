@@ -25,7 +25,7 @@ std::tm getLocalTime() {
     std::tm t{};
 
     const auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::system_clock::to_time_t(now);
+    auto time      = std::chrono::system_clock::to_time_t(now);
 
 #ifdef SGE_UNIX
     localtime_r(&time, &t);
@@ -71,7 +71,8 @@ std::mutex Log::generalMutex;
 Log::Log() : m_mt(MessageType::Info), m_writeTime(false) {
 }
 
-Log::Log(const std::filesystem::path& file) : m_mt(MessageType::Info), m_writeTime(true) {
+Log::Log(const std::filesystem::path& file)
+    : m_mt(MessageType::Info), m_writeTime(true) {
     if (!open(file)) {
         throw std::runtime_error("Failed to open log");
     }
@@ -81,12 +82,13 @@ Log::~Log() {
     close();
 }
 
-Log::Log(Log&& other) noexcept : m_mt(other.m_mt), m_writeTime(other.m_writeTime) {
+Log::Log(Log&& other) noexcept
+    : m_mt(other.m_mt), m_writeTime(other.m_writeTime) {
     m_log = std::move(other.m_log);
 }
 
 Log& Log::operator=(Log&& other) noexcept {
-    m_mt = other.m_mt;
+    m_mt        = other.m_mt;
     m_writeTime = other.m_writeTime;
 
     m_log = std::move(other.m_log);
@@ -105,8 +107,9 @@ Log& Log::operator<<(const bool b) {
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -125,8 +128,9 @@ Log& Log::operator<<(const signed int i) {
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -141,8 +145,9 @@ Log& Log::operator<<(const unsigned int i) {
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -157,8 +162,9 @@ Log& Log::operator<<(const float f) {
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -173,8 +179,9 @@ Log& Log::operator<<(const double d) {
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -189,8 +196,9 @@ Log& Log::operator<<(const std::string_view s) {
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -208,13 +216,15 @@ Log& Log::operator<<(const char* s) {
     }
 
     if (!isStringSafe(s)) {
-        throw std::invalid_argument("C-style string longer than 256 characters");
+        throw std::invalid_argument(
+            "C-style string longer than 256 characters");
     }
 
     if (m_writeTime) {
         const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
-              << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
         m_writeTime = false;
     }
@@ -245,8 +255,9 @@ bool Log::open(const std::filesystem::path& file) {
     m_writeTime = true;
 
     const auto t = getLocalTime();
-    m_log << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour << ":"
-          << t.tm_min << ":" << t.tm_sec << std::endl;
+    m_log << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/"
+          << t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":"
+          << t.tm_sec << std::endl;
 
     return m_log.is_open();
 }
@@ -265,11 +276,12 @@ void Log::close() {
     }
 
     m_writeTime = true;
-    m_mt = MessageType::Info;
+    m_mt        = MessageType::Info;
 
     const auto t = getLocalTime();
-    m_log << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour << ":"
-          << t.tm_min << ":" << t.tm_sec << std::endl;
+    m_log << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/"
+          << t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":"
+          << t.tm_sec << std::endl;
 
     m_log.close();
 }

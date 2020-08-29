@@ -64,7 +64,8 @@ void errorCallback(const int code, const char* message) {
 
     {
         std::scoped_lock l(sge::Log::generalMutex);
-        sge::Log::general << sge::Log::MessageType::Error << msg << sge::Log::Operation::Endl;
+        sge::Log::general << sge::Log::MessageType::Error << msg
+                          << sge::Log::Operation::Endl;
     }
 
     throw std::runtime_error(msg);
@@ -82,7 +83,8 @@ void monitorCallback(GLFWmonitor* monitor, const int event) {
 
     {
         std::scoped_lock l(sge::Log::generalMutex);
-        sge::Log::general << sge::Log::MessageType::Info << msg << sge::Log::Operation::Endl;
+        sge::Log::general << sge::Log::MessageType::Info << msg
+                          << sge::Log::Operation::Endl;
     }
 }
 }

@@ -15,17 +15,24 @@
 #include <SGE/RenderWindow.hpp>
 
 namespace sge {
-RenderWindow::RenderWindow(const ContextSettings contextSettings) : Window(contextSettings) {
+RenderWindow::RenderWindow(const ContextSettings contextSettings)
+    : Window(contextSettings) {
 }
 
-RenderWindow::RenderWindow(const std::string_view title, const ContextSettings contextSettings) : Window(title, contextSettings) {
+RenderWindow::RenderWindow(const std::string_view title,
+                           const ContextSettings contextSettings)
+    : Window(title, contextSettings) {
 }
 
-RenderWindow::RenderWindow(const std::string_view title, const Vector2I size, const ContextSettings contextSettings)
+RenderWindow::RenderWindow(const std::string_view title,
+                           const Vector2I size,
+                           const ContextSettings contextSettings)
     : Window(title, size, contextSettings) {
 }
 
-RenderWindow::RenderWindow(const std::string_view title, const Monitor::VideoMode videoMode, const Monitor& monitor,
+RenderWindow::RenderWindow(const std::string_view title,
+                           const Monitor::VideoMode videoMode,
+                           const Monitor& monitor,
                            const ContextSettings contextSettings)
     : Window(title, videoMode, monitor, contextSettings) {
 }
@@ -37,5 +44,5 @@ Context& RenderWindow::getRenderingContext() {
 Vector2U RenderWindow::getPhysicalSize() const {
     return getFramebufferSize();
 }
-
 }
+

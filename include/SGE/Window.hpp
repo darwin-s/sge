@@ -60,7 +60,8 @@ public:
      * \param title Title of the window
      * \param contextSettings Settings for the underlying context
      */
-    explicit Window(std::string_view title, const ContextSettings& contextSettings = ContextSettings());
+    explicit Window(std::string_view title,
+                    const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create window
@@ -72,7 +73,9 @@ public:
      * \param size Size of the window
      * \param contextSettings Settings for the underlying context
      */
-    Window(std::string_view title, const Vector2I& size, const ContextSettings& contextSettings = ContextSettings());
+    Window(std::string_view title,
+           const Vector2I& size,
+           const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create window
@@ -85,9 +88,11 @@ public:
      * \param monitor Monitor on which to make the window fullscreen
      * \param contextSettings Settings for the underlying context
      */
-    Window(std::string_view title, const Monitor::VideoMode& videoMode, const Monitor& monitor,
+    Window(std::string_view title,
+           const Monitor::VideoMode& videoMode,
+           const Monitor& monitor,
            const ContextSettings& contextSettings = ContextSettings());
-    Window(const Window&) = delete;
+    Window(const Window&)     = delete;
     Window(Window&&) noexcept = delete;
     Window& operator=(const Window&) = delete;
     Window& operator=(Window&&) noexcept = delete;
@@ -197,7 +202,8 @@ public:
      * \param videoMode Video mode to be set
      * \param monitor Monitor on which the window will be fullscreen
      */
-    void enableFullscreen(const Monitor::VideoMode& videoMode, const Monitor& monitor);
+    void enableFullscreen(const Monitor::VideoMode& videoMode,
+                          const Monitor& monitor);
 
     /**
      * \brief Disable fullscreen window
@@ -362,19 +368,26 @@ private:
     SGE_PRIVATE void setCallbacks();
     static SGE_PRIVATE void closeCallback(void* window);
     static SGE_PRIVATE void resizeCallback(void* window, int width, int height);
-    static SGE_PRIVATE void framebufferResizeCallback(void* window, int width, int height);
-    static SGE_PRIVATE void contentScaleCallback(void* window, float xScale, float yScale);
+    static SGE_PRIVATE void
+    framebufferResizeCallback(void* window, int width, int height);
+    static SGE_PRIVATE void
+    contentScaleCallback(void* window, float xScale, float yScale);
     static SGE_PRIVATE void positionCallback(void* window, int xPos, int yPos);
     static SGE_PRIVATE void minimizeCallback(void* window, int minimized);
     static SGE_PRIVATE void maximizeCallback(void* window, int maximized);
     static SGE_PRIVATE void focusCallback(void* window, int focused);
     static SGE_PRIVATE void refreshCallback(void* window);
-    static SGE_PRIVATE void keyboardCallback(void* window, int key, int scancode, int action, int mods);
-    static SGE_PRIVATE void textInputCallback(void* window, unsigned int codePoint);
-    static SGE_PRIVATE void cursorPositionCallback(void* window, double xPos, double yPos);
+    static SGE_PRIVATE void
+    keyboardCallback(void* window, int key, int scancode, int action, int mods);
+    static SGE_PRIVATE void textInputCallback(void* window,
+                                              unsigned int codePoint);
+    static SGE_PRIVATE void
+    cursorPositionCallback(void* window, double xPos, double yPos);
     static SGE_PRIVATE void cursorEnterCallback(void* window, int entered);
-    static SGE_PRIVATE void mouseButtonCallback(void* window, int button, int action, int mods);
-    static SGE_PRIVATE void scrollCallback(void* window, double xOffset, double yOffset);
+    static SGE_PRIVATE void
+    mouseButtonCallback(void* window, int button, int action, int mods);
+    static SGE_PRIVATE void
+    scrollCallback(void* window, double xOffset, double yOffset);
 
     Context m_context;
     EventHandler* m_eventHandler;

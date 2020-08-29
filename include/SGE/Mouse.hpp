@@ -108,7 +108,8 @@ public:
      * \param button The Mouse::Button type
      * \return State of the mouse button
      */
-    [[nodiscard]] static ButtonState getButtonState(const Window& window, Button button);
+    [[nodiscard]] static ButtonState getButtonState(const Window& window,
+                                                    Button button);
 
     /**
      * \brief Get mouse position

@@ -462,7 +462,7 @@ std::string Keyboard::getKeyName(const int scancode) {
 }
 
 Keyboard::KeyState Keyboard::getKeyState(const Window& window, const Key key) {
-    auto* win = static_cast<GLFWwindow*>(window.getContext().m_handle);
+    auto* win        = static_cast<GLFWwindow*>(window.getContext().m_handle);
     const auto state = glfwGetKey(win, getCodeFromKey(key));
 
     switch (state) {

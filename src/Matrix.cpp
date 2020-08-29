@@ -38,9 +38,9 @@ const float* Matrix::getData() const {
 }
 
 Matrix Matrix::getInverse() const {
-    const auto det = m_mat[0] * (m_mat[15] * m_mat[5] - m_mat[7] * m_mat[13]) -
-                     m_mat[1] * (m_mat[15] * m_mat[4] - m_mat[7] * m_mat[12]) +
-                     m_mat[3] * (m_mat[13] * m_mat[4] - m_mat[5] * m_mat[12]);
+    const auto det = m_mat[0] * (m_mat[15] * m_mat[5] - m_mat[7] * m_mat[13])
+        - m_mat[1] * (m_mat[15] * m_mat[4] - m_mat[7] * m_mat[12])
+        + m_mat[3] * (m_mat[13] * m_mat[4] - m_mat[5] * m_mat[12]);
 
     if (det != 0.f) {
         return Matrix( (m_mat[15] * m_mat[5] - m_mat[7] * m_mat[13]) / det,
@@ -57,8 +57,7 @@ Matrix Matrix::getInverse() const {
     return identity;
 }
 
-
-Matrix Matrix::operator*(const Matrix& other) const{
+Matrix Matrix::operator*(const Matrix& other) const {
     const auto* a = static_cast<const float*>(m_mat);
     const auto* b = static_cast<const float*>(other.m_mat);
 
@@ -81,17 +80,23 @@ Vector2F Matrix::operator*(const Vector2F& vec) const {
 RectangleFloat Matrix::operator*(const RectangleFloat& rect) const {
     // First create a transformed rectangle out of the source one
     const Vector2F points[] = {
-        *this * Vector2F(rect.left, rect.top), // Top left corner
-        *this * Vector2F(rect.left + rect.width, rect.top), // Top right corner
-        *this * Vector2F(rect.left + rect.width, rect.top - rect.height), // Bottom right corner
-        *this * Vector2F(rect.left, rect.top - rect.height) // Bottom left corner
+        *this * Vector2F(rect.left, rect.top),             // Top left corner
+        *this * Vector2F(rect.left + rect.width, rect.top),// Top right corner
+        *this
+            * Vector2F(rect.left + rect.width,
+                       rect.top - rect.height),// Bottom right corner
+        *this * Vector2F(rect.left, rect.top - rect.height)// Bottom left corner
     };
 
     // Now compute the extremes of the transformed rectangle
-    const auto minX = std::min({points[0].x, points[1].x, points[2].x, points[3].x}); // Left
-    const auto maxX = std::max({points[0].x, points[1].x, points[2].x, points[3].x}); // Right
-    const auto minY = std::min({points[0].y, points[1].y, points[2].y, points[3].y}); // Bottom
-    const auto maxY = std::max({points[0].y, points[1].y, points[2].y, points[3].y}); // Top
+    const auto minX =
+        std::min({points[0].x, points[1].x, points[2].x, points[3].x});// Left
+    const auto maxX =
+        std::max({points[0].x, points[1].x, points[2].x, points[3].x});// Right
+    const auto minY =
+        std::min({points[0].y, points[1].y, points[2].y, points[3].y});// Bottom
+    const auto maxY =
+        std::max({points[0].y, points[1].y, points[2].y, points[3].y});// Top
 
     return RectangleFloat(minX, maxY, maxX - minX, maxY - minY);
 }

@@ -73,11 +73,13 @@ public:
      * \param id id of the resource
      * \return Shared pointer to the resource, ot nullptr if it doesn't exist
      */
-    template<typename T>
-    std::shared_ptr<T> getResource(std::uint64_t id);
+    template<typename T> std::shared_ptr<T> getResource(std::uint64_t id);
+
 private:
     ResourceManager() = default;
-    SGE_PRIVATE void loadResource(std::shared_ptr<Resource> r, const std::filesystem::path& path, std::uint64_t hash);
+    SGE_PRIVATE void loadResource(std::shared_ptr<Resource> r,
+                                  const std::filesystem::path& path,
+                                  std::uint64_t hash);
     std::unordered_map<std::uint64_t, std::weak_ptr<Resource>> m_map;
 };
 

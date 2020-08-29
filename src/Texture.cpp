@@ -24,29 +24,29 @@
 
 namespace sge {
 Texture::Texture()
-    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder), m_filterMode(FilterMode::Nearest),
-      m_hasMipmaps(false) {  
+    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
+      m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
 }
 
 Texture::Texture(const std::filesystem::path& file)
-    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder), m_filterMode(FilterMode::Nearest),
-      m_hasMipmaps(false) {
+    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
+      m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
     if (!loadFromFile(file)) {
         throw std::runtime_error("Failed to load texture");
     }
 }
 
 Texture::Texture(const std::size_t size, const void* data)
-    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder), m_filterMode(FilterMode::Nearest),
-      m_hasMipmaps(false) {
+    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
+      m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
     if (loadFromMemory(size, data)) {
         throw std::runtime_error("Failed to load texture");
     }
 }
 
 Texture::Texture(const Image& image)
-    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder), m_filterMode(FilterMode::Nearest),
-      m_hasMipmaps(false) {
+    : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
+      m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
     if (loadFromImage(image)) {
         throw std::runtime_error("Failed to load texture");
     }
@@ -77,8 +77,12 @@ bool Texture::loadFromMemory(const std::size_t size, const void* data) {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
     stbi_set_flip_vertically_on_load(true);
     int w, h, c;
-    auto* imageData = stbi_load_from_memory(static_cast<const stbi_uc*>(data), size, &w, &h, &c, 
-                                     STBI_rgb_alpha);
+    auto* imageData = stbi_load_from_memory(static_cast<const stbi_uc*>(data),
+                                            size,
+                                            &w,
+                                            &h,
+                                            &c,
+                                            STBI_rgb_alpha);
     if (imageData == nullptr || c < 4 || w == 0 || h == 0) {
         if (imageData != nullptr) {
             stbi_image_free(imageData);
@@ -93,7 +97,15 @@ bool Texture::loadFromMemory(const std::size_t size, const void* data) {
     const GLint texLevels = 1 + std::floor(std::log2(std::max(w, h)));
 
     glTextureStorage2D(m_id, texLevels, GL_RGBA8, m_size.x, m_size.y);
-    glTextureSubImage2D(m_id, 0, 0, 0, m_size.x, m_size.y, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+    glTextureSubImage2D(m_id,
+                        0,
+                        0,
+                        0,
+                        m_size.x,
+                        m_size.y,
+                        GL_RGBA,
+                        GL_UNSIGNED_BYTE,
+                        imageData);
 
     stbi_image_free(imageData);
 
@@ -119,9 +131,18 @@ bool Texture::loadFromImage(const Image& image) {
 
     m_size = image.getSize();
 
-    const GLint texLevels = 1 + std::floor(std::log2(std::max(m_size.x, m_size.y)));
+    const GLint texLevels =
+        1 + std::floor(std::log2(std::max(m_size.x, m_size.y)));
     glTextureStorage2D(m_id, texLevels, GL_RGBA8, m_size.x, m_size.y);
-    glTextureSubImage2D(m_id, 0, 0, 0, m_size.x, m_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelData());
+    glTextureSubImage2D(m_id,
+                        0,
+                        0,
+                        0,
+                        m_size.x,
+                        m_size.y,
+                        GL_RGBA,
+                        GL_UNSIGNED_BYTE,
+                        image.getPixelData());
 
     return true;
 }
@@ -177,7 +198,8 @@ void Texture::setFilterMode(const FilterMode mode) {
     if (!m_hasMipmaps) {
         if (m == GL_NEAREST_MIPMAP_NEAREST || m == GL_LINEAR_MIPMAP_NEAREST) {
             m = GL_NEAREST;
-        } else if (m == GL_NEAREST_MIPMAP_LINEAR || m == GL_LINEAR_MIPMAP_LINEAR) {
+        } else if (m == GL_NEAREST_MIPMAP_LINEAR
+                   || m == GL_LINEAR_MIPMAP_LINEAR) {
             m = GL_LINEAR;
         }
     }

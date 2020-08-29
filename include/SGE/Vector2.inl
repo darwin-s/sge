@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-template<typename T> Vector2<T>::Vector2() : x(static_cast<T>(0)), y(static_cast<T>(0)) {
+template<typename T>
+Vector2<T>::Vector2() : x(static_cast<T>(0)), y(static_cast<T>(0)) {
 }
 
 template<typename T> Vector2<T>::Vector2(T x, T y) : x(x), y(y) {
@@ -20,18 +21,21 @@ template<typename T> Vector2<T>::Vector2(T x, T y) : x(x), y(y) {
 
 template<typename T>
 template<typename U>
-Vector2<T>::Vector2(const Vector2<U>& vec) : x(static_cast<T>(vec.x)), y(static_cast<T>(vec.y)) {
+Vector2<T>::Vector2(const Vector2<U>& vec)
+    : x(static_cast<T>(vec.x)), y(static_cast<T>(vec.y)) {
 }
 
 template<typename T> Vector2<T> Vector2<T>::operator-() const {
     return Vector2<T>(-x, -y);
 }
 
-template<typename T> Vector2<T> Vector2<T>::operator+(const Vector2<T>& other) const {
+template<typename T>
+Vector2<T> Vector2<T>::operator+(const Vector2<T>& other) const {
     return Vector2<T>(x + other.x, y + other.y);
 }
 
-template<typename T> Vector2<T> Vector2<T>::operator-(const Vector2<T>& other) const {
+template<typename T>
+Vector2<T> Vector2<T>::operator-(const Vector2<T>& other) const {
     return Vector2<T>(x - other.x, y - other.y);
 }
 
@@ -39,13 +43,15 @@ template<typename T> Vector2<T> Vector2<T>::operator*(T value) const {
     return Vector2<T>(x * value, y * value);
 }
 
-template<typename T> Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other) {
+template<typename T>
+Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other) {
     x = x + other.x;
     y = y + other.y;
     return *this;
 }
 
-template<typename T> Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other) {
+template<typename T>
+Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other) {
     x = x - other.x;
     y = y - other.y;
     return *this;
@@ -57,7 +63,8 @@ template<typename T> Vector2<T>& Vector2<T>::operator*=(T value) {
     return *this;
 }
 
-template<typename T> T Vector2<T>::dot(const Vector2<T>& first, const Vector2<T>& second) {
+template<typename T>
+T Vector2<T>::dot(const Vector2<T>& first, const Vector2<T>& second) {
     return first.x * second.x + first.y * second.y;
 }
 

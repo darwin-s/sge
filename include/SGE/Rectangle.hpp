@@ -136,15 +136,15 @@ public:
      */
     bool operator!=(const Rectangle<T>& other) const;
 
-    T left; ///< Left coordinate
-    T top; ///< Top coordinate
+    T left;  ///< Left coordinate
+    T top;   ///< Top coordinate
     T width; ///< Width of rectangle
-    T height; ///< Height of rectangle
+    T height;///< Height of rectangle
 };
 
 #include <SGE/Rectangle.inl>
 
-using RectangleInt = Rectangle<int>;
+using RectangleInt   = Rectangle<int>;
 using RectangleFloat = Rectangle<float>;
 }
 

@@ -99,7 +99,8 @@ public:
      * \param cam Camera used to reference the view
      * \return Pixel coordinates
      */
-    Vector2I coordinatesToPixel(const Vector2F& coordinate, const Camera& cam) const;
+    Vector2I coordinatesToPixel(const Vector2F& coordinate,
+                                const Camera& cam) const;
 
     /**
      * \brief Clear the framebuffer
@@ -112,7 +113,8 @@ public:
      * \param drawable Reference to drawable object
      * \param renderState Rendering state
      */
-    void draw(const Drawable& drawable, const RenderState& renderState = RenderState::defaultState);
+    void draw(const Drawable& drawable,
+              const RenderState& renderState = RenderState::defaultState);
 
     /**
      * \brief Draw triangles
@@ -121,10 +123,13 @@ public:
      * \param vertexCount Number of vertices
      * \param renderState Current rendering state
      */
-    void drawTriangles(const VAO& vao, std::size_t firstVertex, std::size_t vertexCount,
-                       const RenderState& renderState = RenderState::defaultState);
+    void
+    drawTriangles(const VAO& vao,
+                  std::size_t firstVertex,
+                  std::size_t vertexCount,
+                  const RenderState& renderState = RenderState::defaultState);
 
-    static const Camera defaultCamera; ///< Default camera for render targets
+    static const Camera defaultCamera;///< Default camera for render targets
 
 private:
     bool m_cameraChanged;

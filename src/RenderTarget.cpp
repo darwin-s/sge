@@ -26,7 +26,7 @@ RenderTarget::RenderTarget() : m_cameraChanged(true) {
 }
 
 void RenderTarget::setCamera(const Camera& camera) {
-    m_camera = camera;
+    m_camera        = camera;
     m_cameraChanged = true;
 }
 
@@ -35,36 +35,46 @@ const Camera& RenderTarget::getCamera() const {
 }
 
 RectangleInt RenderTarget::getViewport(const Camera& cam) const {
-    const auto width = static_cast<float>(getPhysicalSize().x);
+    const auto width  = static_cast<float>(getPhysicalSize().x);
     const auto height = static_cast<float>(getPhysicalSize().y);
-    const auto& rect = cam.getViewport();
+    const auto& rect  = cam.getViewport();
 
-    return RectangleInt(static_cast<int>(std::round(width * rect.left)), static_cast<int>(std::round(height * rect.top)),
-                        static_cast<int>(std::round(width * rect.width)), static_cast<int>(std::round(height * rect.height)));
+    return RectangleInt(static_cast<int>(std::round(width * rect.left)),
+                        static_cast<int>(std::round(height * rect.top)),
+                        static_cast<int>(std::round(width * rect.width)),
+                        static_cast<int>(std::round(height * rect.height)));
 }
 
-Vector2F RenderTarget::pixelToCoordinates(const Vector2I& pixel, const Camera& cam) const {
+Vector2F RenderTarget::pixelToCoordinates(const Vector2I& pixel,
+                                          const Camera& cam) const {
     const auto viewport = getViewport(cam);
-    const Vector2F normalized(-1.0f + 2.0f * (pixel.x - viewport.left) / viewport.width,
-                               1.0f - 2.0f * (pixel.y - viewport.top) / viewport.height);
+    const Vector2F normalized(
+        -1.0f + 2.0f * (pixel.x - viewport.left) / viewport.width,
+        1.0f - 2.0f * (pixel.y - viewport.top) / viewport.height);
 
     return cam.getInverseTransform() * normalized;
 }
 
-Vector2I RenderTarget::coordinatesToPixel(const Vector2F& coordinate, const Camera& cam) const {
+Vector2I RenderTarget::coordinatesToPixel(const Vector2F& coordinate,
+                                          const Camera& cam) const {
     const Vector2F normalized = cam.getTransform() * coordinate;
-    const auto viewport = getViewport(cam);
+    const auto viewport       = getViewport(cam);
 
-    return Vector2I(static_cast<int>((normalized.x + 1.0f) / 2.0f * viewport.width + viewport.left),
-                    static_cast<int>((normalized.y + 1.0f) / 2.0f * viewport.height + viewport.top));
+    return Vector2I(
+        static_cast<int>((normalized.x + 1.0f) / 2.0f * viewport.width
+                         + viewport.left),
+        static_cast<int>((normalized.y + 1.0f) / 2.0f * viewport.height
+                         + viewport.top));
 }
 
 void RenderTarget::clear(const Color& clearColor) {
     auto* active = Context::getCurrentContext();
 
     getRenderingContext().setCurrent(true);
-    glClearColor(static_cast<GLfloat>(clearColor.red) / 255, static_cast<GLfloat>(clearColor.green) / 255,
-                 static_cast<GLfloat>(clearColor.blue) / 255, static_cast<GLfloat>(clearColor.alpha) / 255);
+    glClearColor(static_cast<GLfloat>(clearColor.red) / 255,
+                 static_cast<GLfloat>(clearColor.green) / 255,
+                 static_cast<GLfloat>(clearColor.blue) / 255,
+                 static_cast<GLfloat>(clearColor.alpha) / 255);
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (active != nullptr) {
@@ -72,11 +82,14 @@ void RenderTarget::clear(const Color& clearColor) {
     }
 }
 
-void RenderTarget::draw(const Drawable& drawable, const RenderState& renderState) {
+void RenderTarget::draw(const Drawable& drawable,
+                        const RenderState& renderState) {
     drawable.draw(*this, renderState);
 }
 
-void RenderTarget::drawTriangles(const VAO& vao, const std::size_t firstVertex, const std::size_t vertexCount,
+void RenderTarget::drawTriangles(const VAO& vao,
+                                 const std::size_t firstVertex,
+                                 const std::size_t vertexCount,
                                  const RenderState& renderState) {
     auto* active = Context::getCurrentContext();
 
@@ -84,7 +97,7 @@ void RenderTarget::drawTriangles(const VAO& vao, const std::size_t firstVertex, 
 
     if (m_cameraChanged) {
         const auto view = getViewport(getCamera());
-        const auto top = getPhysicalSize().y - (view.top + view.height);
+        const auto top  = getPhysicalSize().y - (view.top + view.height);
 
         glViewport(view.left, top, view.width, view.height);
     }
@@ -92,7 +105,9 @@ void RenderTarget::drawTriangles(const VAO& vao, const std::size_t firstVertex, 
     if (renderState.shader != nullptr) {
         renderState.shader->use();
         if (renderState.shader->hasUniform("transform")) {
-            renderState.shader->setUniform("transform", renderState.transform * getCamera().getTransform());
+            renderState.shader->setUniform("transform",
+                                           renderState.transform
+                                               * getCamera().getTransform());
         }
     }
 

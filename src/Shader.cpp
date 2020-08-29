@@ -36,7 +36,7 @@ Shader::~Shader() {
 }
 
 Shader& Shader::operator=(Shader&& other) noexcept {
-    m_id = other.m_id;
+    m_id       = other.m_id;
     other.m_id = 0;
 
     return *this;
@@ -51,7 +51,9 @@ bool Shader::load(const std::filesystem::path& file, const Type type) const {
     return load(shaderSize, shaderData.data(), type);
 }
 
-bool Shader::load(const std::size_t size, const void* data, const Type type) const {
+bool Shader::load(const std::size_t size,
+                  const void* data,
+                  const Type type) const {
     assert(Context::getCurrentContext());
     GLuint shader;
     GLint success;
@@ -75,7 +77,9 @@ bool Shader::load(const std::size_t size, const void* data, const Type type) con
         glDeleteShader(shader);
 
         std::scoped_lock l(Log::generalMutex);
-        Log::general << Log::MessageType::Error << "Shader compilation error: " << log.data() << Log::Operation::Endl;
+        Log::general << Log::MessageType::Error
+                     << "Shader compilation error: " << log.data()
+                     << Log::Operation::Endl;
 
         return false;
     }
@@ -102,7 +106,9 @@ bool Shader::link() const {
         glDeleteProgram(m_id);
 
         std::scoped_lock l(Log::generalMutex);
-        Log::general << Log::MessageType::Error << "Shader compilation error: " << log.data() << Log::Operation::Endl;
+        Log::general << Log::MessageType::Error
+                     << "Shader compilation error: " << log.data()
+                     << Log::Operation::Endl;
 
         return false;
     }
@@ -119,7 +125,10 @@ bool Shader::hasUniform(const std::string_view name) {
 }
 
 void Shader::setUniform(const std::string_view name, const Matrix& mat) {
-    glProgramUniformMatrix4fv(m_id, glGetUniformLocation(m_id, name.data()), 1, GL_FALSE, mat.getData());
+    glProgramUniformMatrix4fv(m_id,
+                              glGetUniformLocation(m_id, name.data()),
+                              1,
+                              GL_FALSE,
+                              mat.getData());
 }
-
 }

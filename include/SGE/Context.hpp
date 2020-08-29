@@ -56,7 +56,7 @@ public:
      * Destroys the context object and also unbinds it from the current thread if it was active.
      */
     ~Context();
-    Context(const Context&) = delete;
+    Context(const Context&)     = delete;
     Context(Context&&) noexcept = delete;
     Context& operator=(const Context&) = delete;
     Context& operator=(Context&&) noexcept = delete;
@@ -89,7 +89,8 @@ public:
      * \param extensionName Name of the extension
      * \return true if the extension is supported and available, false otherwise
      */
-    [[nodiscard]] bool isExtensionAvailable(std::string_view extensionName) const;
+    [[nodiscard]] bool
+    isExtensionAvailable(std::string_view extensionName) const;
 
     /**
      * \brief Get the active context on the current thread.

@@ -30,13 +30,14 @@ std::size_t Filesystem::getFileSize(const std::filesystem::path& path) {
     PHYSFS_Stat st;
 
     if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        const auto ec = PHYSFS_getLastErrorCode();
+        const auto ec   = PHYSFS_getLastErrorCode();
         std::string msg = "Could not get file size: ";
         msg += PHYSFS_getErrorByCode(ec);
 
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << msg
+                         << Log::Operation::Endl;
         }
 
         throw std::runtime_error("Failed to get file size");
@@ -50,13 +51,14 @@ bool Filesystem::isFileReadOnly(const std::filesystem::path& path) {
     PHYSFS_Stat st;
 
     if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        const auto ec = PHYSFS_getLastErrorCode();
+        const auto ec   = PHYSFS_getLastErrorCode();
         std::string msg = "Could not find if file is read-only: ";
         msg += PHYSFS_getErrorByCode(ec);
 
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << msg
+                         << Log::Operation::Endl;
         }
 
         throw std::runtime_error("Failed to get file read-only property");
@@ -65,18 +67,20 @@ bool Filesystem::isFileReadOnly(const std::filesystem::path& path) {
     return st.readonly != 0;
 }
 
-Filesystem::FileType Filesystem::getFileType(const std::filesystem::path& path) {
+Filesystem::FileType
+Filesystem::getFileType(const std::filesystem::path& path) {
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
     if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        const auto ec = PHYSFS_getLastErrorCode();
+        const auto ec   = PHYSFS_getLastErrorCode();
         std::string msg = "Could not get file type: ";
         msg += PHYSFS_getErrorByCode(ec);
 
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << msg
+                         << Log::Operation::Endl;
         }
 
         throw std::runtime_error("Failed to get file type");
@@ -93,7 +97,8 @@ Filesystem::FileType Filesystem::getFileType(const std::filesystem::path& path) 
     }
 }
 
-bool Filesystem::mount(const std::filesystem::path& archive, const std::filesystem::path& mountPoint) {
+bool Filesystem::mount(const std::filesystem::path& archive,
+                       const std::filesystem::path& mountPoint) {
     assert(PHYSFS_isInit());
 
 #ifndef SGE_DEBUG
@@ -110,20 +115,26 @@ bool Filesystem::mount(const std::filesystem::path& archive, const std::filesyst
             realName.replace_extension(".7z");
             if (!std::filesystem::exists(realName)) {
                 std::scoped_lock sl(Log::generalMutex);
-                Log::general << Log::MessageType::Warning << "File mounting unsuccessful: non-existent archive"
-                             << Log::Operation::Endl;
+                Log::general
+                    << Log::MessageType::Warning
+                    << "File mounting unsuccessful: non-existent archive"
+                    << Log::Operation::Endl;
                 return false;
             }
         }
     }
 
-    if (PHYSFS_mount(realName.u8string().c_str(), mountPoint.generic_u8string().c_str(), 0) == 0) {
-        const auto ec = PHYSFS_getLastErrorCode();
+    if (PHYSFS_mount(realName.u8string().c_str(),
+                     mountPoint.generic_u8string().c_str(),
+                     0)
+        == 0) {
+        const auto ec   = PHYSFS_getLastErrorCode();
         std::string msg = "File mounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
         std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+        Log::general << Log::MessageType::Warning << msg
+                     << Log::Operation::Endl;
 
         return false;
     }
@@ -149,8 +160,10 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
             if (!std::filesystem::exists(realName)) {
                 {
                     std::scoped_lock sl(Log::generalMutex);
-                    Log::general << Log::MessageType::Warning << "File unmounting unsuccessful: non-existent archive"
-                                 << Log::Operation::Endl;
+                    Log::general
+                        << Log::MessageType::Warning
+                        << "File unmounting unsuccessful: non-existent archive"
+                        << Log::Operation::Endl;
                 }
                 throw std::runtime_error("Failed to unmount archive");
             }
@@ -158,13 +171,14 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
     }
 
     if (PHYSFS_unmount(realName.u8string().c_str()) == 0) {
-        const auto ec = PHYSFS_getLastErrorCode();
+        const auto ec   = PHYSFS_getLastErrorCode();
         std::string msg = "File unmounting unsuccessful: ";
         msg += PHYSFS_getErrorByCode(ec);
 
         {
             std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+            Log::general << Log::MessageType::Warning << msg
+                         << Log::Operation::Endl;
         }
 
         throw std::runtime_error("Failed to unmount archive");

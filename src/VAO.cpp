@@ -23,7 +23,7 @@ VAO::VAO() : m_id(0) {
     glCreateVertexArrays(1, &m_id);
 }
 
-VAO::VAO(VAO &&other) noexcept : m_id(other.m_id) {
+VAO::VAO(VAO&& other) noexcept : m_id(other.m_id) {
     other.m_id = 0;
 }
 
@@ -33,13 +33,15 @@ VAO::~VAO() {
 }
 
 VAO& VAO::operator=(VAO&& other) noexcept {
-    m_id = other.m_id;
+    m_id       = other.m_id;
     other.m_id = 0;
 
     return *this;
 }
 
-void VAO::bindVBO(const VBO& vbo, const unsigned int bindingIndex, const std::int64_t offset, 
+void VAO::bindVBO(const VBO& vbo,
+                  const unsigned int bindingIndex,
+                  const std::int64_t offset,
                   const std::size_t stride) const {
     assert(Context::getCurrentContext());
     glVertexArrayVertexBuffer(m_id, bindingIndex, vbo.m_id, offset, stride);
@@ -50,7 +52,10 @@ void VAO::enableAttribute(const unsigned int index) const {
     glEnableVertexArrayAttrib(m_id, index);
 }
 
-void VAO::setAttributeFormat(const unsigned int index, const int size, const Data type, const bool normalized, 
+void VAO::setAttributeFormat(const unsigned int index,
+                             const int size,
+                             const Data type,
+                             const bool normalized,
                              const unsigned int relativeOffset) const {
     assert(Context::getCurrentContext());
     GLuint dataType = 0;
@@ -86,10 +91,16 @@ void VAO::setAttributeFormat(const unsigned int index, const int size, const Dat
         dataType = GL_UNSIGNED_INT;
         break;
     }
-    glVertexArrayAttribFormat(m_id, index, size, dataType, normalized ? GL_TRUE : GL_FALSE, relativeOffset);
+    glVertexArrayAttribFormat(m_id,
+                              index,
+                              size,
+                              dataType,
+                              normalized ? GL_TRUE : GL_FALSE,
+                              relativeOffset);
 }
 
-void VAO::setAttributeBinding(const unsigned int index, const unsigned int bindingIndex) const {
+void VAO::setAttributeBinding(const unsigned int index,
+                              const unsigned int bindingIndex) const {
     assert(Context::getCurrentContext());
     glVertexArrayAttribBinding(m_id, index, bindingIndex);
 }

@@ -45,9 +45,16 @@ public:
      * \param blueBits Number of blue bits
      * \param alphaBits Number of alpha bits
      */
-    explicit ContextSettings(bool vsync = false, int samples = 0, bool debugContext = false, bool srgbCapable = false,
-                             int depthBits = 24, int stencilBits = 8, int redBits = 8, int greenBits = 8,
-                             int blueBits = 8, int alphaBits = 8);
+    explicit ContextSettings(bool vsync        = false,
+                             int samples       = 0,
+                             bool debugContext = false,
+                             bool srgbCapable  = false,
+                             int depthBits     = 24,
+                             int stencilBits   = 8,
+                             int redBits       = 8,
+                             int greenBits     = 8,
+                             int blueBits      = 8,
+                             int alphaBits     = 8);
 
     bool vsync;       ///< VSync enabled
     int samples;      ///< MSAA samples

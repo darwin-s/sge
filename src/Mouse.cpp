@@ -86,8 +86,9 @@ std::string Mouse::getButtonName(const Button button) {
     }
 }
 
-Mouse::ButtonState Mouse::getButtonState(const Window& window, const Button button) {
-    auto* win = static_cast<GLFWwindow*>(window.getContext().m_handle);
+Mouse::ButtonState Mouse::getButtonState(const Window& window,
+                                         const Button button) {
+    auto* win        = static_cast<GLFWwindow*>(window.getContext().m_handle);
     const auto state = glfwGetMouseButton(win, getCodeFromButton(button));
 
     switch (state) {

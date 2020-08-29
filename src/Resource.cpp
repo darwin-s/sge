@@ -17,7 +17,6 @@
 
 namespace sge {
 Resource::Resource() : m_id(0), m_ready(false), m_failed(false) {
-
 }
 
 std::uint64_t Resource::getId() const {

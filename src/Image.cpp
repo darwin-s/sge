@@ -20,27 +20,28 @@
 
 namespace sge {
 Image::Image() : m_data(nullptr), m_channels(0) {
-    
 }
 
-Image::Image(const std::filesystem::path& file) : m_data(nullptr), m_channels(0) {
+Image::Image(const std::filesystem::path& file)
+    : m_data(nullptr), m_channels(0) {
     if (!loadFromFile(file)) {
         throw std::runtime_error("Failed to load image");
     }
 }
 
-Image::Image(const std::size_t size, const void* data) : m_data(nullptr), m_channels(0) {
+Image::Image(const std::size_t size, const void* data)
+    : m_data(nullptr), m_channels(0) {
     if (!loadFromMemory(size, data)) {
         throw std::runtime_error("Failed to load image");
     }
 }
 
-Image::Image(Image&& other) noexcept : m_data(other.m_data), m_size(other.m_size), m_channels(other.m_channels) {
-    other.m_data = nullptr;
-    other.m_size = Vector2U(0, 0);
+Image::Image(Image&& other) noexcept
+    : m_data(other.m_data), m_size(other.m_size), m_channels(other.m_channels) {
+    other.m_data     = nullptr;
+    other.m_size     = Vector2U(0, 0);
     other.m_channels = 0;
 }
-
 
 Image::~Image() {
     if (m_data != nullptr) {
@@ -49,17 +50,16 @@ Image::~Image() {
 }
 
 Image& Image::operator=(Image&& other) noexcept {
-    m_data = other.m_data;
-    m_size = other.m_size;
+    m_data     = other.m_data;
+    m_size     = other.m_size;
     m_channels = other.m_channels;
 
-    other.m_data = nullptr;
-    other.m_size = Vector2U(0, 0);
+    other.m_data     = nullptr;
+    other.m_size     = Vector2U(0, 0);
     other.m_channels = 0;
 
     return *this;
 }
-
 
 bool Image::loadFromFile(const std::filesystem::path& path) {
     const auto fileSize = Filesystem::getFileSize(path);
@@ -76,7 +76,11 @@ bool Image::loadFromMemory(const std::size_t size, const void* data) {
 
     stbi_set_flip_vertically_on_load(true);
     int x, y;
-    m_data = stbi_load_from_memory(static_cast<const stbi_uc*>(data), size, &x, &y, &m_channels,
+    m_data = stbi_load_from_memory(static_cast<const stbi_uc*>(data),
+                                   size,
+                                   &x,
+                                   &y,
+                                   &m_channels,
                                    STBI_rgb_alpha);
 
     if (x < 0 || y < 0) {

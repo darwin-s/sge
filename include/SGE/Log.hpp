@@ -58,7 +58,7 @@ public:
      * message will influence only the next message (the next one after an Operation::Endl).
      */
     enum class MessageType {
-        Info,   ///< Purely informational message (status updates, general info, etc.)
+        Info,///< Purely informational message (status updates, general info, etc.)
         Warning,///< A warning, that is not critical, but the user should be wary
         Error,  ///< An error, that needs to be immediately addressed
         Debug   ///< Debug information
@@ -263,8 +263,10 @@ public:
      */
     [[nodiscard]] MessageType getMessageType() const;
 
-    static Log general;            ///< A global Log instance for convenience (not opened by default)
-    static std::mutex generalMutex;///< Global mutex to protect the global instance
+    static Log
+        general;///< A global Log instance for convenience (not opened by default)
+    static std::mutex
+        generalMutex;///< Global mutex to protect the global instance
 private:
     MessageType m_mt;
     std::ofstream m_log;

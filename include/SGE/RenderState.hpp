@@ -49,7 +49,7 @@ public:
      */
     explicit RenderState(Texture* texture);
 
-    static RenderState defaultState; ///< Default rendering state
+    static RenderState defaultState;///< Default rendering state
 
     Shader* shader;
     Matrix transform;

@@ -71,5 +71,4 @@ void EventHandler::mouseButtonEvent(Mouse::MouseButtonEvent event) {
 
 void EventHandler::scrollEvent(const Vector2D& scroll) {
 }
-
 }

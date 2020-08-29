@@ -23,20 +23,23 @@ namespace sge {
 Camera::Camera()
     : m_center(0.0f, 0.0f), m_size(2.0f, 2.0f), m_rotation(0.0f),
       m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity),
-      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity), m_inverseTransformNeedsUpdate(true) {
+      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity),
+      m_inverseTransformNeedsUpdate(true) {
 }
 
 Camera::Camera(const RectangleFloat& rect)
     : m_center(rect.left + rect.width / 2.0f, rect.top - rect.height / 2.0f),
-      m_size(rect.width, rect.height), m_rotation(0.0f), m_viewport(0.0f, 0.0f, 1.0f, 1.0f),
-      m_transform(Matrix::identity),
-      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity), m_inverseTransformNeedsUpdate(true) {
+      m_size(rect.width, rect.height), m_rotation(0.0f),
+      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity),
+      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity),
+      m_inverseTransformNeedsUpdate(true) {
 }
 
 Camera::Camera(const Vector2F& center, const Vector2F& size)
     : m_center(center), m_size(size), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity), m_transformNeedsUpdate(true),
-      m_inverseTransform(Matrix::identity), m_inverseTransformNeedsUpdate(true) {
+      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity),
+      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity),
+      m_inverseTransformNeedsUpdate(true) {
 }
 
 void Camera::setViewPort(const RectangleFloat& viewportRatio) {
@@ -47,7 +50,7 @@ void Camera::setCenter(const float x, const float y) {
     m_center.x = x;
     m_center.y = y;
 
-    m_transformNeedsUpdate = true;
+    m_transformNeedsUpdate        = true;
     m_inverseTransformNeedsUpdate = true;
 }
 
@@ -59,7 +62,7 @@ void Camera::setSize(const float width, const float height) {
     m_size.x = width;
     m_size.y = height;
 
-    m_transformNeedsUpdate = true;
+    m_transformNeedsUpdate        = true;
     m_inverseTransformNeedsUpdate = true;
 }
 
@@ -70,8 +73,8 @@ void Camera::setSize(const Vector2F& size) {
 void Camera::setRectangle(const RectangleFloat& rect) {
     m_center.x = rect.left + rect.width / 2.0f;
     m_center.y = rect.top - rect.height / 2.0f;
-    m_size.x = rect.width;
-    m_size.y = rect.height;
+    m_size.x   = rect.width;
+    m_size.y   = rect.height;
 }
 
 void Camera::setRotation(const float degrees) {
@@ -80,7 +83,7 @@ void Camera::setRotation(const float degrees) {
         m_rotation += 360.0f;
     }
 
-    m_transformNeedsUpdate = true;
+    m_transformNeedsUpdate        = true;
     m_inverseTransformNeedsUpdate = true;
 }
 
@@ -93,7 +96,8 @@ void Camera::move(const Vector2F& offset) {
 }
 
 void Camera::zoom(const float factor) {
-    const auto zoom = 1.0f / factor; //For example a 2x zoom would mean shrinking the view size twice
+    const auto zoom = 1.0f
+        / factor;//For example a 2x zoom would mean shrinking the view size twice
 
     setSize(m_size.x * zoom, m_size.y * zoom);
 }
@@ -115,8 +119,10 @@ const Vector2F& Camera::getSize() const {
 }
 
 RectangleFloat Camera::getRectangle() const {
-    const RectangleFloat rect{m_center.x - m_size.x / 2.0f, m_center.y + m_size.y / 2.0f,
-                              m_size.x, m_size.y};
+    const RectangleFloat rect{m_center.x - m_size.x / 2.0f,
+                              m_center.y + m_size.y / 2.0f,
+                              m_size.x,
+                              m_size.y};
     return rect;
 }
 
@@ -127,10 +133,12 @@ float Camera::getRoatation() const {
 const Matrix& Camera::getTransform() const {
     if (m_transformNeedsUpdate) {
         const auto radians = m_rotation * PI / 180.0f;//Radians = angle*pi/180
-        const auto cos = std::cos(radians);
-        const auto sin = std::sin(radians);
-        const auto translateX = -m_center.x * cos - m_center.y * sin + m_center.x;
-        const auto translateY = m_center.x * sin - m_center.y * cos + m_center.y;
+        const auto cos     = std::cos(radians);
+        const auto sin     = std::sin(radians);
+        const auto translateX =
+            -m_center.x * cos - m_center.y * sin + m_center.x;
+        const auto translateY =
+            m_center.x * sin - m_center.y * cos + m_center.y;
 
         const auto a = 2.0f / m_size.x;
         const auto b = 2.0f / m_size.y;
@@ -139,7 +147,7 @@ const Matrix& Camera::getTransform() const {
 
         m_transform = Matrix( a * cos, a * sin, a * translateX + c,
                              -b * sin, b * cos, b * translateY + d,
-                                 0.0f,    0.0f,                1.0f );
+                             0.0f,    0.0f,                1.0f);
 
         m_transformNeedsUpdate = false;
     }
@@ -149,11 +157,10 @@ const Matrix& Camera::getTransform() const {
 
 const Matrix& Camera::getInverseTransform() const {
     if (m_inverseTransformNeedsUpdate) {
-        m_inverseTransform = getTransform().getInverse();
+        m_inverseTransform            = getTransform().getInverse();
         m_inverseTransformNeedsUpdate = false;
     }
 
     return m_inverseTransform;
 }
-
 }

@@ -74,7 +74,7 @@ public:
      */
     enum ReturnCode {
         ReturnError = -1,///< Problems were encountered
-        ReturnOk = 0     ///< Operation completed successfully
+        ReturnOk    = 0  ///< Operation completed successfully
     };
 
     /**
@@ -103,7 +103,7 @@ public:
      */
     virtual ~Application();
     Application(const Application&) = delete;
-    Application(Application&&) = delete;
+    Application(Application&&)      = delete;
     Application& operator=(const Application&) = delete;
     Application& operator=(Application&&) = delete;
 

@@ -33,7 +33,7 @@ VBO::~VBO() {
 }
 
 VBO& VBO::operator=(VBO&& other) noexcept {
-    m_id = other.m_id;
+    m_id       = other.m_id;
     other.m_id = 0;
 
     return *this;

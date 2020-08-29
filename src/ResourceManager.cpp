@@ -20,10 +20,13 @@ ResourceManager& ResourceManager::instance() {
     return rm;
 }
 
-void ResourceManager::loadResource(std::shared_ptr<Resource> r, const std::filesystem::path& path, std::uint64_t hash) {
-    auto loaderThread = [](std::shared_ptr<sge::Resource> r, const std::filesystem::path& path) -> void {
-      r->loadFromFile(path);
-      r->setReady(true);
+void ResourceManager::loadResource(std::shared_ptr<Resource> r,
+                                   const std::filesystem::path& path,
+                                   std::uint64_t hash) {
+    auto loaderThread = [](std::shared_ptr<sge::Resource> r,
+                           const std::filesystem::path& path) -> void {
+        r->loadFromFile(path);
+        r->setReady(true);
     };
     std::thread th(loaderThread, r, path);
     th.detach();

@@ -15,7 +15,7 @@
 #include <SGE/Hash.hpp>
 
 namespace {
-constexpr uint64_t fnvPrime = 0x00000100000001B3;
+constexpr uint64_t fnvPrime  = 0x00000100000001B3;
 constexpr uint64_t fnvOffset = 0xcbf29ce484222325;
 
 std::uint64_t fnv(const sge::ByteData& data) {

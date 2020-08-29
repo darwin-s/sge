@@ -41,9 +41,9 @@ namespace sge {
  */
 template<typename T> class Vector2 {
 public:
-    T x; ///< First vector component
+    T x;///< First vector component
 
-    T y; ///< Second vector component
+    T y;///< Second vector component
 
     /**
      * \brief Default-construct a vector

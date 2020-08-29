@@ -44,10 +44,10 @@ public:
      * area of the texture.
      */
     enum class WrapMode {
-        Repeat, ///< Repeat the texture
-        MirroredRepeat, ///< Repeat the texture mirrored
-        ClampToEdge, ///< Clamp to the edge of the texture
-        ClampToBorder ///< Clamp to the border of the texture
+        Repeat,        ///< Repeat the texture
+        MirroredRepeat,///< Repeat the texture mirrored
+        ClampToEdge,   ///< Clamp to the edge of the texture
+        ClampToBorder  ///< Clamp to the border of the texture
     };
 
     /**
@@ -56,12 +56,12 @@ public:
      * Represents the filtering mode for the texture.
      */
     enum class FilterMode {
-        Nearest, ///< Nearest filtering
-        Linear, ///< Linear filtering
-        NearestMipmapNearest, ///< Nearest mipmap, nearest pixel filtering
+        Nearest,             ///< Nearest filtering
+        Linear,              ///< Linear filtering
+        NearestMipmapNearest,///< Nearest mipmap, nearest pixel filtering
         NearestMipmapLinear, ///< Nearest mipmap, linear pixel filtering
         LinearMipmapNearest, ///< Linear mipmap, nearest pixel filtering
-        LinearMipmapLinear ///< Linear mipmap, linear pixel filtering
+        LinearMipmapLinear   ///< Linear mipmap, linear pixel filtering
     };
 
     /**
@@ -106,7 +106,7 @@ public:
     virtual ~Texture();
 
     Texture(const Texture&) = delete;
-    Texture(Texture&&) = delete;
+    Texture(Texture&&)      = delete;
     Texture& operator=(const Texture&) = delete;
     Texture& operator=(Texture&&) = delete;
 

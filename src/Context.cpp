@@ -26,8 +26,8 @@ constexpr int openGlVersionMajor = 4;
 constexpr int openGlVersionMinor = 6;
 
 thread_local sge::Context* active = nullptr;
-sge::Context* shared = nullptr;
-int sharedCount = 0;
+sge::Context* shared              = nullptr;
+int sharedCount                   = 0;
 std::recursive_mutex sharedMutex;
 bool loadedGL = false;
 std::mutex loadedMutex;
@@ -43,10 +43,12 @@ void setHints(const int refreshRate, const sge::ContextSettings& settings) {
     glfwWindowHint(GLFW_STENCIL_BITS, settings.stencilBits);
     glfwWindowHint(GLFW_SAMPLES, settings.samples);
     glfwWindowHint(GLFW_REFRESH_RATE, refreshRate);
-    glfwWindowHint(GLFW_SRGB_CAPABLE, settings.srgbCapable ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_SRGB_CAPABLE,
+                   settings.srgbCapable ? GLFW_TRUE : GLFW_FALSE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGlVersionMajor);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGlVersionMinor);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, settings.debugContext ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT,
+                   settings.debugContext ? GLFW_TRUE : GLFW_FALSE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
@@ -106,8 +108,12 @@ const char* severityToString(const GLenum severity) {
     }
 }
 
-void GLAPIENTRY messageCallback(const GLenum source, const GLenum type, const GLuint id, const GLenum severity, 
-                                [[maybe_unused]] const GLsizei length, const GLchar* message, 
+void GLAPIENTRY messageCallback(const GLenum source,
+                                const GLenum type,
+                                const GLuint id,
+                                const GLenum severity,
+                                [[maybe_unused]] const GLsizei length,
+                                const GLchar* message,
                                 [[maybe_unused]] const void* userParam) {
     std::string msg = "OpenGL message: source - ";
     msg += sourceToString(source);
@@ -121,7 +127,8 @@ void GLAPIENTRY messageCallback(const GLenum source, const GLenum type, const GL
     msg += message;
     {
         std::scoped_lock logLock(sge::Log::generalMutex);
-        sge::Log::general << sge::Log::MessageType::Debug << msg << sge::Log::Operation::Endl;
+        sge::Log::general << sge::Log::MessageType::Debug << msg
+                          << sge::Log::Operation::Endl;
     }
     if (type == GL_DEBUG_TYPE_ERROR) {
         throw std::runtime_error(msg);
@@ -177,7 +184,8 @@ void Context::setCurrent(const bool current) {
 
 bool Context::isExtensionAvailable(const std::string_view extensionName) const {
     glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
-    const auto supported = glfwExtensionSupported(extensionName.data()) == GLFW_TRUE;
+    const auto supported =
+        glfwExtensionSupported(extensionName.data()) == GLFW_TRUE;
     if (active != nullptr) {
         glfwMakeContextCurrent(static_cast<GLFWwindow*>(active->m_handle));
     } else {
@@ -207,15 +215,23 @@ void Context::create(const int refreshRate, const ContextSettings& settings) {
         if (sharedCount == 0) {
             m_handle = glfwCreateWindow(1, 1, "hidden", NULL, NULL);
         } else {
-            m_handle = glfwCreateWindow(1, 1, "hidden", NULL, static_cast<GLFWwindow*>(shared->m_handle));
+            m_handle =
+                glfwCreateWindow(1,
+                                 1,
+                                 "hidden",
+                                 NULL,
+                                 static_cast<GLFWwindow*>(shared->m_handle));
         }
     }
     glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
     {
         std::scoped_lock sl(loadedMutex);
         if (!loadedGL) {
-            if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)) == 0) {
-                throw std::runtime_error("Could not load OpenGL function pointers");
+            if (gladLoadGLLoader(
+                    reinterpret_cast<GLADloadproc>(glfwGetProcAddress))
+                == 0) {
+                throw std::runtime_error(
+                    "Could not load OpenGL function pointers");
             }
             loadedGL = true;
         }
@@ -231,22 +247,35 @@ void Context::create(const int refreshRate, const ContextSettings& settings) {
         glDebugMessageCallback(messageCallback, nullptr);
     }
 
-    m_settings.vsync = settings.vsync;
+    m_settings.vsync        = settings.vsync;
     m_settings.debugContext = settings.debugContext;
-    m_settings.srgbCapable = settings.srgbCapable;
+    m_settings.srgbCapable  = settings.srgbCapable;
     glGetIntegerv(GL_SAMPLES, &m_settings.samples);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE,
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER,
+                                          GL_FRONT_LEFT,
+                                          GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE,
                                           &m_settings.redBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE,
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER,
+                                          GL_FRONT_LEFT,
+                                          GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE,
                                           &m_settings.greenBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE,
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER,
+                                          GL_FRONT_LEFT,
+                                          GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE,
                                           &m_settings.blueBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE,
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER,
+                                          GL_FRONT_LEFT,
+                                          GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE,
                                           &m_settings.alphaBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE,
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER,
+                                          GL_DEPTH,
+                                          GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE,
                                           &m_settings.depthBits);
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_STENCIL, GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
-                                          &m_settings.stencilBits);
+    glGetFramebufferAttachmentParameteriv(
+        GL_DRAW_FRAMEBUFFER,
+        GL_STENCIL,
+        GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
+        &m_settings.stencilBits);
 
     if (active != nullptr) {
         glfwMakeContextCurrent(static_cast<GLFWwindow*>(active->m_handle));

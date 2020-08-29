@@ -22,13 +22,13 @@ constexpr float PI = 3.14159265358979323846;
 namespace sge {
 Transformable::Transformable()
     : m_origin(0.0f, 0.0f), m_position(0.0f, 0.0f), m_scale(1.0f, 1.0f),
-      m_rotation(0.0f), m_transform(Matrix::identity), m_transformNeedsUpdate(true) {
-    
+      m_rotation(0.0f), m_transform(Matrix::identity),
+      m_transformNeedsUpdate(true) {
 }
 
 void Transformable::setOrigin(const float x, const float y) {
-    m_origin.x = x;
-    m_origin.y = y;
+    m_origin.x             = x;
+    m_origin.y             = y;
     m_transformNeedsUpdate = true;
 }
 
@@ -37,8 +37,8 @@ void Transformable::setOrigin(const Vector2F& origin) {
 }
 
 void Transformable::setPosition(const float x, const float y) {
-    m_position.x = x;
-    m_position.y = y;
+    m_position.x           = x;
+    m_position.y           = y;
     m_transformNeedsUpdate = true;
 }
 
@@ -47,8 +47,8 @@ void Transformable::setPosition(const Vector2F& position) {
 }
 
 void Transformable::setScale(const float xFactor, const float yFactor) {
-    m_scale.x = xFactor;
-    m_scale.y = yFactor;
+    m_scale.x              = xFactor;
+    m_scale.y              = yFactor;
     m_transformNeedsUpdate = true;
 }
 
@@ -103,20 +103,22 @@ float Transformable::getRotation() const {
 
 const Matrix& Transformable::getTransform() const {
     if (m_transformNeedsUpdate) {
-        const auto radians = -m_rotation * PI / 180.0f; //Radians = angle*pi/180
-        const auto cos = std::cos(radians);
-        const auto sin = std::sin(radians);
+        const auto radians = -m_rotation * PI / 180.0f;//Radians = angle*pi/180
+        const auto cos     = std::cos(radians);
+        const auto sin     = std::sin(radians);
         const auto scaleXCos = m_scale.x * cos;
         const auto scaleYCos = m_scale.y * cos;
         const auto scaleXSin = m_scale.x * sin;
         const auto scaleYSin = m_scale.y * sin;
         //This codes transforms the origin and then adds the position to it
-        const auto translateX = -m_origin.x * scaleXCos - m_origin.y * scaleYSin + m_position.x;
-        const auto translateY =  m_origin.x * scaleXSin - m_origin.y * scaleYCos + m_position.y;
+        const auto translateX =
+            -m_origin.x * scaleXCos - m_origin.y * scaleYSin + m_position.x;
+        const auto translateY =
+            m_origin.x * scaleXSin - m_origin.y * scaleYCos + m_position.y;
 
         m_transform = Matrix( scaleXCos, scaleYSin, translateX,
                              -scaleXSin, scaleYCos, translateY,
-                                   0.0f,      0.0f,        1.0f);
+                             0.0f,      0.0f,        1.0f);
 
         m_transformNeedsUpdate = false;
     }

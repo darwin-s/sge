@@ -96,7 +96,6 @@ public:
     [[nodiscard]] bool isFailed() const;
 
 protected:
-
     /**
      * \brief Fail Resource
      *

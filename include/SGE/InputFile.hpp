@@ -54,7 +54,8 @@ public:
      * \param path Path to the virtual file
      * \param bufferSize Internal buffer size
      */
-    explicit InputFile(const std::filesystem::path& path, std::size_t bufferSize = defaultBufferSize);
+    explicit InputFile(const std::filesystem::path& path,
+                       std::size_t bufferSize = defaultBufferSize);
 
     /**
      * \brief Move file
@@ -94,7 +95,8 @@ public:
      * \param bufferSize Size of the internal buffer
      * \return true on success, false otherwise
      */
-    bool open(const std::filesystem::path& path, std::size_t bufferSize = defaultBufferSize);
+    bool open(const std::filesystem::path& path,
+              std::size_t bufferSize = defaultBufferSize);
 
     /**
      * \brief Is File Open

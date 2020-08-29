@@ -46,7 +46,7 @@ public:
      */
     enum Type {
         Vertex, ///< Vertex Shader
-        Fragment ///< Fragment Shader
+        Fragment///< Fragment Shader
     };
 
     /**
@@ -108,7 +108,8 @@ public:
      * \param type Shader type
      * \return true on success, false otherwise
      */
-    [[nodiscard]] bool load(std::size_t size, const void* data, Type type) const;
+    [[nodiscard]] bool
+    load(std::size_t size, const void* data, Type type) const;
 
     /**
      * \brief Link shader program
@@ -126,7 +127,6 @@ public:
      * Use this shader program to draw geometry.
      */
     void use() const;
-
 
     /**
      * \brief Shader has uniform

@@ -36,16 +36,16 @@ public:
      * Represents the data type of the vertex attribute
      */
     enum class Data {
-        Byte, ///< Byte size integer
-        Short, ///< Short (16-bit) integer
-        Int, ///< Integer (32-bit)
-        Fixed, ///< Fixed precision number
-        Float, ///< Floating point number
-        HalfFloat, ///< Half precision floating point number
-        Double, ///< Double precision floating point number
+        Byte,         ///< Byte size integer
+        Short,        ///< Short (16-bit) integer
+        Int,          ///< Integer (32-bit)
+        Fixed,        ///< Fixed precision number
+        Float,        ///< Floating point number
+        HalfFloat,    ///< Half precision floating point number
+        Double,       ///< Double precision floating point number
         UnsignedByte, ///< Unsigned byte size integer
-        UnsignedShort, ///< Unsigned short (16-bit) integer
-        UnsignedInt ///< Unsigned integer (32-bit)
+        UnsignedShort,///< Unsigned short (16-bit) integer
+        UnsignedInt   ///< Unsigned integer (32-bit)
     };
 
     /**
@@ -84,7 +84,10 @@ public:
      * \param offset Offset of the first element in the VBO
      * \param stride Size to get to the next element in the VBO
      */
-    void bindVBO(const VBO& vbo, unsigned int bindingIndex, std::int64_t offset, std::size_t stride) const;
+    void bindVBO(const VBO& vbo,
+                 unsigned int bindingIndex,
+                 std::int64_t offset,
+                 std::size_t stride) const;
 
     /**
      * \brief Enable vertex attribute
@@ -106,14 +109,19 @@ public:
      * \param normalized Whether the data is normalized (between 0 and 1)
      * \param relativeOffset Relative offset of the element
      */
-    void setAttributeFormat(unsigned int index, int size, Data type, bool normalized, unsigned int relativeOffset) const;
+    void setAttributeFormat(unsigned int index,
+                            int size,
+                            Data type,
+                            bool normalized,
+                            unsigned int relativeOffset) const;
 
     /**
      * \brief Bind Attribute to VBO binding
      * \param index Attribute index
      * \param bindingIndex VBO binding index
      */
-    void setAttributeBinding(unsigned int index, unsigned int bindingIndex) const;
+    void setAttributeBinding(unsigned int index,
+                             unsigned int bindingIndex) const;
 
     /**
      * \brief Bind this VAO

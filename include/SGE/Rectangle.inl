@@ -12,23 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-template<typename T> Rectangle<T>::Rectangle()
-    : left(static_cast<T>(0)), top(static_cast<T>(0)), width(static_cast<T>(0)), height(static_cast<T>(0)) {
+template<typename T>
+Rectangle<T>::Rectangle()
+    : left(static_cast<T>(0)), top(static_cast<T>(0)), width(static_cast<T>(0)),
+      height(static_cast<T>(0)) {
 }
 
-template<typename T> Rectangle<T>::Rectangle(T left, T top, T width, T height)
-    : left(left), top(top), width(width), height(height) {   
+template<typename T>
+Rectangle<T>::Rectangle(T left, T top, T width, T height)
+    : left(left), top(top), width(width), height(height) {
 }
 
-template<typename T> Rectangle<T>::Rectangle(const Vector2<T>& position, const Vector2<T>& size)
+template<typename T>
+Rectangle<T>::Rectangle(const Vector2<T>& position, const Vector2<T>& size)
     : left(position.x), top(position.y), width(size.x), height(size.y) {
 }
 
 template<typename T>
 template<typename U>
 Rectangle<T>::Rectangle(const Rectangle<U>& rect)
-    : left(static_cast<T>(rect.left)), top(static_cast<T>(rect.top)), width(static_cast<T>(rect.width)),
-      height(static_cast<T>(rect.height)) {
+    : left(static_cast<T>(rect.left)), top(static_cast<T>(rect.top)),
+      width(static_cast<T>(rect.width)), height(static_cast<T>(rect.height)) {
 }
 
 template<typename T> bool Rectangle<T>::contains(T x, T y) const {
@@ -40,11 +44,13 @@ template<typename T> bool Rectangle<T>::contains(T x, T y) const {
     return (x >= minX) && (x < maxX) && (y >= minY) && (y < maxY);
 }
 
-template<typename T> bool Rectangle<T>::contains(const Vector2<T>& point) const {
+template<typename T>
+bool Rectangle<T>::contains(const Vector2<T>& point) const {
     return contains(point.x, point.y);
 }
 
-template<typename T> bool Rectangle<T>::intersects(const Rectangle<T>& rect) const {
+template<typename T>
+bool Rectangle<T>::intersects(const Rectangle<T>& rect) const {
     T r1MinX = std::min(left, left + width);
     T r1MaxX = std::max(left, left + width);
     T r1MinY = std::min(top, top + height);
@@ -67,7 +73,8 @@ template<typename T> bool Rectangle<T>::intersects(const Rectangle<T>& rect) con
     return false;
 }
 
-template<typename T> Rectangle<T> Rectangle<T>::getIntersection(const Rectangle<T>& rect) const {
+template<typename T>
+Rectangle<T> Rectangle<T>::getIntersection(const Rectangle<T>& rect) const {
     if (!intersects(rect)) {
         return Rectangle<T>(0, 0, 0, 0);
     }
@@ -82,12 +89,15 @@ template<typename T> Rectangle<T> Rectangle<T>::getIntersection(const Rectangle<
     T r2MinY = std::min(rect.top, rect.top + rect.height);
     T r2MaxY = std::max(rect.top, rect.top + rect.height);
 
-    T intersLeft = std::max(r1MinX, r2MinX);
-    T intersTop = std::max(r1MinY, r2MinY);
-    T intersRight = std::min(r1MaxX, r2MaxX);
+    T intersLeft   = std::max(r1MinX, r2MinX);
+    T intersTop    = std::max(r1MinY, r2MinY);
+    T intersRight  = std::min(r1MaxX, r2MaxX);
     T intersBottom = std::min(r1MaxY, r2MaxY);
 
-    return Rectangle<T>(intersLeft, intersTop, intersRight - intersLeft, intersBottom - intersTop);
+    return Rectangle<T>(intersLeft,
+                        intersTop,
+                        intersRight - intersLeft,
+                        intersBottom - intersTop);
 }
 
 template<typename T> Vector2<T> Rectangle<T>::getPosition() const {
@@ -98,14 +108,14 @@ template<typename T> Vector2<T> Rectangle<T>::getSize() const {
     return Vector2<T>(width, height);
 }
 
-template<typename T> bool Rectangle<T>::operator==(const Rectangle<T>& other) const {
-    return left == other.left && top == other.top && width == other.width && height == other.height;
+template<typename T>
+bool Rectangle<T>::operator==(const Rectangle<T>& other) const {
+    return left == other.left && top == other.top && width == other.width
+        && height == other.height;
 }
 
-template<typename T> bool Rectangle<T>::operator!=(const Rectangle<T>& other) const {
+template<typename T>
+bool Rectangle<T>::operator!=(const Rectangle<T>& other) const {
     return !(*this == other);
 }
-
-
-
 

@@ -56,8 +56,9 @@ public:
      * \param a21 row 2, column 1 of the matrix
      * \param a22 row 2, column 2 of the matrix
      */
-    Matrix(float a00, float a01, float a02, float a10, float a11, float a12, float a20, float a21, float a22);
-
+    Matrix(float a00, float a01, float a02,
+           float a10, float a11, float a12,
+           float a20, float a21, float a22);
 
     /**
      * \brief Get matrix data

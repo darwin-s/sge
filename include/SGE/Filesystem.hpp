@@ -73,7 +73,8 @@ public:
      * \param path Path to the file
      * \return Size of the file, or 0 if it doesn't exist or it is empty
      */
-    [[nodiscard]] static std::size_t getFileSize(const std::filesystem::path& path);
+    [[nodiscard]] static std::size_t
+    getFileSize(const std::filesystem::path& path);
 
     /**
      * \brief Is File Read-Only
@@ -96,7 +97,8 @@ public:
      * \return The type of the file, or FileType::Other if there was a problem
      * \sa Filesystem::FileType
      */
-    [[nodiscard]] static FileType getFileType(const std::filesystem::path& path);
+    [[nodiscard]] static FileType
+    getFileType(const std::filesystem::path& path);
 
     /**
      * \brief Mount archive
@@ -109,7 +111,8 @@ public:
      * \param mountPoint The point on which to mount the archive in the virtual filesystem
      * \return true on success, false otherwise
      */
-    static bool mount(const std::filesystem::path& archive, const std::filesystem::path& mountPoint);
+    static bool mount(const std::filesystem::path& archive,
+                      const std::filesystem::path& mountPoint);
 
     /**
      * \brief Unmount archive
