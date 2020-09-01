@@ -13,13 +13,15 @@
 // limitations under the License.
 
 #include <SGE/Context.hpp>
+#include <SGE/Window.hpp>
 #include <SGE/Log.hpp>
 #include <string>
 #include <stdexcept>
 #include <mutex>
 #include <cassert>
 #include <glad.h>
-#include <GLFW/glfw3.h>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 
 namespace {
 constexpr int openGlVersionMajor = 4;
@@ -32,24 +34,26 @@ std::recursive_mutex sharedMutex;
 bool loadedGL = false;
 std::mutex loadedMutex;
 
-void setHints(const int refreshRate, const sge::ContextSettings& settings) {
-    glfwDefaultWindowHints();
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    glfwWindowHint(GLFW_RED_BITS, settings.redBits);
-    glfwWindowHint(GLFW_GREEN_BITS, settings.greenBits);
-    glfwWindowHint(GLFW_BLUE_BITS, settings.blueBits);
-    glfwWindowHint(GLFW_ALPHA_BITS, settings.alphaBits);
-    glfwWindowHint(GLFW_DEPTH_BITS, settings.depthBits);
-    glfwWindowHint(GLFW_STENCIL_BITS, settings.stencilBits);
-    glfwWindowHint(GLFW_SAMPLES, settings.samples);
-    glfwWindowHint(GLFW_REFRESH_RATE, refreshRate);
-    glfwWindowHint(GLFW_SRGB_CAPABLE,
-                   settings.srgbCapable ? GLFW_TRUE : GLFW_FALSE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGlVersionMajor);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGlVersionMinor);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT,
-                   settings.debugContext ? GLFW_TRUE : GLFW_FALSE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+void setHints(const sge::ContextSettings& settings) {
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, settings.redBits);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, settings.greenBits);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, settings.blueBits);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, settings.alphaBits);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, settings.depthBits);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, settings.stencilBits);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    if (settings.samples > 0) {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, settings.samples);
+    }
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE,
+                        settings.srgbCapable ? 1 : 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, openGlVersionMajor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, openGlVersionMinor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+                        settings.debugContext ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
 }
 
 const char* sourceToString(const GLenum source) {
@@ -137,8 +141,14 @@ void GLAPIENTRY messageCallback(const GLenum source,
 }
 
 namespace sge {
-Context::Context(const ContextSettings& settings) : m_handle(nullptr) {
-    create(GLFW_DONT_CARE, settings);
+Context::Context(const ContextSettings& settings)
+    : m_handle(nullptr), m_windowHandle(nullptr), m_sharedWindow(false) {
+    create(nullptr, settings);
+}
+
+Context::Context(const Window& window, const ContextSettings& settings)
+    : m_handle(nullptr), m_windowHandle(nullptr), m_sharedWindow(true) {
+    create(window.m_handle, settings);
 }
 
 Context::~Context() {
@@ -146,7 +156,10 @@ Context::~Context() {
         setCurrent(false);
     }
     assert(active == nullptr);
-    glfwDestroyWindow(static_cast<GLFWwindow*>(m_handle));
+    SDL_GL_DeleteContext(static_cast<SDL_GLContext>(m_handle));
+    if (!m_sharedWindow) {
+        SDL_DestroyWindow(static_cast<SDL_Window*>(m_windowHandle));
+    }
     {
         std::scoped_lock sl(sharedMutex);
         if (sharedCount > 0) {
@@ -171,25 +184,61 @@ void Context::setCurrent(const bool current) {
         if (active != nullptr) {
             active->setCurrent(false);
         }
-        glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
+        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                               static_cast<SDL_GLContext>(m_handle)) != 0) {
+            std::scoped_lock logLock(sge::Log::generalMutex);
+            sge::Log::general << sge::Log::MessageType::Error
+                              << "SDL error: " << SDL_GetError()
+                              << sge::Log::Operation::Endl;
+            throw std::runtime_error("SDL error");
+        }
         active = this;
     } else {
         if (active != this) {
             return;
         }
-        glfwMakeContextCurrent(NULL);
+        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                               NULL) != 0) {
+            std::scoped_lock logLock(sge::Log::generalMutex);
+            sge::Log::general << sge::Log::MessageType::Error
+                              << "SDL error: " << SDL_GetError()
+                              << sge::Log::Operation::Endl;
+            throw std::runtime_error("SDL error");
+        }
         active = nullptr;
     }
 }
 
 bool Context::isExtensionAvailable(const std::string_view extensionName) const {
-    glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
+    if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                           static_cast<SDL_GLContext>(m_handle)) != 0) {
+        std::scoped_lock logLock(sge::Log::generalMutex);
+        sge::Log::general << sge::Log::MessageType::Error
+                          << "SDL error: " << SDL_GetError()
+                          << sge::Log::Operation::Endl;
+        throw std::runtime_error("SDL error");
+    }
     const auto supported =
-        glfwExtensionSupported(extensionName.data()) == GLFW_TRUE;
+        SDL_GL_ExtensionSupported(extensionName.data()) == SDL_TRUE;
     if (active != nullptr) {
-        glfwMakeContextCurrent(static_cast<GLFWwindow*>(active->m_handle));
+        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                               static_cast<SDL_GLContext>(active->m_handle)) !=
+            0) {
+            std::scoped_lock logLock(sge::Log::generalMutex);
+            sge::Log::general << sge::Log::MessageType::Error
+                              << "SDL error: " << SDL_GetError()
+                              << sge::Log::Operation::Endl;
+            throw std::runtime_error("SDL error");
+        }
     } else {
-        glfwMakeContextCurrent(NULL);
+        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                               NULL) != 0) {
+            std::scoped_lock logLock(sge::Log::generalMutex);
+            sge::Log::general << sge::Log::MessageType::Error
+                              << "SDL error: " << SDL_GetError()
+                              << sge::Log::Operation::Endl;
+            throw std::runtime_error("SDL error");
+        }
     }
     return supported;
 }
@@ -198,7 +247,7 @@ Context* Context::getCurrentContext() {
     return active;
 }
 
-void Context::create(const int refreshRate, const ContextSettings& settings) {
+void Context::create(void* winHandle, const ContextSettings& settings) {
     {
         std::scoped_lock sl(sharedMutex);
         if (sharedCount == 0) {
@@ -211,25 +260,52 @@ void Context::create(const int refreshRate, const ContextSettings& settings) {
             shared = new Context(s);
         }
         sharedCount++;
-        setHints(refreshRate, settings);
+        setHints(settings);
         if (sharedCount == 0) {
-            m_handle = glfwCreateWindow(1, 1, "hidden", NULL, NULL);
-        } else {
-            m_handle =
-                glfwCreateWindow(1,
+            SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
+            m_windowHandle =
+                SDL_CreateWindow("hidden",
+                                 SDL_WINDOWPOS_UNDEFINED,
+                                 SDL_WINDOWPOS_UNDEFINED,
                                  1,
-                                 "hidden",
-                                 NULL,
-                                 static_cast<GLFWwindow*>(shared->m_handle));
+                                 1,
+                                 SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+            m_handle =
+                SDL_GL_CreateContext(static_cast<SDL_Window*>(m_windowHandle));
+        } else {
+            if (SDL_GL_MakeCurrent(
+                    static_cast<SDL_Window*>(shared->m_windowHandle),
+                    static_cast<SDL_GLContext>(shared->m_handle)) != 0) {
+                std::scoped_lock logLock(sge::Log::generalMutex);
+                sge::Log::general << sge::Log::MessageType::Error
+                                  << "SDL error: " << SDL_GetError()
+                                  << sge::Log::Operation::Endl;
+                throw std::runtime_error("SDL error");
+            }
+            SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+            if (winHandle == nullptr) {
+                m_windowHandle =
+                    SDL_CreateWindow("hidden",
+                                     SDL_WINDOWPOS_UNDEFINED,
+                                     SDL_WINDOWPOS_UNDEFINED,
+                                     1,
+                                     1,
+                                     SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+                m_handle = SDL_GL_CreateContext(
+                    static_cast<SDL_Window*>(m_windowHandle));
+            } else {
+                m_windowHandle = winHandle;
+                m_handle =
+                    SDL_GL_CreateContext(static_cast<SDL_Window*>(winHandle));
+            }
         }
     }
-    glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_handle));
+
     {
         std::scoped_lock sl(loadedMutex);
         if (!loadedGL) {
-            if (gladLoadGLLoader(
-                    reinterpret_cast<GLADloadproc>(glfwGetProcAddress))
-                == 0) {
+            if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(
+                    SDL_GL_GetProcAddress)) == 0) {
                 throw std::runtime_error(
                     "Could not load OpenGL function pointers");
             }
@@ -237,9 +313,9 @@ void Context::create(const int refreshRate, const ContextSettings& settings) {
         }
     }
     if (!settings.vsync) {
-        glfwSwapInterval(0);
+        SDL_GL_SetSwapInterval(0);
     } else {
-        glfwSwapInterval(1);
+        SDL_GL_SetSwapInterval(1);
     }
 
     if (settings.debugContext) {
@@ -278,9 +354,24 @@ void Context::create(const int refreshRate, const ContextSettings& settings) {
         &m_settings.stencilBits);
 
     if (active != nullptr) {
-        glfwMakeContextCurrent(static_cast<GLFWwindow*>(active->m_handle));
+        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                               static_cast<SDL_GLContext>(active->m_handle)) !=
+            0) {
+            std::scoped_lock logLock(sge::Log::generalMutex);
+            sge::Log::general << sge::Log::MessageType::Error
+                              << "SDL error: " << SDL_GetError()
+                              << sge::Log::Operation::Endl;
+            throw std::runtime_error("SDL error");
+        }
     } else {
-        glfwMakeContextCurrent(NULL);
+        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
+                               NULL) != 0) {
+            std::scoped_lock logLock(sge::Log::generalMutex);
+            sge::Log::general << sge::Log::MessageType::Error
+                              << "SDL error: " << SDL_GetError()
+                              << sge::Log::Operation::Endl;
+            throw std::runtime_error("SDL error");
+        }
     }
 }
 }

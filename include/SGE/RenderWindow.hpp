@@ -18,6 +18,7 @@
 #include <SGE/Export.hpp>
 #include <SGE/Window.hpp>
 #include <SGE/RenderTarget.hpp>
+#include <SGE/Context.hpp>
 #include <string_view>
 
 namespace sge {
@@ -70,21 +71,30 @@ public:
      * \brief Create render window
      *
      *
-     * Creates a fullscreen window(not borderless window) on a monitor.
+     * Creates a fullscreen window.
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
      * \param videoMode Video mode to be set
-     * \param monitor Monitor on which to make the window fullscreen
      * \param contextSettings Settings for the underlying context
      */
     RenderWindow(std::string_view title,
                  Monitor::VideoMode videoMode,
-                 const Monitor& monitor,
                  ContextSettings contextSettings = ContextSettings());
 
     Context& getRenderingContext() override;
 
-    Vector2U getPhysicalSize() const override;
+    Vector2I getPhysicalSize() const override;
+
+    /**
+     * \brief Swap window buffers
+     *
+     *
+     * Swaps the drawing buffers for a window.
+     */
+    void swapBuffers();
+
+private:
+    Context m_context;
 };
 }
 

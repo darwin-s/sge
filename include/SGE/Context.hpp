@@ -22,8 +22,6 @@
 
 namespace sge {
 class Window;
-class Keyboard;
-class Mouse;
 
 /**
  * \brief Object representing an OpenGL context
@@ -48,6 +46,19 @@ public:
      * \param settings Settings for the context
      */
     explicit Context(const ContextSettings& settings = ContextSettings());
+
+    /**
+     * \brief Create a context
+     *
+     *
+     * Creates an OpenGL context using the settings provided and attach it to a window.
+     * \note A created OpenGL context is not made current.
+     * \note The context settings may not be respected exactly. Check the settings after creating the context.
+     * \param window Window to attach the context to
+     * \param settings Settings for the context
+     */
+    Context(const Window& window,
+            const ContextSettings& settings = ContextSettings());
 
     /**
      * \brief Destroy context
@@ -103,12 +114,11 @@ public:
     static Context* getCurrentContext();
 
 private:
-    friend class Window;
-    friend class Keyboard;
-    friend class Mouse;
-    SGE_PRIVATE void create(int refreshRate, const ContextSettings& settings);
+    SGE_PRIVATE void create(void* winHandle, const ContextSettings& settings);
     ContextSettings m_settings;
     void* m_handle;
+    void* m_windowHandle;
+    bool m_sharedWindow;
 };
 }
 

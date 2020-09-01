@@ -14,50 +14,39 @@
 
 #include <SGE/Mouse.hpp>
 #include <SGE/Window.hpp>
-#include <GLFW/glfw3.h>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 
 namespace sge {
 Mouse::Button Mouse::getButtonFromInternal(const int button) {
     switch (button) {
-    case GLFW_MOUSE_BUTTON_1:
+    case SDL_BUTTON_LEFT:
         return Button::Left;
-    case GLFW_MOUSE_BUTTON_2:
+    case SDL_BUTTON_RIGHT:
         return Button::Right;
-    case GLFW_MOUSE_BUTTON_3:
+    case SDL_BUTTON_MIDDLE:
         return Button::Middle;
-    case GLFW_MOUSE_BUTTON_4:
+    case SDL_BUTTON_X1:
         return Button::Mb4;
-    case GLFW_MOUSE_BUTTON_5:
+    case SDL_BUTTON_X2:
         return Button::Mb5;
-    case GLFW_MOUSE_BUTTON_6:
-        return Button::Mb6;
-    case GLFW_MOUSE_BUTTON_7:
-        return Button::Mb7;
-    case GLFW_MOUSE_BUTTON_8:
-        return Button::Mb8;
     default:
-        return Button::Left;
+        return Button::Unknown;
     }
 }
 
 int Mouse::getCodeFromButton(const Button button) {
     switch (button) {
     case Button::Left:
-        return GLFW_MOUSE_BUTTON_1;
+        return SDL_BUTTON_LEFT;
     case Button::Right:
-        return GLFW_MOUSE_BUTTON_2;
+        return SDL_BUTTON_RIGHT;
     case Button::Middle:
-        return GLFW_MOUSE_BUTTON_3;
+        return SDL_BUTTON_MIDDLE;
     case Button::Mb4:
-        return GLFW_MOUSE_BUTTON_4;
+        return SDL_BUTTON_X1;
     case Button::Mb5:
-        return GLFW_MOUSE_BUTTON_5;
-    case Button::Mb6:
-        return GLFW_MOUSE_BUTTON_6;
-    case Button::Mb7:
-        return GLFW_MOUSE_BUTTON_7;
-    case Button::Mb8:
-        return GLFW_MOUSE_BUTTON_8;
+        return SDL_BUTTON_X2;
     default:
         return -1;
     }
@@ -75,41 +64,45 @@ std::string Mouse::getButtonName(const Button button) {
         return "Mouse4";
     case Button::Mb5:
         return "Mouse5";
-    case Button::Mb6:
-        return "Mouse6";
-    case Button::Mb7:
-        return "Mouse7";
-    case Button::Mb8:
-        return "Mouse8";
     default:
-        return "LMB";
+        return "Unknows";
     }
 }
 
-Mouse::ButtonState Mouse::getButtonState(const Window& window,
-                                         const Button button) {
-    auto* win        = static_cast<GLFWwindow*>(window.getContext().m_handle);
-    const auto state = glfwGetMouseButton(win, getCodeFromButton(button));
+Mouse::ButtonState Mouse::getButtonState(const Button button) {
+    const auto state = SDL_GetMouseState(NULL, NULL);
 
-    switch (state) {
-    case GLFW_PRESS:
+    if ((state & SDL_BUTTON(getCodeFromButton(button))) != 0) {
         return ButtonState::Pressed;
-    case GLFW_RELEASE:
-    default:
-        return ButtonState::Released;
     }
+
+    return ButtonState::Released;
 }
 
-Vector2D Mouse::getMousePosition(const Window& window) {
-    auto* win = static_cast<GLFWwindow*>(window.getContext().m_handle);
-    Vector2D ret;
+Vector2I Mouse::getMousePosition() {
+    Vector2I pos;
+    if (isInRelativeMode()) {
+        SDL_GetRelativeMouseState(&pos.x, &pos.y);
+    } else {
+        SDL_GetMouseState(&pos.x, &pos.y);
+    }
 
-    glfwGetCursorPos(win, &ret.x, &ret.y);
-
-    return ret;
+    return pos;
 }
 
-bool Mouse::isRawInputSupported() {
-    return glfwRawMouseMotionSupported() == GLFW_TRUE;
+void Mouse::setRelativeMode(bool active) {
+    SDL_SetRelativeMouseMode(active ? SDL_TRUE : SDL_FALSE);
+}
+
+bool Mouse::isInRelativeMode() {
+    return SDL_GetRelativeMouseMode() == SDL_TRUE;
+}
+
+void Mouse::setCursorVisibility(bool visible) {
+    SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
+}
+
+bool Mouse::isCursorVisible() {
+    return SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE;
 }
 }

@@ -31,7 +31,7 @@ BraceWrapping:
   IndentBraces: false
   SplitEmptyFunction: true
   SplitEmptyRecord: true
-BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon

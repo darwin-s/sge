@@ -52,7 +52,7 @@ public:
      * Get the physical size in pixels of the rendering target.
      * \return 
      */
-    [[nodiscard]] virtual Vector2U getPhysicalSize() const = 0;
+    [[nodiscard]] virtual Vector2I getPhysicalSize() const = 0;
 
     /**
      * \brief Set camera

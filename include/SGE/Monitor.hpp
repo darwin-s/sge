@@ -17,6 +17,7 @@
 
 #include <SGE/Export.hpp>
 #include <SGE/Vector2.hpp>
+#include <SGE/Rectangle.hpp>
 #include <vector>
 #include <string>
 
@@ -54,36 +55,7 @@ public:
     struct VideoMode {
         int width;      ///< Width in virtual units
         int height;     ///< Height in virtual units
-        int redBits;    ///< Number of red bits
-        int greenBits;  ///< Number of green bits
-        int blueBits;   ///< Number of blue bits
         int refreshRate;///< Refresh rate of the monitor
-    };
-
-    /**
-     * \brief Available work area
-     *
-     *
-     * Represents the available screen space on the current system (space no occupied by taskbars, etc.).
-     */
-    struct WorkArea {
-        Vector2I pos;///< Starting position of the free area
-        int width;   ///< Width of the free area in virtual units
-        int height;  ///< Height of the free area in virtual units
-    };
-
-    /**
-     * \brief Gamma ramp
-     *
-     *
-     * Represents the gamma ramp for gamma management.
-     * \note Windows only supports a gamma ramp with a size of 256
-     */
-    struct GammaRamp {
-        std::vector<unsigned short> red;  ///< Gamma ramp for red pixels
-        std::vector<unsigned short> green;///< Gamma ramp for green pixels
-        std::vector<unsigned short> blue; ///< Gamma ramp for blue pixels
-        std::size_t size;                 ///< Size of the gamma ramp
     };
 
     /**
@@ -94,7 +66,7 @@ public:
      * \note This constructor is used only internally in the library. It should not be used by users
      * \param handle Internal handle of the monitor
      */
-    SGE_PRIVATE explicit Monitor(void* handle);
+    SGE_PRIVATE explicit Monitor(int handle);
 
     /**
      * \brief Get primary monitor
@@ -135,36 +107,6 @@ public:
     [[nodiscard]] std::vector<VideoMode> getSupportedVideoModes() const;
 
     /**
-     * \brief Get monitor physical size
-     *
-     *
-     * Returns the physical size of the monitor in mm (millimeters).
-     * The X component of the vector represents the width of the monitor and
-     * the Y component represents the height.
-     * \return 2D Vector describing the monitor physical size
-     */
-    [[nodiscard]] Vector2I getPhysicalSizeMm() const;
-
-    /**
-     * \brief Get monitor content scale
-     *
-     *
-     * Returns the content(dpi) scale factor for the monitor. This
-     * is used for supporting hidpi monitors.
-     * \return 2D Vector describing the scale factors
-     */
-    [[nodiscard]] Vector2F getContentScale() const;
-
-    /**
-     * \brief Get monitor virtual position
-     *
-     *
-     * Returns the virtual position of the monitor relative to other monitors.
-     * \return 2D Vector describing the virtual position
-     */
-    [[nodiscard]] Vector2I getVirtualPosition() const;
-
-    /**
      * \brief Get available work area
      *
      *
@@ -172,7 +114,7 @@ public:
      * \return WorkArea structure describing the free area
      * \sa Monitor::WorkArea
      */
-    [[nodiscard]] WorkArea getAvailableWorkArea() const;
+    [[nodiscard]] RectangleInt getAvailableWorkArea() const;
 
     /**
      * \brief Get monitor name
@@ -183,37 +125,9 @@ public:
      */
     [[nodiscard]] std::string getName() const;
 
-    /**
-     * \brief Get gamma ramp
-     *
-     *
-     * Returns the currently set gamma ramp for the monitor.
-     * \return GammaRamp structure describing the gamma ramp
-     * \sa Monitor::GammaRamp
-     */
-    [[nodiscard]] GammaRamp getCurrentGammaRamp() const;
-
-    /**
-     * \brief Set gamma ramp
-     *
-     * Sets the gamma ramp on the monitor using a Monitor::GammaRamp structure.
-     * \param ramp GammaRamp structure describing the gamma ramp
-     * \sa Monitor::GammaRamp
-     */
-    void setGammaRamp(const GammaRamp& ramp);
-
-    /**
-     * \brief Set gamma
-     *
-     *
-     * Sets the gamma value on the monitor using a float value.
-     * \param gamma Gamma value
-     */
-    void setGamma(float gamma);
-
 private:
     friend class Window;
-    void* m_handle;
+    int m_handle;
 };
 }
 

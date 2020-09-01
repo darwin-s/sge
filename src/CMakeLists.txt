@@ -3,21 +3,6 @@ include(GenerateExportHeader)
 
 find_package(Threads REQUIRED)
 
-#Force some GLFW parameters
-set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
-set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "")
-set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
-set(GLFW_INSTALL OFF CACHE INTERNAL "")
-
-FetchContent_Declare(
-        glfw
-        GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.3.2
-)
-
-message(STATUS "Downloading glfw. Please wait")
-FetchContent_MakeAvailable(glfw)
-
 set(SRC_PREF ${CMAKE_CURRENT_SOURCE_DIR})
 set(INC_PREF ${CMAKE_CURRENT_SOURCE_DIR}/../include/SGE)
 set(SGE_GENERATED_INCLUDES
@@ -96,7 +81,7 @@ set(SGE_SRC
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)
-target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} PRIVATE glfw physfs-static)
+target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}  PRIVATE physfs-static)
 target_compile_features(sge PUBLIC cxx_std_17)
 set_target_properties(sge PROPERTIES
         PUBLIC_HEADER "${SGE_PUBLIC}"
@@ -115,6 +100,14 @@ target_include_directories(sge PUBLIC
         $<INSTALL_INTERFACE:include>
         PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    target_link_libraries(sge PUBLIC SDL2)
+else()
+    find_package(SDL2 REQUIRED)
+    target_include_directories(sge PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(sge PUBLIC ${SDL2_LIBRARIES})
+endif()
+
 generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/../include/SGE/Export.hpp
         INCLUDE_GUARD_NAME SGE_EXPORT_HPP EXPORT_MACRO_NAME SGE_API
         NO_EXPORT_MACRO_NAME SGE_PRIVATE)
@@ -127,8 +120,10 @@ if (UNIX)
     target_compile_definitions(sge PRIVATE SGE_UNIX)
 elseif (WIN32)
     target_compile_definitions(sge PRIVATE SGE_WIN32)
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+    target_compile_definitions(sge PRIVATE SGE_ANDROID)
 else ()
-    message(FATAL_ERROR "OS target target not supported by GLFW")
+    message(FATAL_ERROR "OS target not supported")
 endif ()
 
 target_compile_definitions(sge PRIVATE "$<$<CONFIG:DEBUG>:SGE_DEBUG>")

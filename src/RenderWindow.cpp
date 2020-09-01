@@ -13,36 +13,47 @@
 // limitations under the License.
 
 #include <SGE/RenderWindow.hpp>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 
 namespace sge {
 RenderWindow::RenderWindow(const ContextSettings contextSettings)
-    : Window(contextSettings) {
+    : Window(), m_context(*this, contextSettings) {
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
                            const ContextSettings contextSettings)
-    : Window(title, contextSettings) {
+    : Window(title), m_context(*this, contextSettings) {
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
                            const Vector2I size,
                            const ContextSettings contextSettings)
-    : Window(title, size, contextSettings) {
+    : Window(title, size), m_context(*this, contextSettings) {
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
                            const Monitor::VideoMode videoMode,
-                           const Monitor& monitor,
                            const ContextSettings contextSettings)
-    : Window(title, videoMode, monitor, contextSettings) {
+    : Window(title, videoMode), m_context(*this, contextSettings) {
 }
 
 Context& RenderWindow::getRenderingContext() {
-    return getContext();
+    return m_context;
 }
 
-Vector2U RenderWindow::getPhysicalSize() const {
-    return getFramebufferSize();
-}
+Vector2I RenderWindow::getPhysicalSize() const {
+    auto* w = static_cast<SDL_Window*>(getHandle());
+    Vector2I r;
+
+    SDL_GL_GetDrawableSize(w, &r.x, &r.y);
+
+    return r;
 }
 
+void RenderWindow::swapBuffers() {
+    auto* w = static_cast<SDL_Window*>(getHandle());
+
+    SDL_GL_SwapWindow(w);
+}
+}

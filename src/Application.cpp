@@ -16,77 +16,12 @@
 #include <SGE/Log.hpp>
 #include <cassert>
 #include <stdexcept>
-#include <GLFW/glfw3.h>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include <physfs.h>
 
 namespace {
 sge::Application* current = nullptr;
-
-void errorCallback(const int code, const char* message) {
-    std::string msg = "GLFW error(";
-    switch (code) {
-    case GLFW_NOT_INITIALIZED:
-        msg += "NOT_INITIALIZED): ";
-        break;
-    case GLFW_NO_CURRENT_CONTEXT:
-        msg += "NO_CURRENT_CONTEXT): ";
-        break;
-    case GLFW_INVALID_ENUM:
-        msg += "INVALID_ENUM): ";
-        break;
-    case GLFW_INVALID_VALUE:
-        msg += "INVALID_VALUE): ";
-        break;
-    case GLFW_OUT_OF_MEMORY:
-        msg += "OUT_OF_MEMORY): ";
-        break;
-    case GLFW_API_UNAVAILABLE:
-        msg += "API_UNAVAILABLE): ";
-        break;
-    case GLFW_VERSION_UNAVAILABLE:
-        msg += "VERSION_UNAVAILABLE): ";
-        break;
-    case GLFW_PLATFORM_ERROR:
-        msg += "PLATFORM_ERROR): ";
-        break;
-    case GLFW_FORMAT_UNAVAILABLE:
-        msg += "FORMAT_UNAVAILABLE): ";
-        break;
-    case GLFW_NO_WINDOW_CONTEXT:
-        msg += "NO_WINDOW_CONTEXT): ";
-        break;
-    default:
-        msg += "UNK): ";
-        break;
-    }
-
-    msg += message;
-
-    {
-        std::scoped_lock l(sge::Log::generalMutex);
-        sge::Log::general << sge::Log::MessageType::Error << msg
-                          << sge::Log::Operation::Endl;
-    }
-
-    throw std::runtime_error(msg);
-}
-
-void monitorCallback(GLFWmonitor* monitor, const int event) {
-    std::string msg = "Monitor \"";
-    msg += glfwGetMonitorName(monitor);
-    msg += "\" ";
-    if (event == GLFW_CONNECTED) {
-        msg += "connected";
-    } else if (event == GLFW_DISCONNECTED) {
-        msg += "disconnected";
-    }
-
-    {
-        std::scoped_lock l(sge::Log::generalMutex);
-        sge::Log::general << sge::Log::MessageType::Info << msg
-                          << sge::Log::Operation::Endl;
-    }
-}
 }
 
 namespace sge {
@@ -97,14 +32,11 @@ Application::Application() {
 
     Log::general.open("log.txt");
 
-    glfwSetErrorCallback(errorCallback);
-
-    glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-    if (glfwInit() != GLFW_TRUE) {
-        throw std::runtime_error("Could not initialize GLFW!");
+    SDL_SetMainReady();
+    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
+                 SDL_INIT_JOYSTICK | SDL_INIT_VIDEO) != 0) {
+        throw std::runtime_error("Could not initialize SDL!");
     }
-
-    glfwSetMonitorCallback(monitorCallback);
 
     if (PHYSFS_init(NULL) == 0) {
         const auto code = PHYSFS_getLastErrorCode();
@@ -131,14 +63,11 @@ Application::Application(const int argc, char** argv) {
 
     Log::general.open("log.txt");
 
-    glfwSetErrorCallback(errorCallback);
-
-    glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-    if (glfwInit() != GLFW_TRUE) {
-        throw std::runtime_error("Could not initialize GLFW!");
+    SDL_SetMainReady();
+    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
+                 SDL_INIT_JOYSTICK | SDL_INIT_VIDEO) != 0) {
+        throw std::runtime_error("Could not initialize SDL!");
     }
-
-    glfwSetMonitorCallback(monitorCallback);
 
     if (PHYSFS_init(argv[0]) == 0) {
         const auto code = PHYSFS_getLastErrorCode();
@@ -160,7 +89,7 @@ Application::~Application() {
     Log::general.close();
 
     PHYSFS_deinit();
-    glfwTerminate();
+    SDL_Quit();
 
     current = nullptr;
 }
