@@ -49,7 +49,7 @@ target_link_libraries(myexecutable SGE::sge)
 The project is licensed under the [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/).
 
 SGE also uses other projects internally:
-  - [GLFW](https://www.glfw.org/) - Licensed under [zlib/libpng license](https://www.glfw.org/license.html).
+  - [SDL2](https://www.libsdl.org/) - Licensed under [zlib license](https://www.libsdl.org/license.php).
   - [PhysicsFS](https://icculus.org/physfs/) - Licensed under [zlib license](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt).
   - [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) - Public Domain
   - [glad](https://github.com/Dav1dde/glad) - Public Domain for generated files, source code uses [this license](https://github.com/Dav1dde/glad/blob/master/LICENSE).
