@@ -16,7 +16,7 @@ jobs:
               run: sudo apt-get install -qq xorg-dev
 
             - name: Download sdl2 development files
-              run: sduo apt-get install -qq libsdl-dev
+              run: sudo apt-get install -qq libsdl2-dev
                   
             - name: Create Build Environment
               run: cmake -E make_directory ${{runner.workspace}}/build
