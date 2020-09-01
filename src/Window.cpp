@@ -13,91 +13,76 @@
 // limitations under the License.
 
 #include <SGE/Window.hpp>
-#include <GLFW/glfw3.h>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 
 namespace {
 sge::EventHandler defaultHandler;
 }
 
 namespace sge {
-Window::Window(const ContextSettings& contextSettings)
-    : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
+Window::Window()
+    : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    m_handle = SDL_CreateWindow("Untitled",
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED,
+                                100,
+                                100,
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
+}
 
-    glfwSetWindowUserPointer(win, this);
-    glfwSetWindowTitle(win, "SGE");
-    glfwSetWindowSize(win, 100, 100);
-    setCallbacks();
+Window::Window(const std::string_view title)
+    : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    m_handle = SDL_CreateWindow(title.data(),
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED,
+                                100,
+                                100,
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
+}
+
+Window::Window(const std::string_view title, const Vector2I& size)
+    : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    m_handle = SDL_CreateWindow(title.data(),
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED,
+                                size.x,
+                                size.y,
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
 Window::Window(const std::string_view title,
-               const ContextSettings& contextSettings)
-    : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowUserPointer(win, this);
-    glfwSetWindowTitle(win, title.data());
-    glfwSetWindowSize(win, 100, 100);
-    setCallbacks();
-}
-
-Window::Window(const std::string_view title,
-               const Vector2I& size,
-               const ContextSettings& contextSettings)
-    : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowUserPointer(win, this);
-    glfwSetWindowTitle(win, title.data());
-    glfwSetWindowSize(win, size.x, size.y);
-    setCallbacks();
-}
-
-Window::Window(const std::string_view title,
-               const Monitor::VideoMode& videoMode,
-               const Monitor& monitor,
-               const ContextSettings& contextSettings)
-    : m_context(contextSettings), m_eventHandler(&defaultHandler) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowUserPointer(win, this);
-    glfwSetWindowTitle(win, title.data());
-    glfwSetWindowSize(win, videoMode.width, videoMode.height);
-    glfwSetWindowMonitor(win,
-                         static_cast<GLFWmonitor*>(monitor.m_handle),
-                         0,
-                         0,
-                         videoMode.width,
-                         videoMode.height,
-                         videoMode.refreshRate);
-    setCallbacks();
+               const Monitor::VideoMode& videoMode)
+    : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    m_handle = SDL_CreateWindow(title.data(),
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED,
+                                100,
+                                100,
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
+    enableFullscreen(videoMode);
 }
 
 Window::~Window() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
+    if (m_open) {
+        m_eventHandler->windowCloseEvent();
+    }
 
     m_eventHandler = &defaultHandler;
-    glfwSetWindowShouldClose(win, GLFW_TRUE);
+    SDL_DestroyWindow(static_cast<SDL_Window*>(m_handle));
 }
 
 void Window::show() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwShowWindow(win);
+    SDL_ShowWindow(static_cast<SDL_Window*>(m_handle));
+    m_open = true;
 }
 
 bool Window::isOpen() const {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    return glfwWindowShouldClose(win) == GLFW_FALSE;
-}
-
-const Context& Window::getContext() const {
-    return m_context;
-}
-
-Context& Window::getContext() {
-    return m_context;
+    return m_open;
 }
 
 void Window::setEventHandler(EventHandler& handler) {
@@ -109,398 +94,238 @@ void Window::setDefaultEventHandler() {
 }
 
 void Window::processEvents() {
-    glfwPollEvents();
+    SDL_PumpEvents();
+    SDL_FilterEvents(reinterpret_cast<SDL_EventFilter>(eventFilter), nullptr);
 }
 
 void Window::setTitle(const std::string_view title) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowTitle(win, title.data());
+    SDL_SetWindowTitle(static_cast<SDL_Window*>(m_handle), title.data());
 }
 
 void Window::setPosition(const Vector2I& pos) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowPos(win, pos.x, pos.y);
+    SDL_SetWindowPosition(static_cast<SDL_Window*>(m_handle), pos.x, pos.y);
 }
 
 void Window::setSize(const Vector2I& size) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowSize(win, size.x, size.y);
+    SDL_SetWindowSize(static_cast<SDL_Window*>(m_handle), size.x, size.y);
 }
 
-void Window::enableFullscreen(const Monitor::VideoMode& videoMode,
-                              const Monitor& monitor) {
-    auto* win    = static_cast<GLFWwindow*>(m_context.m_handle);
-    auto* active = Context::getCurrentContext();
-
-    glfwSetWindowMonitor(win,
-                         static_cast<GLFWmonitor*>(monitor.m_handle),
-                         0,
-                         0,
-                         videoMode.width,
-                         videoMode.height,
-                         videoMode.refreshRate);
-    m_context.setCurrent(true);
-    if (!m_context.getContextSettings().vsync) {
-        glfwSwapInterval(0);
-    } else {
-        glfwSwapInterval(1);
-    }
-    m_context.setCurrent(false);
-    if (active != nullptr) {
-        active->setCurrent(true);
-    }
+void Window::enableFullscreen(const Monitor::VideoMode& videoMode) {
+    SDL_DisplayMode mode;
+    SDL_GetWindowDisplayMode(static_cast<SDL_Window*>(m_handle), &mode);
+    mode.w            = videoMode.width;
+    mode.h            = videoMode.height;
+    mode.refresh_rate = videoMode.refreshRate;
+    SDL_SetWindowDisplayMode(static_cast<SDL_Window*>(m_handle), &mode);
+    SDL_SetWindowFullscreen(static_cast<SDL_Window*>(m_handle),
+                            SDL_WINDOW_FULLSCREEN);
 }
 
 void Window::disableFullscreen() {
-    auto* win    = static_cast<GLFWwindow*>(m_context.m_handle);
-    auto* active = Context::getCurrentContext();
-
-    glfwSetWindowMonitor(win, NULL, 50, 50, 100, 100, 0);
-    glfwSetWindowAttrib(win, GLFW_DECORATED, GLFW_TRUE);
-    m_context.setCurrent(true);
-    if (!m_context.getContextSettings().vsync) {
-        glfwSwapInterval(0);
-    } else {
-        glfwSwapInterval(1);
-    }
-    m_context.setCurrent(false);
-    if (active != nullptr) {
-        active->setCurrent(true);
-    }
-}
-
-void Window::setSizeLimits(const Vector2I& minSize, const Vector2I& maxSize) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowSizeLimits(win, minSize.x, minSize.y, maxSize.x, maxSize.y);
-}
-
-void Window::setAspectRatio(const int numer, const int denom) {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowAspectRatio(win, numer, denom);
+    SDL_SetWindowFullscreen(static_cast<SDL_Window*>(m_handle), 0);
 }
 
 void Window::minimize() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwIconifyWindow(win);
+    SDL_MinimizeWindow(static_cast<SDL_Window*>(m_handle));
 }
 
 void Window::maximize() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwMaximizeWindow(win);
+    SDL_MaximizeWindow(static_cast<SDL_Window*>(m_handle));
 }
 
 void Window::restore() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwRestoreWindow(win);
-}
-
-void Window::requestAttention() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwRequestWindowAttention(win);
-}
-
-void Window::enableRawInput() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetInputMode(win, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-}
-
-void Window::disableRawInput() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetInputMode(win, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
-}
-
-void Window::disableCursor() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-}
-
-void Window::hideCursor() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-}
-
-void Window::enableCursor() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-}
-
-void Window::swapBuffers() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSwapBuffers(win);
-}
-
-void Window::preventClosing() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowShouldClose(win, GLFW_FALSE);
+    SDL_RestoreWindow(static_cast<SDL_Window*>(m_handle));
 }
 
 void Window::close() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-
-    glfwSetWindowShouldClose(win, GLFW_TRUE);
+    m_open = false;
 }
 
 Vector2I Window::getPosition() const {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2I ret;
 
-    glfwGetWindowPos(win, &ret.x, &ret.y);
+    SDL_GetWindowPosition(static_cast<SDL_Window*>(m_handle), &ret.x, &ret.y);
 
     return ret;
 }
 
 Vector2I Window::getSize() const {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
     Vector2I ret;
 
-    glfwGetWindowSize(win, &ret.x, &ret.y);
+    SDL_GetWindowSize(static_cast<SDL_Window*>(m_handle), &ret.x, &ret.y);
 
     return ret;
 }
 
-Vector2U Window::getFramebufferSize() const {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-    Vector2I ret;
-
-    glfwGetFramebufferSize(win, &ret.x, &ret.y);
-
-    return Vector2U(ret);
+void* Window::getHandle() const {
+    return m_handle;
 }
 
-Vector2F Window::getContentScale() const {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
-    Vector2F ret;
+int Window::eventFilter(void* userdata, void* event) {
+    auto* ev = static_cast<SDL_Event*>(event);
 
-    glfwGetWindowContentScale(win, &ret.x, &ret.y);
+    if (ev->type == SDL_WINDOWEVENT) {
+        auto* win = SDL_GetWindowFromID(ev->window.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-    return ret;
-}
+        if (w == nullptr) {
+            return 0;
+        }
 
-void Window::setCallbacks() {
-    auto* win = static_cast<GLFWwindow*>(m_context.m_handle);
+        switch (ev->window.event) {
+        case SDL_WINDOWEVENT_EXPOSED:
+            w->m_eventHandler->windowRefreshEvent();
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            w->m_eventHandler->windowPositionEvent(
+                {ev->window.data1, ev->window.data2});
+            break;
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            w->m_eventHandler->windowResizeEvent(
+                {ev->window.data1, ev->window.data2});
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            w->m_eventHandler->windowMinimizeEvent();
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            w->m_eventHandler->windowMaximizeEvent();
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            w->m_eventHandler->windowRestoredEvent();
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            w->m_eventHandler->cursorEnterEvent();
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            w->m_eventHandler->cursorLeaveEvent();
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            w->m_eventHandler->windowGainedFocusEvent();
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            w->m_eventHandler->windowLostFocusEvent();
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            w->m_eventHandler->windowCloseEvent();
+            break;
+        }
+    } else if (ev->type == SDL_KEYUP) {
+        auto* win = SDL_GetWindowFromID(ev->key.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-    glfwSetWindowCloseCallback(
-        win,
-        reinterpret_cast<GLFWwindowclosefun>(closeCallback));
-    glfwSetWindowSizeCallback(
-        win,
-        reinterpret_cast<GLFWwindowsizefun>(resizeCallback));
-    glfwSetFramebufferSizeCallback(
-        win,
-        reinterpret_cast<GLFWframebuffersizefun>(framebufferResizeCallback));
-    glfwSetWindowContentScaleCallback(
-        win,
-        reinterpret_cast<GLFWwindowcontentscalefun>(contentScaleCallback));
-    glfwSetWindowPosCallback(
-        win,
-        reinterpret_cast<GLFWwindowposfun>(positionCallback));
-    glfwSetWindowIconifyCallback(
-        win,
-        reinterpret_cast<GLFWwindowiconifyfun>(minimizeCallback));
-    glfwSetWindowMaximizeCallback(
-        win,
-        reinterpret_cast<GLFWwindowmaximizefun>(maximizeCallback));
-    glfwSetWindowFocusCallback(
-        win,
-        reinterpret_cast<GLFWwindowfocusfun>(focusCallback));
-    glfwSetWindowRefreshCallback(
-        win,
-        reinterpret_cast<GLFWwindowrefreshfun>(refreshCallback));
-    glfwSetKeyCallback(win, reinterpret_cast<GLFWkeyfun>(keyboardCallback));
-    glfwSetCharCallback(win, reinterpret_cast<GLFWcharfun>(textInputCallback));
-    glfwSetCursorPosCallback(
-        win,
-        reinterpret_cast<GLFWcursorposfun>(cursorPositionCallback));
-    glfwSetCursorEnterCallback(
-        win,
-        reinterpret_cast<GLFWcursorenterfun>(cursorEnterCallback));
-    glfwSetMouseButtonCallback(
-        win,
-        reinterpret_cast<GLFWmousebuttonfun>(mouseButtonCallback));
-    glfwSetScrollCallback(win, reinterpret_cast<GLFWscrollfun>(scrollCallback));
-}
+        if (w == nullptr) {
+            return 0;
+        }
 
-void Window::closeCallback(void* window) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        Keyboard::KeyboardEvent e{};
+        e.key      = Keyboard::getKeyFromInternal(ev->key.keysym.sym);
+        e.state    = Keyboard::KeyState::Released;
+        e.scancode = ev->key.keysym.scancode;
+        e.ctrl     = (ev->key.keysym.mod & KMOD_CTRL) != 0;
+        e.shift    = (ev->key.keysym.mod & KMOD_SHIFT) != 0;
+        e.alt      = (ev->key.keysym.mod & KMOD_ALT) != 0;
+        e.system   = (ev->key.keysym.mod & KMOD_GUI) != 0;
+        e.capsLock = (ev->key.keysym.mod & KMOD_CAPS) != 0;
+        e.numLock  = (ev->key.keysym.mod & KMOD_NUM) != 0;
 
-    win->m_eventHandler->windowCloseEvent();
-}
+        w->m_eventHandler->keyboardEvent(e);
+    } else if (ev->type == SDL_KEYDOWN) {
+        auto* win = SDL_GetWindowFromID(ev->key.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-void Window::resizeCallback(void* window, const int width, const int height) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        if (w == nullptr) {
+            return 0;
+        }
 
-    win->m_eventHandler->windowResizeEvent(Vector2I(width, height));
-}
+        Keyboard::KeyboardEvent e{};
+        e.key = Keyboard::getKeyFromInternal(ev->key.keysym.sym);
+        if (ev->key.repeat != 0) {
+            e.state = Keyboard::KeyState::Repeating;
+        } else {
+            e.state = Keyboard::KeyState::Pressed;
+        }
+        e.scancode = ev->key.keysym.scancode;
+        e.ctrl     = (ev->key.keysym.mod & KMOD_CTRL) != 0;
+        e.shift    = (ev->key.keysym.mod & KMOD_SHIFT) != 0;
+        e.alt      = (ev->key.keysym.mod & KMOD_ALT) != 0;
+        e.system   = (ev->key.keysym.mod & KMOD_GUI) != 0;
+        e.capsLock = (ev->key.keysym.mod & KMOD_CAPS) != 0;
+        e.numLock  = (ev->key.keysym.mod & KMOD_NUM) != 0;
 
-void Window::framebufferResizeCallback(void* window,
-                                       const int width,
-                                       const int height) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        w->m_eventHandler->keyboardEvent(e);
+    } else if (ev->type == SDL_TEXTINPUT) {
+        auto* win = SDL_GetWindowFromID(ev->text.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-    win->m_eventHandler->windowFramebufferResizeEvent(Vector2U(width, height));
-}
+        w->m_eventHandler->textInputEvent(ev->text.text);
+    } else if (ev->type == SDL_MOUSEMOTION) {
+        auto* win = SDL_GetWindowFromID(ev->motion.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-void Window::contentScaleCallback(void* window,
-                                  const float xScale,
-                                  const float yScale) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        if (w == nullptr) {
+            return 0;
+        }
 
-    win->m_eventHandler->windowContentScaleEvent(Vector2F(xScale, yScale));
-}
+        if (!Mouse::isInRelativeMode()) {
+            w->m_eventHandler->cursorPositionEvent(
+                {ev->motion.x, ev->motion.y});
+        } else {
+            w->m_eventHandler->cursorPositionEvent(
+                {ev->motion.xrel, ev->motion.yrel});
+        }
+    } else if (ev->type == SDL_MOUSEBUTTONUP) {
+        auto* win = SDL_GetWindowFromID(ev->button.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-void Window::positionCallback(void* window, const int xPos, const int yPos) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        if (w == nullptr) {
+            return 0;
+        }
 
-    win->m_eventHandler->windowPositionEvent(Vector2I(xPos, yPos));
-}
+        const auto mod = SDL_GetModState();
 
-void Window::minimizeCallback(void* window, const int minimized) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        Mouse::MouseButtonEvent e{};
+        e.button = Mouse::getButtonFromInternal(ev->button.button);
+        e.state = Mouse::ButtonState::Released;
+        e.ctrl     = (mod & KMOD_CTRL) != 0;
+        e.shift    = (mod & KMOD_SHIFT) != 0;
+        e.alt      = (mod & KMOD_ALT) != 0;
+        e.system   = (mod & KMOD_GUI) != 0;
+        e.capsLock = (mod & KMOD_CAPS) != 0;
+        e.numLock  = (mod & KMOD_NUM) != 0;
 
-    if (minimized != 0) {
-        win->m_eventHandler->windowMinimizeEvent();
-    } else {
-        win->m_eventHandler->windowUnminimizeEvent();
-    }
-}
+        w->m_eventHandler->mouseButtonEvent(e);
+    } else if (ev->type == SDL_MOUSEBUTTONDOWN) {
+        auto* win = SDL_GetWindowFromID(ev->button.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-void Window::maximizeCallback(void* window, const int maximized) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        if (w == nullptr) {
+            return 0;
+        }
 
-    if (maximized != 0) {
-        win->m_eventHandler->windowMaximizeEvent();
-    } else {
-        win->m_eventHandler->windowUnmaximizeEvent();
-    }
-}
+        const auto mod = SDL_GetModState();
 
-void Window::focusCallback(void* window, const int focused) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        Mouse::MouseButtonEvent e{};
+        e.button = Mouse::getButtonFromInternal(ev->button.button);
+        e.state = Mouse::ButtonState::Pressed;
+        e.ctrl     = (mod & KMOD_CTRL) != 0;
+        e.shift    = (mod & KMOD_SHIFT) != 0;
+        e.alt      = (mod & KMOD_ALT) != 0;
+        e.system   = (mod & KMOD_GUI) != 0;
+        e.capsLock = (mod & KMOD_CAPS) != 0;
+        e.numLock  = (mod & KMOD_NUM) != 0;
 
-    if (focused != 0) {
-        win->m_eventHandler->windowGainedFocusEvent();
-    } else {
-        win->m_eventHandler->windowLostFocusEvent();
-    }
-}
+        w->m_eventHandler->mouseButtonEvent(e);
+    } else if (ev->type == SDL_MOUSEWHEEL) {
+        auto* win = SDL_GetWindowFromID(ev->wheel.windowID);
+        auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
-void Window::refreshCallback(void* window) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+        if (w == nullptr) {
+            return 0;
+        }
 
-    win->m_eventHandler->windowRefreshEvent();
-}
-
-void Window::keyboardCallback(void* window,
-                              const int key,
-                              const int scancode,
-                              const int action,
-                              const int mods) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-    Keyboard::KeyboardEvent kbe{};
-
-    kbe.key = Keyboard::getKeyFromInternal(key);
-    if (action == GLFW_PRESS) {
-        kbe.state = Keyboard::KeyState::Pressed;
-    } else if (action == GLFW_REPEAT) {
-        kbe.state = Keyboard::KeyState::Repeating;
-    } else {
-        kbe.state = Keyboard::KeyState::Released;
-    }
-    kbe.scancode = scancode;
-    kbe.ctrl     = (mods & GLFW_MOD_CONTROL) != 0;
-    kbe.shift    = (mods & GLFW_MOD_SHIFT) != 0;
-    kbe.alt      = (mods & GLFW_MOD_ALT) != 0;
-    kbe.system   = (mods & GLFW_MOD_SUPER) != 0;
-    kbe.capsLock = (mods & GLFW_MOD_CAPS_LOCK) != 0;
-    kbe.numLock  = (mods & GLFW_MOD_NUM_LOCK) != 0;
-
-    win->m_eventHandler->keyboardEvent(kbe);
-}
-
-void Window::textInputCallback(void* window, const unsigned int codePoint) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-
-    win->m_eventHandler->textInputEvent(codePoint);
-}
-
-void Window::cursorPositionCallback(void* window,
-                                    const double xPos,
-                                    const double yPos) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-
-    win->m_eventHandler->cursorPositionEvent(Vector2D(xPos, yPos));
-}
-
-void Window::cursorEnterCallback(void* window, const int entered) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-
-    if (entered != 0) {
-        win->m_eventHandler->cursorEnterEvent();
-    } else {
-        win->m_eventHandler->cursorLeaveEvent();
-    }
-}
-
-void Window::mouseButtonCallback(void* window,
-                                 const int button,
-                                 const int action,
-                                 const int mods) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-    Mouse::MouseButtonEvent mbe{};
-
-    mbe.button = Mouse::getButtonFromInternal(button);
-    if (action == GLFW_PRESS) {
-        mbe.state = Mouse::ButtonState::Pressed;
-    } else {
-        mbe.state = Mouse::ButtonState::Released;
+        w->m_eventHandler->scrollEvent({ev->wheel.x, ev->wheel.y});
     }
 
-    mbe.ctrl     = (mods & GLFW_MOD_CONTROL) != 0;
-    mbe.shift    = (mods & GLFW_MOD_SHIFT) != 0;
-    mbe.alt      = (mods & GLFW_MOD_ALT) != 0;
-    mbe.system   = (mods & GLFW_MOD_SUPER) != 0;
-    mbe.capsLock = (mods & GLFW_MOD_CAPS_LOCK) != 0;
-    mbe.numLock  = (mods & GLFW_MOD_NUM_LOCK) != 0;
-
-    win->m_eventHandler->mouseButtonEvent(mbe);
-}
-
-void Window::scrollCallback(void* window,
-                            const double xOffset,
-                            const double yOffset) {
-    auto* handle = static_cast<GLFWwindow*>(window);
-    auto* win    = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-
-    win->m_eventHandler->scrollEvent(Vector2D(xOffset, yOffset));
+    return 0;
 }
 }

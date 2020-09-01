@@ -72,10 +72,9 @@ public:
         LCtrl,
         LAlt,
         Menu,
-        LSystem,
+        System,
         Space,
         RAlt,
-        RSystem,
         RCtrl,
         RShift,
         Enter,
@@ -232,12 +231,31 @@ public:
      * \brief Get key state
      *
      *
-     * Returns the current key state for a window.
-     * \param window Window to pe polled for the state of the key
+     * Returns the current state of a key.
      * \param key The Keyboard::Key type
      * \return State of the key
      */
-    [[nodiscard]] static KeyState getKeyState(const Window& window, Key key);
+    [[nodiscard]] static KeyState getKeyState(Key key);
+
+    /**
+     * \brief Set text input
+     *
+     *
+     * Turns either on or off the text input mode. All windows will start
+     * to receive text input events and some platforms may show an on-screen
+     * keyboard if text input is on.
+     * \param input Whether to turn text input on or off
+     */
+    static void setTextInput(bool input);
+
+    /**
+     * \brief Is text input enabled
+     *
+     *
+     * Returns whether the text input mode is enabled.
+     * \return true if text input is enabled, false otherwise
+     */
+    static bool isTextureInputEnabled();
 };
 }
 

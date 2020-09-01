@@ -45,11 +45,10 @@ public:
      * \brief Create window
      *
      *
-     * Creates a window, setting only the context settings for this window.
+     * Creates a window
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
-     * \param contextSettings Settings for the underlying context
      */
-    explicit Window(const ContextSettings& contextSettings = ContextSettings());
+    explicit Window();
 
     /**
      * \brief Create window
@@ -58,10 +57,8 @@ public:
      * Creates a window, setting it's title.
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
-     * \param contextSettings Settings for the underlying context
      */
-    explicit Window(std::string_view title,
-                    const ContextSettings& contextSettings = ContextSettings());
+    explicit Window(std::string_view title);
 
     /**
      * \brief Create window
@@ -71,27 +68,21 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
      * \param size Size of the window
-     * \param contextSettings Settings for the underlying context
      */
     Window(std::string_view title,
-           const Vector2I& size,
-           const ContextSettings& contextSettings = ContextSettings());
+           const Vector2I& size);
 
     /**
      * \brief Create window
      *
      *
-     * Creates a fullscreen window(not borderless window) on a monitor.
+     * Creates a fullscreen window.
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
      * \param videoMode Video mode to be set
-     * \param monitor Monitor on which to make the window fullscreen
-     * \param contextSettings Settings for the underlying context
      */
     Window(std::string_view title,
-           const Monitor::VideoMode& videoMode,
-           const Monitor& monitor,
-           const ContextSettings& contextSettings = ContextSettings());
+           const Monitor::VideoMode& videoMode);
     Window(const Window&)     = delete;
     Window(Window&&) noexcept = delete;
     Window& operator=(const Window&) = delete;
@@ -123,24 +114,6 @@ public:
     [[nodiscard]] bool isOpen() const;
 
     /**
-     * \brief Get window context
-     *
-     *
-     * Returns the underlying context of the window.
-     * \return Reference to the context of the window
-     */
-    [[nodiscard]] const Context& getContext() const;
-
-    /**
-     * \brief Get window context
-     *
-     *
-     * Returns the underlying context of the window.
-     * \return Reference to the context of the window
-     */
-    [[nodiscard]] Context& getContext();
-
-    /**
      * \brief Set the window event handler
      *
      *
@@ -165,7 +138,7 @@ public:
      * Processes events on all currently created windows and calls their event handlers.
      * \sa EventHandler
      */
-    static void processEvents();
+    void processEvents();
 
     /**
      * \brief Set window title
@@ -198,12 +171,10 @@ public:
      * \brief Make the window fullscreen
      *
      *
-     * Makes the window fullscreen on a monitor.
+     * Makes the window fullscreen.
      * \param videoMode Video mode to be set
-     * \param monitor Monitor on which the window will be fullscreen
      */
-    void enableFullscreen(const Monitor::VideoMode& videoMode,
-                          const Monitor& monitor);
+    void enableFullscreen(const Monitor::VideoMode& videoMode);
 
     /**
      * \brief Disable fullscreen window
@@ -211,26 +182,6 @@ public:
      * Returns the window back to windowed mode.
      */
     void disableFullscreen();
-
-    /**
-     * \brief Set window size limits
-     *
-     *
-     * Sets a limit on the size of the window.
-     * \param minSize Minimal window size in virtual units
-     * \param maxSize Maximal window size in virtual units
-     */
-    void setSizeLimits(const Vector2I& minSize, const Vector2I& maxSize);
-
-    /**
-     * \brief Set window aspect ratio
-     *
-     *
-     * Sets the aspect ratio to be maintained while resizing the window.
-     * \param numer Numerator of the aspect ratio
-     * \param denom Denominator of the aspect ratio
-     */
-    void setAspectRatio(int numer, int denom);
 
     /**
      * \brief Minimize window
@@ -255,71 +206,6 @@ public:
      * Restores the window from either a maximized or a minimized state.
      */
     void restore();
-
-    /**
-     * \brief Request attention
-     *
-     *
-     * Requests attention from the user.
-     */
-    void requestAttention();
-
-    /**
-     * \brief Enable raw mouse input
-     *
-     *
-     * Enables raw mouse input for the current window.
-     * \note Raw input only works while the cursor is disabled
-     */
-    void enableRawInput();
-
-    /**
-     * \brief Disable raw mouse input
-     *
-     *
-     * Disables raw mouse input for the current window.
-     */
-    void disableRawInput();
-
-    /**
-     * \brief Disable cursor
-     *
-     *
-     * Disables the cursor for the current window
-     */
-    void disableCursor();
-
-    /**
-     * \brief Hide cursor
-     *
-     *
-     * Hides the cursor for the current window.
-     * \note A hidden cursor can still leave the window's area
-     */
-    void hideCursor();
-
-    /**
-     * \brief Enable cursor
-     *
-     *
-     * Shows the cursor for the current window.
-     */
-    void enableCursor();
-
-    /**
-     * \brief Swap buffers
-     *
-     *
-     * Swaps the front and back buffers for the current window.
-     */
-    void swapBuffers();
-
-    /**
-     * \brief Prevent window from closing
-     *
-     * Prevents the window from immediately closing (useful for event handlers).
-     */
-    void preventClosing();
 
     /**
      * \brief Close window
@@ -347,50 +233,22 @@ public:
     [[nodiscard]] Vector2I getSize() const;
 
     /**
-     * \brief Get window framebuffer size
+     * \brief Get window handle
      *
      *
-     * Returns the current window framebuffer size.
-     * \return 2D vector with the size of the framebuffer in pixels
+     * Returns the internal handle of the window.
+     * \return Internal window handle
      */
-    [[nodiscard]] Vector2U getFramebufferSize() const;
-
-    /**
-     * \brief Get window DPI scale
-     *
-     *
-     * Returns the current window DPI scale.
-     * \return 2D vector with the window scaling factors
-     */
-    [[nodiscard]] Vector2F getContentScale() const;
+    [[nodiscard]] void* getHandle() const;
 
 private:
-    SGE_PRIVATE void setCallbacks();
-    static SGE_PRIVATE void closeCallback(void* window);
-    static SGE_PRIVATE void resizeCallback(void* window, int width, int height);
-    static SGE_PRIVATE void
-    framebufferResizeCallback(void* window, int width, int height);
-    static SGE_PRIVATE void
-    contentScaleCallback(void* window, float xScale, float yScale);
-    static SGE_PRIVATE void positionCallback(void* window, int xPos, int yPos);
-    static SGE_PRIVATE void minimizeCallback(void* window, int minimized);
-    static SGE_PRIVATE void maximizeCallback(void* window, int maximized);
-    static SGE_PRIVATE void focusCallback(void* window, int focused);
-    static SGE_PRIVATE void refreshCallback(void* window);
-    static SGE_PRIVATE void
-    keyboardCallback(void* window, int key, int scancode, int action, int mods);
-    static SGE_PRIVATE void textInputCallback(void* window,
-                                              unsigned int codePoint);
-    static SGE_PRIVATE void
-    cursorPositionCallback(void* window, double xPos, double yPos);
-    static SGE_PRIVATE void cursorEnterCallback(void* window, int entered);
-    static SGE_PRIVATE void
-    mouseButtonCallback(void* window, int button, int action, int mods);
-    static SGE_PRIVATE void
-    scrollCallback(void* window, double xOffset, double yOffset);
+    friend class Context;
 
-    Context m_context;
+    static int eventFilter(void* userdata, void* event);
+
+    void* m_handle;
     EventHandler* m_eventHandler;
+    bool m_open;
 };
 }
 

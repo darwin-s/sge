@@ -21,25 +21,16 @@ void EventHandler::windowCloseEvent() {
 void EventHandler::windowResizeEvent(const Vector2I& size) {
 }
 
-void EventHandler::windowFramebufferResizeEvent(const Vector2U& size) {
-}
-
-void EventHandler::windowContentScaleEvent(const Vector2F& scale) {
-}
-
 void EventHandler::windowPositionEvent(const Vector2I& pos) {
 }
 
 void EventHandler::windowMinimizeEvent() {
 }
 
-void EventHandler::windowUnminimizeEvent() {
-}
-
 void EventHandler::windowMaximizeEvent() {
 }
 
-void EventHandler::windowUnmaximizeEvent() {
+void EventHandler::windowRestoredEvent() {
 }
 
 void EventHandler::windowGainedFocusEvent() {
@@ -54,10 +45,10 @@ void EventHandler::windowRefreshEvent() {
 void EventHandler::keyboardEvent(Keyboard::KeyboardEvent event) {
 }
 
-void EventHandler::textInputEvent(unsigned int codePoint) {
+void EventHandler::textInputEvent(const char* text) {
 }
 
-void EventHandler::cursorPositionEvent(const Vector2D& pos) {
+void EventHandler::cursorPositionEvent(const Vector2I& pos) {
 }
 
 void EventHandler::cursorEnterEvent() {
@@ -69,6 +60,6 @@ void EventHandler::cursorLeaveEvent() {
 void EventHandler::mouseButtonEvent(Mouse::MouseButtonEvent event) {
 }
 
-void EventHandler::scrollEvent(const Vector2D& scroll) {
+void EventHandler::scrollEvent(const Vector2I& scroll) {
 }
 }

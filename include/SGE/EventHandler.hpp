@@ -54,24 +54,6 @@ public:
     virtual void windowResizeEvent(const Vector2I& size);
 
     /**
-     * \brief Handle framebuffer resizing
-     *
-     *
-     * This event is called when the window's framebuffer is resized.
-     * \param size The new size of the framebuffer in pixels
-     */
-    virtual void windowFramebufferResizeEvent(const Vector2U& size);
-
-    /**
-     * \brief Handle DPI scale change
-     *
-     *
-     * This event is called when the window's DPI scale is changed.
-     * \param scale The new DPI scale
-     */
-    virtual void windowContentScaleEvent(const Vector2F& scale);
-
-    /**
      * \brief Handle window positioning
      *
      *
@@ -83,16 +65,10 @@ public:
     /**
      * \brief Handle window minimization
      *
+     *
      * This event is called when the window is minimized
      */
     virtual void windowMinimizeEvent();
-
-    /**
-     * \brief Handle window "un"minimization
-     *
-     * This event is called when the window is restored from a minimized state.
-     */
-    virtual void windowUnminimizeEvent();
 
     /**
      * \brief Handle window maximization
@@ -103,12 +79,13 @@ public:
     virtual void windowMaximizeEvent();
 
     /**
-     * \brief Handle window "un"maximization
+     * \brief handle window restoration
      *
      *
-     * This event is called when the window is restored from a maximized state.
+     * This event is called when the window is restored to it's
+     * normal size.
      */
-    virtual void windowUnmaximizeEvent();
+    virtual void windowRestoredEvent();
 
     /**
      * \brief Handle the gaining of focus
@@ -148,17 +125,20 @@ public:
      * \brief Handle text input
      *
      * This event is called when text is being input into the window.
-     * \param codePoint UTF-32 encoded code point of the character
+     * \param text UTF-8 encoded text
      */
-    virtual void textInputEvent(unsigned int codePoint);
+    virtual void textInputEvent(const char* text);
 
     /**
      * \brief Handle cursor position change
      *
-     * This event is called when the cursor changes position relative to the window.
-     * \param pos New position of the cursor relative to the window's top left corner
+     * This event is called when the cursor changes position. If the mouse
+     * is in relative mode, this will represent the amount the mouse has moved.
+     * Otherwise this represents the mouse position relative to the top left corner
+     * of the window.
+     * \param pos New position of the cursor
      */
-    virtual void cursorPositionEvent(const Vector2D& pos);
+    virtual void cursorPositionEvent(const Vector2I& pos);
 
     /**
      * \brief Handle cursor leaving
@@ -189,7 +169,7 @@ public:
      * This event is called when the mouse scroll wheel is used.
      * \param scroll The scroll offset (x - horizontal scroll, y - vertical scroll)
      */
-    virtual void scrollEvent(const Vector2D& scroll);
+    virtual void scrollEvent(const Vector2I& scroll);
 };
 }
 

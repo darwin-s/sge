@@ -39,7 +39,7 @@ public:
      *
      * Represents the buttons on a mouse
      */
-    enum class Button { Left, Right, Middle, Mb4, Mb5, Mb6, Mb7, Mb8 };
+    enum class Button { Unknown, Left, Right, Middle, Mb4, Mb5 };
 
     /**
      * \brief Mouse button state
@@ -103,33 +103,58 @@ public:
      * \brief Get button state
      *
      *
-     * Returns the current mouse button state for a window.
-     * \param window Window to pe polled for the state of the button
+     * Returns the current mouse button state.
      * \param button The Mouse::Button type
      * \return State of the mouse button
      */
-    [[nodiscard]] static ButtonState getButtonState(const Window& window,
-                                                    Button button);
+    [[nodiscard]] static ButtonState getButtonState(Button button);
 
     /**
      * \brief Get mouse position
      *
      *
-     * Get the cursor's position in virtual units, relative to the window's
-     * top left corner.
-     * \param window Window to get position from
+     * Get the cursor's position in virtual units.
      * \return Vector containing the mouse position
      */
-    [[nodiscard]] static Vector2D getMousePosition(const Window& window);
+    [[nodiscard]] static Vector2I getMousePosition();
 
     /**
-     * \brief Quarry for raw mouse input support
+     * \brief Set mouse relative mode
      *
-     *
-     * Quarries the system for raw mouse input support.
-     * \return true if raw mouse input is supported, false otherwise
+     * Sets whether the mouse is in relative mode, or not. When the mouse is in
+     * relative mode, the cursor will remain hidden, and it's position will
+     * remain fixed. Querying the mouse position will return the amount of
+     * movement since last query.
      */
-    [[nodiscard]] static bool isRawInputSupported();
+    static void setRelativeMode(bool active);
+
+    /**
+     * \brief Is mouse in relative mode
+     *
+     *
+     * Returns whether the mouse is in relative mode.
+     * \return true if mouse is in relative mode, false otherwise
+     */
+    static bool isInRelativeMode();
+
+    /**
+     * \brief Set mouse cursor visibility
+     *
+     *
+     * Sets the visibility of the mouse cursor. Note that a hidden cursor
+     * can still leave the window.
+     * \param visible Whether to show the mouse or not
+     */
+    static void setCursorVisibility(bool visible);
+
+    /**
+     * \brief Is mouse cursor visible
+     *
+     *
+     * Returns whether the mouse cursor is currently visible.
+     * \return true if cursor is visible, false otherwise
+     */
+    static bool isCursorVisible();
 };
 }
 
