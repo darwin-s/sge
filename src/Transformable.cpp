@@ -22,7 +22,7 @@ constexpr float PI = 3.14159265358979323846;
 namespace sge {
 Transformable::Transformable()
     : m_origin(0.0f, 0.0f), m_position(0.0f, 0.0f), m_scale(1.0f, 1.0f),
-      m_rotation(0.0f), m_transform(Matrix::identity),
+      m_rotation(0.0f), m_transform(1.0f),
       m_transformNeedsUpdate(true) {
 }
 
@@ -32,7 +32,7 @@ void Transformable::setOrigin(const float x, const float y) {
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::setOrigin(const Vector2F& origin) {
+void Transformable::setOrigin(const glm::vec2& origin) {
     setOrigin(origin.x, origin.y);
 }
 
@@ -42,7 +42,7 @@ void Transformable::setPosition(const float x, const float y) {
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::setPosition(const Vector2F& position) {
+void Transformable::setPosition(const glm::vec2& position) {
     setPosition(position.x, position.y);
 }
 
@@ -52,7 +52,7 @@ void Transformable::setScale(const float xFactor, const float yFactor) {
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::setScale(const Vector2F& factor) {
+void Transformable::setScale(const glm::vec2& factor) {
     setScale(factor.x, factor.y);
 }
 
@@ -69,7 +69,7 @@ void Transformable::move(const float x, const float y) {
     setPosition(m_position.x + x, m_position.y + y);
 }
 
-void Transformable::move(const Vector2F& offset) {
+void Transformable::move(const glm::vec2& offset) {
     move(offset.x, offset.y);
 }
 
@@ -77,7 +77,7 @@ void Transformable::scale(const float xFactor, const float yFactor) {
     setScale(m_scale.x * xFactor, m_scale.y * yFactor);
 }
 
-void Transformable::scale(const Vector2F& factor) {
+void Transformable::scale(const glm::vec2& factor) {
     scale(factor.x, factor.y);
 }
 
@@ -85,15 +85,15 @@ void Transformable::rotate(const float degrees) {
     setRotation(m_rotation + degrees);
 }
 
-const Vector2F& Transformable::getOrigin() const {
+const glm::vec2& Transformable::getOrigin() const {
     return m_origin;
 }
 
-const Vector2F& Transformable::getPosition() const {
+const glm::vec2& Transformable::getPosition() const {
     return m_position;
 }
 
-const Vector2F& Transformable::getScale() const {
+const glm::vec2& Transformable::getScale() const {
     return m_scale;
 }
 
@@ -101,7 +101,7 @@ float Transformable::getRotation() const {
     return m_rotation;
 }
 
-const Matrix& Transformable::getTransform() const {
+const glm::mat4& Transformable::getTransform() const {
     if (m_transformNeedsUpdate) {
         const auto radians = -m_rotation * PI / 180.0f;//Radians = angle*pi/180
         const auto cos     = std::cos(radians);
@@ -116,9 +116,10 @@ const Matrix& Transformable::getTransform() const {
         const auto translateY =
             m_origin.x * scaleXSin - m_origin.y * scaleYCos + m_position.y;
 
-        m_transform = Matrix( scaleXCos, scaleYSin, translateX,
-                             -scaleXSin, scaleYCos, translateY,
-                             0.0f,      0.0f,        1.0f);
+        m_transform = glm::mat4( scaleXCos, -scaleXSin, 0.0f, 0.0f,
+                                 scaleYSin,  scaleYCos, 0.0f, 0.0f,
+                                      0.0f,       0.0f, 1.0f, 0.0f,
+                                translateX, translateY, 0.0f, 1.0f);
 
         m_transformNeedsUpdate = false;
     }

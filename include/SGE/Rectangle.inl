@@ -24,7 +24,8 @@ Rectangle<T>::Rectangle(T left, T top, T width, T height)
 }
 
 template<typename T>
-Rectangle<T>::Rectangle(const Vector2<T>& position, const Vector2<T>& size)
+Rectangle<T>::Rectangle(const glm::vec<2, T, glm::defaultp>& position,
+                        const glm::vec<2, T, glm::defaultp>& size)
     : left(position.x), top(position.y), width(size.x), height(size.y) {
 }
 
@@ -45,7 +46,7 @@ template<typename T> bool Rectangle<T>::contains(T x, T y) const {
 }
 
 template<typename T>
-bool Rectangle<T>::contains(const Vector2<T>& point) const {
+bool Rectangle<T>::contains(const glm::vec<2, T, glm::defaultp>& point) const {
     return contains(point.x, point.y);
 }
 
@@ -66,11 +67,7 @@ bool Rectangle<T>::intersects(const Rectangle<T>& rect) const {
     T intersRight  = std::min(r1MaxX, r2MaxX);
     T intersBottom = std::min(r1MaxY, r2MaxY);
 
-    if (intersLeft < intersRight && intersTop < intersBottom) {
-        return true;
-    }
-
-    return false;
+    return intersLeft < intersRight && intersTop < intersBottom;
 }
 
 template<typename T>
@@ -100,22 +97,21 @@ Rectangle<T> Rectangle<T>::getIntersection(const Rectangle<T>& rect) const {
                         intersBottom - intersTop);
 }
 
-template<typename T> Vector2<T> Rectangle<T>::getPosition() const {
-    return Vector2<T>(left, top);
+template<typename T> glm::vec<2, T, glm::defaultp> Rectangle<T>::getPosition() const {
+    return {left, top};
 }
 
-template<typename T> Vector2<T> Rectangle<T>::getSize() const {
-    return Vector2<T>(width, height);
+template<typename T> glm::vec<2, T, glm::defaultp> Rectangle<T>::getSize() const {
+    return {width, height};
 }
 
 template<typename T>
 bool Rectangle<T>::operator==(const Rectangle<T>& other) const {
-    return left == other.left && top == other.top && width == other.width
-        && height == other.height;
+    return left == other.left && top == other.top && width == other.width &&
+        height == other.height;
 }
 
 template<typename T>
 bool Rectangle<T>::operator!=(const Rectangle<T>& other) const {
     return !(*this == other);
 }
-

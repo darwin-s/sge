@@ -28,7 +28,8 @@ Window::Window()
                                 SDL_WINDOWPOS_UNDEFINED,
                                 100,
                                 100,
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN |
+                                    SDL_WINDOW_RESIZABLE);
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
@@ -39,18 +40,20 @@ Window::Window(const std::string_view title)
                                 SDL_WINDOWPOS_UNDEFINED,
                                 100,
                                 100,
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN |
+                                    SDL_WINDOW_RESIZABLE);
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const std::string_view title, const Vector2I& size)
+Window::Window(const std::string_view title, const glm::ivec2& size)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
     m_handle = SDL_CreateWindow(title.data(),
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 size.x,
                                 size.y,
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN |
+                                    SDL_WINDOW_RESIZABLE);
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
@@ -62,7 +65,8 @@ Window::Window(const std::string_view title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 100,
                                 100,
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN |
+                                    SDL_WINDOW_RESIZABLE);
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
     enableFullscreen(videoMode);
 }
@@ -95,18 +99,18 @@ void Window::setDefaultEventHandler() {
 
 void Window::processEvents() {
     SDL_PumpEvents();
-    SDL_FilterEvents(reinterpret_cast<SDL_EventFilter>(eventFilter), nullptr);
+    SDL_FilterEvents(reinterpret_cast<SDL_EventFilter>(eventFilter), this);
 }
 
 void Window::setTitle(const std::string_view title) {
     SDL_SetWindowTitle(static_cast<SDL_Window*>(m_handle), title.data());
 }
 
-void Window::setPosition(const Vector2I& pos) {
+void Window::setPosition(const glm::ivec2& pos) {
     SDL_SetWindowPosition(static_cast<SDL_Window*>(m_handle), pos.x, pos.y);
 }
 
-void Window::setSize(const Vector2I& size) {
+void Window::setSize(const glm::ivec2& size) {
     SDL_SetWindowSize(static_cast<SDL_Window*>(m_handle), size.x, size.y);
 }
 
@@ -141,16 +145,16 @@ void Window::close() {
     m_open = false;
 }
 
-Vector2I Window::getPosition() const {
-    Vector2I ret;
+glm::ivec2 Window::getPosition() const {
+    glm::ivec2 ret;
 
     SDL_GetWindowPosition(static_cast<SDL_Window*>(m_handle), &ret.x, &ret.y);
 
     return ret;
 }
 
-Vector2I Window::getSize() const {
-    Vector2I ret;
+glm::ivec2 Window::getSize() const {
+    glm::ivec2 ret;
 
     SDL_GetWindowSize(static_cast<SDL_Window*>(m_handle), &ret.x, &ret.y);
 
@@ -162,7 +166,8 @@ void* Window::getHandle() const {
 }
 
 int Window::eventFilter(void* userdata, void* event) {
-    auto* ev = static_cast<SDL_Event*>(event);
+    auto* caller = static_cast<Window*>(userdata);
+    auto* ev     = static_cast<SDL_Event*>(event);
 
     if (ev->type == SDL_WINDOWEVENT) {
         auto* win = SDL_GetWindowFromID(ev->window.windowID);
@@ -170,6 +175,8 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         switch (ev->window.event) {
@@ -215,6 +222,8 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         Keyboard::KeyboardEvent e{};
@@ -235,6 +244,8 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         Keyboard::KeyboardEvent e{};
@@ -257,6 +268,12 @@ int Window::eventFilter(void* userdata, void* event) {
         auto* win = SDL_GetWindowFromID(ev->text.windowID);
         auto* w   = static_cast<Window*>(SDL_GetWindowData(win, "win"));
 
+        if (w == nullptr) {
+            return 0;
+        } else if (w != caller) {
+            return 1;
+        }
+
         w->m_eventHandler->textInputEvent(ev->text.text);
     } else if (ev->type == SDL_MOUSEMOTION) {
         auto* win = SDL_GetWindowFromID(ev->motion.windowID);
@@ -264,6 +281,8 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         if (!Mouse::isInRelativeMode()) {
@@ -279,13 +298,15 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         const auto mod = SDL_GetModState();
 
         Mouse::MouseButtonEvent e{};
-        e.button = Mouse::getButtonFromInternal(ev->button.button);
-        e.state = Mouse::ButtonState::Released;
+        e.button   = Mouse::getButtonFromInternal(ev->button.button);
+        e.state    = Mouse::ButtonState::Released;
         e.ctrl     = (mod & KMOD_CTRL) != 0;
         e.shift    = (mod & KMOD_SHIFT) != 0;
         e.alt      = (mod & KMOD_ALT) != 0;
@@ -300,13 +321,15 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         const auto mod = SDL_GetModState();
 
         Mouse::MouseButtonEvent e{};
-        e.button = Mouse::getButtonFromInternal(ev->button.button);
-        e.state = Mouse::ButtonState::Pressed;
+        e.button   = Mouse::getButtonFromInternal(ev->button.button);
+        e.state    = Mouse::ButtonState::Pressed;
         e.ctrl     = (mod & KMOD_CTRL) != 0;
         e.shift    = (mod & KMOD_SHIFT) != 0;
         e.alt      = (mod & KMOD_ALT) != 0;
@@ -321,6 +344,8 @@ int Window::eventFilter(void* userdata, void* event) {
 
         if (w == nullptr) {
             return 0;
+        } else if (w != caller) {
+            return 1;
         }
 
         w->m_eventHandler->scrollEvent({ev->wheel.x, ev->wheel.y});

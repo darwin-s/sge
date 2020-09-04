@@ -2,6 +2,7 @@ include(FetchContent)
 include(GenerateExportHeader)
 
 find_package(Threads REQUIRED)
+find_package(glm 0.9.9 REQUIRED)
 
 set(SRC_PREF ${CMAKE_CURRENT_SOURCE_DIR})
 set(INC_PREF ${CMAKE_CURRENT_SOURCE_DIR}/../include/SGE)
@@ -12,8 +13,6 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Hash.hpp
         ${INC_PREF}/Log.hpp
         ${INC_PREF}/Application.hpp
-        ${INC_PREF}/Vector2.hpp
-        ${INC_PREF}/Vector2.inl
         ${INC_PREF}/Monitor.hpp
         ${INC_PREF}/Keyboard.hpp
         ${INC_PREF}/Mouse.hpp
@@ -36,7 +35,6 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/RenderTarget.hpp
         ${INC_PREF}/RenderWindow.hpp
         ${INC_PREF}/Image.hpp
-        ${INC_PREF}/Matrix.hpp
         ${INC_PREF}/Transformable.hpp
         ${INC_PREF}/Camera.hpp
         ${INC_PREF}/Rectangle.hpp
@@ -74,14 +72,18 @@ set(SGE_SRC
         ${SRC_PREF}/RenderTarget.cpp
         ${SRC_PREF}/RenderWindow.cpp
         ${SRC_PREF}/Image.cpp
-        ${SRC_PREF}/Matrix.cpp
         ${SRC_PREF}/Transformable.cpp
         ${SRC_PREF}/Camera.cpp
         ${SRC_PREF}/Texture.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)
-target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}  PRIVATE physfs-static)
+target_link_libraries(sge PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} PRIVATE physfs-static)
+if (TARGET glm::glm)
+    target_link_libraries(sge PUBLIC glm::glm)
+else ()
+    target_link_libraries(sge PUBLIC glm)
+endif ()
 target_compile_features(sge PUBLIC cxx_std_17)
 set_target_properties(sge PROPERTIES
         PUBLIC_HEADER "${SGE_PUBLIC}"
@@ -92,7 +94,8 @@ set_target_properties(sge PROPERTIES
         INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../binaries
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../binaries
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../binaries)
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../binaries
+        PDB_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../binaries)
 
 target_include_directories(sge PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
@@ -100,13 +103,13 @@ target_include_directories(sge PUBLIC
         $<INSTALL_INTERFACE:include>
         PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     target_link_libraries(sge PUBLIC SDL2)
-else()
+else ()
     find_package(SDL2 REQUIRED)
     target_include_directories(sge PRIVATE ${SDL2_INCLUDE_DIRS})
     target_link_libraries(sge PUBLIC ${SDL2_LIBRARIES})
-endif()
+endif ()
 
 generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/../include/SGE/Export.hpp
         INCLUDE_GUARD_NAME SGE_EXPORT_HPP EXPORT_MACRO_NAME SGE_API
@@ -120,7 +123,7 @@ if (UNIX)
     target_compile_definitions(sge PRIVATE SGE_UNIX)
 elseif (WIN32)
     target_compile_definitions(sge PRIVATE SGE_WIN32)
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     target_compile_definitions(sge PRIVATE SGE_ANDROID)
 else ()
     message(FATAL_ERROR "OS target not supported")

@@ -7,4 +7,7 @@ project(sge
         LANGUAGES CXX C)
 
 add_subdirectory(3rdparty)
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+    include(${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake)
+endif()
 add_subdirectory(src)

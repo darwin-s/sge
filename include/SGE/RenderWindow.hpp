@@ -64,7 +64,7 @@ public:
      * \param contextSettings Settings for the underlying context
      */
     RenderWindow(std::string_view title,
-                 Vector2I size,
+                 glm::ivec2 size,
                  ContextSettings contextSettings = ContextSettings());
 
     /**
@@ -83,7 +83,7 @@ public:
 
     Context& getRenderingContext() override;
 
-    Vector2I getPhysicalSize() const override;
+    glm::ivec2 getPhysicalSize() const override;
 
     /**
      * \brief Swap window buffers

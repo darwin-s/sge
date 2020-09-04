@@ -27,7 +27,7 @@ RenderWindow::RenderWindow(const std::string_view title,
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
-                           const Vector2I size,
+                           const glm::ivec2 size,
                            const ContextSettings contextSettings)
     : Window(title, size), m_context(*this, contextSettings) {
 }
@@ -42,9 +42,9 @@ Context& RenderWindow::getRenderingContext() {
     return m_context;
 }
 
-Vector2I RenderWindow::getPhysicalSize() const {
+glm::ivec2 RenderWindow::getPhysicalSize() const {
     auto* w = static_cast<SDL_Window*>(getHandle());
-    Vector2I r;
+    glm::ivec2 r;
 
     SDL_GL_GetDrawableSize(w, &r.x, &r.y);
 

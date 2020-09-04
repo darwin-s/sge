@@ -16,9 +16,11 @@
 #define SGE_SHADER_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Matrix.hpp>
+#include <glm/mat4x4.hpp>
 #include <filesystem>
 #include <string_view>
+#include <string>
+#include <unordered_map>
 
 namespace sge {
 /**
@@ -118,7 +120,7 @@ public:
      * Link shader program after loading all the shaders.
      * \return true on success, false otherwise
      */
-    [[nodiscard]] bool link() const;
+    [[nodiscard]] bool link();
 
     /**
      * \brief Use shader program
@@ -146,10 +148,11 @@ public:
      * \param name Name of the uniform
      * \param mat Matrix to assign
      */
-    void setUniform(std::string_view name, const Matrix& mat);
+    void setUniform(std::string_view name, const glm::mat4& mat);
 
 private:
     unsigned int m_id;
+    std::unordered_map<std::string, int> m_uniforms;
 };
 }
 

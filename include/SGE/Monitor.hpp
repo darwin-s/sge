@@ -16,7 +16,6 @@
 #define SGE_MONITOR_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Vector2.hpp>
 #include <SGE/Rectangle.hpp>
 #include <vector>
 #include <string>

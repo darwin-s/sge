@@ -320,6 +320,7 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
 
     if (settings.debugContext) {
         glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(messageCallback, nullptr);
     }
 

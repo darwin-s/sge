@@ -18,7 +18,7 @@
 #include <SGE/Export.hpp>
 #include <SGE/Resource.hpp>
 #include <SGE/Image.hpp>
-#include <SGE/Vector2.hpp>
+#include <glm/vec2.hpp>
 
 namespace sge {
 /**
@@ -171,7 +171,7 @@ public:
      * \brief Get texture size
      * \return Texture size
      */
-    const Vector2U& getSize() const;
+    const glm::uvec2& getSize() const;
 
     /**
      * \brief Get texture wrapping mode
@@ -203,7 +203,7 @@ public:
 
 private:
     unsigned int m_id;
-    Vector2U m_size;
+    glm::uvec2 m_size;
     WrapMode m_wrapMode;
     FilterMode m_filterMode;
     bool m_hasMipmaps;

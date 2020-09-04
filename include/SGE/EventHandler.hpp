@@ -18,7 +18,7 @@
 #include <SGE/Export.hpp>
 #include <SGE/Keyboard.hpp>
 #include <SGE/Mouse.hpp>
-#include <SGE/Vector2.hpp>
+#include <glm/vec2.hpp>
 
 namespace sge {
 /**
@@ -51,7 +51,7 @@ public:
      * This event is called when the window is being resized on the screen.
      * \param size The new size of the window in virtual units
      */
-    virtual void windowResizeEvent(const Vector2I& size);
+    virtual void windowResizeEvent(const glm::ivec2& size);
 
     /**
      * \brief Handle window positioning
@@ -60,7 +60,7 @@ public:
      * This event is called when the window changes position on the screen.
      * \param pos New window position in virtual units
      */
-    virtual void windowPositionEvent(const Vector2I& pos);
+    virtual void windowPositionEvent(const glm::ivec2& pos);
 
     /**
      * \brief Handle window minimization
@@ -138,7 +138,7 @@ public:
      * of the window.
      * \param pos New position of the cursor
      */
-    virtual void cursorPositionEvent(const Vector2I& pos);
+    virtual void cursorPositionEvent(const glm::ivec2& pos);
 
     /**
      * \brief Handle cursor leaving
@@ -169,7 +169,7 @@ public:
      * This event is called when the mouse scroll wheel is used.
      * \param scroll The scroll offset (x - horizontal scroll, y - vertical scroll)
      */
-    virtual void scrollEvent(const Vector2I& scroll);
+    virtual void scrollEvent(const glm::ivec2& scroll);
 };
 }
 

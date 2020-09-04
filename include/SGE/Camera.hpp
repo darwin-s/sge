@@ -16,9 +16,9 @@
 #define SGE_CAMERA_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Matrix.hpp>
 #include <SGE/Rectangle.hpp>
-#include <SGE/Vector2.hpp>
+#include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace sge {
 /**
@@ -65,7 +65,7 @@ public:
      * \param center Center coordinates of the camera
      * \param size Size of the camera's rectangle
      */
-    Camera(const Vector2F& center, const Vector2F& size);
+    Camera(const glm::vec2& center, const glm::vec2& size);
 
     /**
      * \brief Set camera viewport
@@ -88,7 +88,7 @@ public:
      * \brief Set camera center
      * \param center Position of the center
      */
-    void setCenter(const Vector2F& center);
+    void setCenter(const glm::vec2& center);
 
     /**
      * \brief Set camera size
@@ -101,7 +101,7 @@ public:
      * \brief Set camera size
      * \param size Size of the camera
      */
-    void setSize(const Vector2F& size);
+    void setSize(const glm::vec2& size);
 
     /**
      * \brief Set camera view rectangle
@@ -126,7 +126,7 @@ public:
      * \brief Move camera
      * \param offset Position offset
      */
-    void move(const Vector2F& offset);
+    void move(const glm::vec2& offset);
 
     /**
      * \brief Zoom camera
@@ -155,13 +155,13 @@ public:
      * \brief Get camera center
      * \return Camera center position
      */
-    [[nodiscard]] const Vector2F& getCenter() const;
+    [[nodiscard]] const glm::vec2& getCenter() const;
 
     /**
      * \brief Get camera size
      * \return Size of camera's view rectangle
      */
-    [[nodiscard]] const Vector2F& getSize() const;
+    [[nodiscard]] const glm::vec2& getSize() const;
 
     /**
      * \brief Get camera view rectangle
@@ -179,22 +179,22 @@ public:
      * \brief Get camera's transform matrix
      * \return Transform to world coordinates
      */
-    [[nodiscard]] const Matrix& getTransform() const;
+    [[nodiscard]] const glm::mat4& getTransform() const;
 
     /**
      * \brief Get inverse of camera's transform matrix
      * \return Inverse of transform matrix
      */
-    [[nodiscard]] const Matrix& getInverseTransform() const;
+    [[nodiscard]] const glm::mat4& getInverseTransform() const;
 
 private:
-    Vector2F m_center;
-    Vector2F m_size;
+    glm::vec2 m_center;
+    glm::vec2 m_size;
     float m_rotation;
     RectangleFloat m_viewport;
-    mutable Matrix m_transform;
+    mutable glm::mat4 m_transform;
     mutable bool m_transformNeedsUpdate;
-    mutable Matrix m_inverseTransform;
+    mutable glm::mat4 m_inverseTransform;
     mutable bool m_inverseTransformNeedsUpdate;
 };
 }

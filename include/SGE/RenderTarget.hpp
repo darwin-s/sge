@@ -20,8 +20,8 @@
 #include <SGE/RenderState.hpp>
 #include <SGE/Color.hpp>
 #include <SGE/Types.hpp>
-#include <SGE/Vector2.hpp>
 #include <SGE/Camera.hpp>
+#include <glm/vec2.hpp>
 
 namespace sge {
 class Drawable;
@@ -52,7 +52,7 @@ public:
      * Get the physical size in pixels of the rendering target.
      * \return 
      */
-    [[nodiscard]] virtual Vector2I getPhysicalSize() const = 0;
+    [[nodiscard]] virtual glm::ivec2 getPhysicalSize() const = 0;
 
     /**
      * \brief Set camera
@@ -88,7 +88,8 @@ public:
      * \param cam Camera used to reference the view
      * \return World coordinates
      */
-    Vector2F pixelToCoordinates(const Vector2I& pixel, const Camera& cam) const;
+    glm::vec2 pixelToCoordinates(const glm::ivec2& pixel,
+                                 const Camera& cam) const;
 
     /**
      * \brief Map world coordinates to pixel
@@ -99,8 +100,8 @@ public:
      * \param cam Camera used to reference the view
      * \return Pixel coordinates
      */
-    Vector2I coordinatesToPixel(const Vector2F& coordinate,
-                                const Camera& cam) const;
+    glm::ivec2 coordinatesToPixel(const glm::vec2& coordinate,
+                                  const Camera& cam) const;
 
     /**
      * \brief Clear the framebuffer

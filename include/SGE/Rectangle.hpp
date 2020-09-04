@@ -16,7 +16,7 @@
 #define SGE_RECTANGLE_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Vector2.hpp>
+#include <glm/glm.hpp>
 #include <algorithm>
 
 namespace sge {
@@ -60,7 +60,8 @@ public:
      * \param position Rectangle position
      * \param size Rectangle size
      */
-    Rectangle(const Vector2<T>& position, const Vector2<T>& size);
+    Rectangle(const glm::vec<2, T, glm::defaultp>& position,
+              const glm::vec<2, T, glm::defaultp>& size);
 
     /**
      * \brief Convert rectangle
@@ -85,7 +86,8 @@ public:
      * \param point Point position
      * \return true if point is contained, false otherwise
      */
-    bool contains(const Vector2<T>& point) const;
+    [[nodiscard]]
+    bool contains(const glm::vec<2, T, glm::defaultp>& point) const;
 
     /**
      * \brief Rectangle intersects rectangle
@@ -108,13 +110,13 @@ public:
      * \brief Get position
      * \return Rectangle position
      */
-    Vector2<T> getPosition() const;
+    glm::vec<2, T, glm::defaultp> getPosition() const;
 
     /**
      * \brief Get size
      * \return Rectangle size
      */
-    Vector2<T> getSize() const;
+    glm::vec<2, T, glm::defaultp> getSize() const;
 
     /**
      * \brief Compare rectangles

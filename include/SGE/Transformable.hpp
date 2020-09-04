@@ -16,8 +16,8 @@
 #define SGE_TRANSFORMABLE_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Vector2.hpp>
-#include <SGE/Matrix.hpp>
+#include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace sge {
 /**
@@ -55,7 +55,7 @@ public:
      * Sets the origin of the transformable object.
      * \param origin Origin position
      */
-    void setOrigin(const Vector2F& origin);
+    void setOrigin(const glm::vec2& origin);
 
     /**
      * \brief Set position
@@ -74,7 +74,7 @@ public:
      * Sets the position of the transformable object.
      * \param position New Position
      */
-    void setPosition(const Vector2F& position);
+    void setPosition(const glm::vec2& position);
 
     /**
      * \brief Set scale
@@ -93,7 +93,7 @@ public:
      * Sets the scale factors of the transformable object.
      * \param factor Scale factor
      */
-    void setScale(const Vector2F& factor);
+    void setScale(const glm::vec2& factor);
 
     /**
      * \brief Set rotation
@@ -121,7 +121,7 @@ public:
      * Move the transformable object.
      * \param offset Position offset
      */
-    void move(const Vector2F& offset);
+    void move(const glm::vec2& offset);
 
     /**
      * \brief Scale object
@@ -140,7 +140,7 @@ public:
      * Scales the transformable object.
      * \param factor Scaling factor
      */
-    void scale(const Vector2F& factor);
+    void scale(const glm::vec2& factor);
 
     /**
      * \brief Rotate object
@@ -155,19 +155,19 @@ public:
      * \brief Get origin
      * \return Origin position
      */
-    [[nodiscard]] const Vector2F& getOrigin() const;
+    [[nodiscard]] const glm::vec2& getOrigin() const;
 
     /**
      * \brief Get position
      * \return Object position
      */
-    [[nodiscard]] const Vector2F& getPosition() const;
+    [[nodiscard]] const glm::vec2& getPosition() const;
 
     /**
      * \brief Get scale
      * \return Object scale factor
      */
-    [[nodiscard]] const Vector2F& getScale() const;
+    [[nodiscard]] const glm::vec2& getScale() const;
 
     /**
      * \brief Get rotation
@@ -182,14 +182,14 @@ public:
      * Get the object's transform matrix, updating it if needed.
      * \return The object's transform matrix
      */
-    [[nodiscard]] const Matrix& getTransform() const;
+    [[nodiscard]] const glm::mat4& getTransform() const;
 
 private:
-    Vector2F m_origin;
-    Vector2F m_position;
-    Vector2F m_scale;
+    glm::vec2 m_origin;
+    glm::vec2 m_position;
+    glm::vec2 m_scale;
     float m_rotation;
-    mutable Matrix m_transform;
+    mutable glm::mat4 m_transform;
     mutable bool m_transformNeedsUpdate;
 };
 }

@@ -18,10 +18,10 @@ namespace sge {
 void EventHandler::windowCloseEvent() {
 }
 
-void EventHandler::windowResizeEvent(const Vector2I& size) {
+void EventHandler::windowResizeEvent(const glm::ivec2& size) {
 }
 
-void EventHandler::windowPositionEvent(const Vector2I& pos) {
+void EventHandler::windowPositionEvent(const glm::ivec2& pos) {
 }
 
 void EventHandler::windowMinimizeEvent() {
@@ -48,7 +48,7 @@ void EventHandler::keyboardEvent(Keyboard::KeyboardEvent event) {
 void EventHandler::textInputEvent(const char* text) {
 }
 
-void EventHandler::cursorPositionEvent(const Vector2I& pos) {
+void EventHandler::cursorPositionEvent(const glm::ivec2& pos) {
 }
 
 void EventHandler::cursorEnterEvent() {
@@ -60,6 +60,6 @@ void EventHandler::cursorLeaveEvent() {
 void EventHandler::mouseButtonEvent(Mouse::MouseButtonEvent event) {
 }
 
-void EventHandler::scrollEvent(const Vector2I& scroll) {
+void EventHandler::scrollEvent(const glm::ivec2& scroll) {
 }
 }

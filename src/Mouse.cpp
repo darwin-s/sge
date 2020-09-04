@@ -79,8 +79,8 @@ Mouse::ButtonState Mouse::getButtonState(const Button button) {
     return ButtonState::Released;
 }
 
-Vector2I Mouse::getMousePosition() {
-    Vector2I pos;
+glm::ivec2 Mouse::getMousePosition() {
+    glm::ivec2 pos;
     if (isInRelativeMode()) {
         SDL_GetRelativeMouseState(&pos.x, &pos.y);
     } else {

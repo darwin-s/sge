@@ -17,7 +17,7 @@
 
 #include <SGE/Export.hpp>
 #include <SGE/Resource.hpp>
-#include <SGE/Vector2.hpp>
+#include <glm/vec2.hpp>
 
 namespace sge {
 /**
@@ -141,7 +141,7 @@ public:
      * Returns the size in pixels of the image.
      * \returns Vector containing the image's size
      */
-    const Vector2U& getSize() const;
+    const glm::uvec2& getSize() const;
 
     /**
      * \brief Get number of channels
@@ -154,7 +154,7 @@ public:
 
 private:
     unsigned char* m_data;
-    Vector2U m_size;
+    glm::uvec2 m_size;
     int m_channels;
 };
 }

@@ -227,7 +227,7 @@ void Texture::bind(const int unit) {
     m_hasMipmaps = true;
 }
 
-const Vector2U& Texture::getSize() const {
+const glm::uvec2& Texture::getSize() const {
     return m_size;
 }
 

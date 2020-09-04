@@ -89,9 +89,12 @@ bool Shader::load(const std::size_t size,
     return true;
 }
 
-bool Shader::link() const {
+bool Shader::link() {
     assert(Context::getCurrentContext());
     GLint success;
+    GLint uniforms;
+    char* nameBuffer = nullptr;
+    GLsizei nbSize = 0;
 
     glLinkProgram(m_id);
 
@@ -113,6 +116,18 @@ bool Shader::link() const {
         return false;
     }
 
+    glGetProgramInterfaceiv(m_id, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniforms);
+    if (uniforms > 0) {
+        glGetProgramInterfaceiv(m_id, GL_UNIFORM, GL_MAX_NAME_LENGTH, &nbSize);
+        nameBuffer = new char[nbSize];
+        for (auto i = 0; i < uniforms; i++) {
+            glGetProgramResourceName(m_id, GL_UNIFORM, i, nbSize, NULL, nameBuffer);
+            auto loc = glGetProgramResourceLocation(m_id, GL_UNIFORM, nameBuffer);
+            m_uniforms.insert(std::make_pair(nameBuffer, loc));
+        }
+        delete[] nameBuffer;
+    }
+
     return true;
 }
 
@@ -121,14 +136,20 @@ void Shader::use() const {
 }
 
 bool Shader::hasUniform(const std::string_view name) {
-    return glGetUniformLocation(m_id, name.data()) != -1;
+    if (m_uniforms.find(name.data()) != m_uniforms.end()) {
+        return true;
+    }
+
+    return false;
 }
 
-void Shader::setUniform(const std::string_view name, const Matrix& mat) {
-    glProgramUniformMatrix4fv(m_id,
-                              glGetUniformLocation(m_id, name.data()),
-                              1,
-                              GL_FALSE,
-                              mat.getData());
+void Shader::setUniform(const std::string_view name, const glm::mat4& mat) {
+    if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
+        glProgramUniformMatrix4fv(m_id,
+                                  l->second,
+                                  1,
+                                  GL_FALSE,
+                                  &mat[0][0]);
+    }
 }
 }

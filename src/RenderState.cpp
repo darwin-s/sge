@@ -15,17 +15,17 @@
 #include <SGE/RenderState.hpp>
 
 namespace sge {
-RenderState RenderState::defaultState = RenderState(Matrix::identity);
+RenderState RenderState::defaultState = RenderState(glm::mat4(1.0f));
 
 RenderState::RenderState(Shader* shader)
-    : shader(shader), transform(Matrix::identity), texture(nullptr) {
+    : shader(shader), transform(1.0f), texture(nullptr) {
 }
 
-RenderState::RenderState(const Matrix& transform)
+RenderState::RenderState(const glm::mat4& transform)
     : shader(nullptr), transform(transform), texture(nullptr) {
 }
 
 RenderState::RenderState(Texture* texture)
-    : shader(nullptr), transform(Matrix::identity), texture(texture) {
+    : shader(nullptr), transform(1.0f), texture(texture) {
 }
 }

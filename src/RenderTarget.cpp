@@ -45,26 +45,29 @@ RectangleInt RenderTarget::getViewport(const Camera& cam) const {
                         static_cast<int>(std::round(height * rect.height)));
 }
 
-Vector2F RenderTarget::pixelToCoordinates(const Vector2I& pixel,
-                                          const Camera& cam) const {
+glm::vec2 RenderTarget::pixelToCoordinates(const glm::ivec2& pixel,
+                                           const Camera& cam) const {
     const auto viewport = getViewport(cam);
-    const Vector2F normalized(
+    const glm::vec4 normalized(
         -1.0f + 2.0f * (pixel.x - viewport.left) / viewport.width,
-        1.0f - 2.0f * (pixel.y - viewport.top) / viewport.height);
+        1.0f - 2.0f * (pixel.y - viewport.top) / viewport.height,
+        0.0f,
+        1.0f);
 
     return cam.getInverseTransform() * normalized;
 }
 
-Vector2I RenderTarget::coordinatesToPixel(const Vector2F& coordinate,
-                                          const Camera& cam) const {
-    const Vector2F normalized = cam.getTransform() * coordinate;
-    const auto viewport       = getViewport(cam);
+glm::ivec2 RenderTarget::coordinatesToPixel(const glm::vec2& coordinate,
+                                            const Camera& cam) const {
+    const glm::vec2 normalized =
+        cam.getTransform() * glm::vec4(coordinate.x, coordinate.y, 0.0f, 1.0f);
+    const auto viewport = getViewport(cam);
 
-    return Vector2I(
-        static_cast<int>((normalized.x + 1.0f) / 2.0f * viewport.width
-                         + viewport.left),
-        static_cast<int>((normalized.y + 1.0f) / 2.0f * viewport.height
-                         + viewport.top));
+    return glm::ivec2(
+        static_cast<int>((normalized.x + 1.0f) / 2.0f * viewport.width +
+                         viewport.left),
+        static_cast<int>((normalized.y + 1.0f) / 2.0f * viewport.height +
+                         viewport.top));
 }
 
 void RenderTarget::clear(const Color& clearColor) {
@@ -106,8 +109,8 @@ void RenderTarget::drawTriangles(const VAO& vao,
         renderState.shader->use();
         if (renderState.shader->hasUniform("transform")) {
             renderState.shader->setUniform("transform",
-                                           renderState.transform
-                                               * getCamera().getTransform());
+                                           renderState.transform *
+                                               getCamera().getTransform());
         }
     }
 

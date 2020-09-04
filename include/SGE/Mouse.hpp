@@ -16,7 +16,7 @@
 #define SGE_MOUSE_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Vector2.hpp>
+#include <glm/vec2.hpp>
 #include <string>
 
 namespace sge {
@@ -116,7 +116,7 @@ public:
      * Get the cursor's position in virtual units.
      * \return Vector containing the mouse position
      */
-    [[nodiscard]] static Vector2I getMousePosition();
+    [[nodiscard]] static glm::ivec2 getMousePosition();
 
     /**
      * \brief Set mouse relative mode

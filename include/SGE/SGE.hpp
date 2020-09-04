@@ -19,7 +19,6 @@
 #include <SGE/Hash.hpp>
 #include <SGE/Log.hpp>
 #include <SGE/Application.hpp>
-#include <SGE/Vector2.hpp>
 #include <SGE/Monitor.hpp>
 #include <SGE/Keyboard.hpp>
 #include <SGE/EventHandler.hpp>
@@ -40,7 +39,6 @@
 #include <SGE/RenderTarget.hpp>
 #include <SGE/RenderWindow.hpp>
 #include <SGE/Image.hpp>
-#include <SGE/Matrix.hpp>
 #include <SGE/Transformable.hpp>
 #include <SGE/Camera.hpp>
 #include <SGE/Texture.hpp>

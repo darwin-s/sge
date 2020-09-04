@@ -22,23 +22,23 @@ constexpr float PI = 3.14159265358979323846;
 namespace sge {
 Camera::Camera()
     : m_center(0.0f, 0.0f), m_size(2.0f, 2.0f), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity),
-      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity),
+      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(1.0f),
+      m_transformNeedsUpdate(true), m_inverseTransform(1.0f),
       m_inverseTransformNeedsUpdate(true) {
 }
 
 Camera::Camera(const RectangleFloat& rect)
     : m_center(rect.left + rect.width / 2.0f, rect.top - rect.height / 2.0f),
       m_size(rect.width, rect.height), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity),
-      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity),
+      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(1.0f),
+      m_transformNeedsUpdate(true), m_inverseTransform(1.0f),
       m_inverseTransformNeedsUpdate(true) {
 }
 
-Camera::Camera(const Vector2F& center, const Vector2F& size)
+Camera::Camera(const glm::vec2& center, const glm::vec2& size)
     : m_center(center), m_size(size), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(Matrix::identity),
-      m_transformNeedsUpdate(true), m_inverseTransform(Matrix::identity),
+      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(1.0f),
+      m_transformNeedsUpdate(true), m_inverseTransform(1.0f),
       m_inverseTransformNeedsUpdate(true) {
 }
 
@@ -54,7 +54,7 @@ void Camera::setCenter(const float x, const float y) {
     m_inverseTransformNeedsUpdate = true;
 }
 
-void Camera::setCenter(const Vector2F& center) {
+void Camera::setCenter(const glm::vec2& center) {
     setCenter(center.x, center.y);
 }
 
@@ -66,7 +66,7 @@ void Camera::setSize(const float width, const float height) {
     m_inverseTransformNeedsUpdate = true;
 }
 
-void Camera::setSize(const Vector2F& size) {
+void Camera::setSize(const glm::vec2& size) {
     setSize(size.x, size.y);
 }
 
@@ -91,7 +91,7 @@ void Camera::move(const float x, const float y) {
     setCenter(m_center.x + x, m_center.y + y);
 }
 
-void Camera::move(const Vector2F& offset) {
+void Camera::move(const glm::vec2& offset) {
     move(offset.x, offset.y);
 }
 
@@ -110,11 +110,11 @@ const RectangleFloat& Camera::getViewport() const {
     return m_viewport;
 }
 
-const Vector2F& Camera::getCenter() const {
+const glm::vec2& Camera::getCenter() const {
     return m_center;
 }
 
-const Vector2F& Camera::getSize() const {
+const glm::vec2& Camera::getSize() const {
     return m_size;
 }
 
@@ -130,7 +130,7 @@ float Camera::getRoatation() const {
     return m_rotation;
 }
 
-const Matrix& Camera::getTransform() const {
+const glm::mat4& Camera::getTransform() const {
     if (m_transformNeedsUpdate) {
         const auto radians = m_rotation * PI / 180.0f;//Radians = angle*pi/180
         const auto cos     = std::cos(radians);
@@ -145,9 +145,10 @@ const Matrix& Camera::getTransform() const {
         const auto c = -a * m_center.x;
         const auto d = -b * m_center.y;
 
-        m_transform = Matrix( a * cos, a * sin, a * translateX + c,
-                             -b * sin, b * cos, b * translateY + d,
-                             0.0f,    0.0f,                1.0f);
+        m_transform = glm::mat4(           a * cos,          -b * sin, 0.0f, 0.0f,
+                                           a * sin,           b * cos, 0.0f, 0.0f,
+                                              0.0f,              0.0f, 1.0f, 0.0f,
+                                a * translateX + c, b* translateY + d, 0.0f, 1.0f);
 
         m_transformNeedsUpdate = false;
     }
@@ -155,9 +156,9 @@ const Matrix& Camera::getTransform() const {
     return m_transform;
 }
 
-const Matrix& Camera::getInverseTransform() const {
+const glm::mat4& Camera::getInverseTransform() const {
     if (m_inverseTransformNeedsUpdate) {
-        m_inverseTransform            = getTransform().getInverse();
+        m_inverseTransform            = glm::inverse(getTransform());
         m_inverseTransformNeedsUpdate = false;
     }
 

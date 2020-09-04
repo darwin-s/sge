@@ -1,4 +1,4 @@
-add_subdirectory(physfs)
+add_subdirectory(physfs EXCLUDE_FROM_ALL)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     add_library(SDL2 SHARED IMPORTED GLOBAL)
     if(MSVC)

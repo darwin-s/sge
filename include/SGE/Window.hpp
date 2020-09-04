@@ -70,7 +70,7 @@ public:
      * \param size Size of the window
      */
     Window(std::string_view title,
-           const Vector2I& size);
+           const glm::ivec2& size);
 
     /**
      * \brief Create window
@@ -135,7 +135,7 @@ public:
      * \brief Process events
      *
      *
-     * Processes events on all currently created windows and calls their event handlers.
+     * Processes events on this window and calls it's event handler.
      * \sa EventHandler
      */
     void processEvents();
@@ -156,7 +156,7 @@ public:
      * Sets a new position for the window.
      * \param pos New position of the window in virtual units
      */
-    void setPosition(const Vector2I& pos);
+    void setPosition(const glm::ivec2& pos);
 
     /**
      * \brief Set window size
@@ -165,7 +165,7 @@ public:
      * Sets the size of the window.
      * \param size New size of the window in virtual units.
      */
-    void setSize(const Vector2I& size);
+    void setSize(const glm::ivec2& size);
 
     /**
      * \brief Make the window fullscreen
@@ -222,7 +222,7 @@ public:
      * Returns the current position of the window.
      * \return 2D vector with the position of the window in virtual units
      */
-    [[nodiscard]] Vector2I getPosition() const;
+    [[nodiscard]] glm::ivec2 getPosition() const;
 
     /**
      * \brief Get window size
@@ -230,7 +230,7 @@ public:
      * Returns the current size of the window.
      * \return 2D vector with the size of the window in virtual units
      */
-    [[nodiscard]] Vector2I getSize() const;
+    [[nodiscard]] glm::ivec2 getSize() const;
 
     /**
      * \brief Get window handle

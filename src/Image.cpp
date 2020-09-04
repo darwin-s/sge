@@ -19,18 +19,18 @@
 #include <stdexcept>
 
 namespace sge {
-Image::Image() : m_data(nullptr), m_channels(0) {
+Image::Image() : m_data(nullptr), m_channels(0), m_size(0, 0) {
 }
 
 Image::Image(const std::filesystem::path& file)
-    : m_data(nullptr), m_channels(0) {
+    : m_data(nullptr), m_channels(0), m_size(0, 0) {
     if (!loadFromFile(file)) {
         throw std::runtime_error("Failed to load image");
     }
 }
 
 Image::Image(const std::size_t size, const void* data)
-    : m_data(nullptr), m_channels(0) {
+    : m_data(nullptr), m_channels(0), m_size(0, 0) {
     if (!loadFromMemory(size, data)) {
         throw std::runtime_error("Failed to load image");
     }
@@ -39,7 +39,7 @@ Image::Image(const std::size_t size, const void* data)
 Image::Image(Image&& other) noexcept
     : m_data(other.m_data), m_size(other.m_size), m_channels(other.m_channels) {
     other.m_data     = nullptr;
-    other.m_size     = Vector2U(0, 0);
+    other.m_size     = glm::uvec2(0, 0);
     other.m_channels = 0;
 }
 
@@ -55,7 +55,7 @@ Image& Image::operator=(Image&& other) noexcept {
     m_channels = other.m_channels;
 
     other.m_data     = nullptr;
-    other.m_size     = Vector2U(0, 0);
+    other.m_size     = glm::uvec2(0, 0);
     other.m_channels = 0;
 
     return *this;
@@ -97,7 +97,7 @@ unsigned char* Image::getPixelData() const {
     return m_data;
 }
 
-const Vector2U& Image::getSize() const {
+const glm::uvec2& Image::getSize() const {
     return m_size;
 }
 

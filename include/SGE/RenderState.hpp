@@ -16,7 +16,7 @@
 #define SGE_RENDERSTATE_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Matrix.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace sge {
 class Shader;
@@ -41,7 +41,7 @@ public:
      * \brief Construct render state
      * \param transform Transform to be passed to shader program
      */
-    explicit RenderState(const Matrix& transform);
+    explicit RenderState(const glm::mat4& transform);
 
     /**
      * \brief Construct render state
@@ -52,7 +52,7 @@ public:
     static RenderState defaultState;///< Default rendering state
 
     Shader* shader;
-    Matrix transform;
+    glm::mat4 transform;
     Texture* texture;
 };
 }
