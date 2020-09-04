@@ -21,15 +21,9 @@ jobs:
             - name: Create Build Environment
               run: cmake -E make_directory ${{runner.workspace}}/build
 
-            - name: Conan add default profile
-              run: conan profile new default --detect
-
-            - name: Conan modify default profile
-              run: conan profile update settings.compiler.libcxx=libstdc++11 default
-
             - name: Conan install
               working-directory: ${{runner.workspace}}
-              run: conan install -if=./build .
+              run: conan install -if build .
 
             - name: Configure CMake
               shell: bash
@@ -60,7 +54,7 @@ jobs:
 
                 - name: Conan install
                   working-directory: ${{runner.workspace}}
-                  run: conan install -if=./build .
+                  run: conan install -if build .
 
                 - name: Configure CMake
                   shell: bash
