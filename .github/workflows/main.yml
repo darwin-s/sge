@@ -28,6 +28,7 @@ jobs:
               run: conan profile update settings.compiler.libcxx=libstdc++11 default
 
             - name: Conan install
+              shell: bash
               working-directory: ${{runner.workspace}}
               run: conan install -if build $GITHUB_WORKSPACE
 
@@ -53,6 +54,7 @@ jobs:
                   run: cmake -E make_directory ${{runner.workspace}}/build
 
                 - name: Conan install
+                  shell: bash
                   working-directory: ${{runner.workspace}}
                   run: conan install -if build $GITHUB_WORKSPACE
 
