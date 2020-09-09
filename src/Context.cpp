@@ -354,25 +354,6 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
         GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
         &m_settings.stencilBits);
 
-    if (active != nullptr) {
-        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
-                               static_cast<SDL_GLContext>(active->m_handle)) !=
-            0) {
-            std::scoped_lock logLock(sge::Log::generalMutex);
-            sge::Log::general << sge::Log::MessageType::Error
-                              << "SDL error: " << SDL_GetError()
-                              << sge::Log::Operation::Endl;
-            throw std::runtime_error("SDL error");
-        }
-    } else {
-        if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
-                               NULL) != 0) {
-            std::scoped_lock logLock(sge::Log::generalMutex);
-            sge::Log::general << sge::Log::MessageType::Error
-                              << "SDL error: " << SDL_GetError()
-                              << sge::Log::Operation::Endl;
-            throw std::runtime_error("SDL error");
-        }
-    }
+    active = this;
 }
 }

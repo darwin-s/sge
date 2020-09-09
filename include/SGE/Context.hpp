@@ -41,7 +41,7 @@ public:
      *
      *
      * Creates an OpenGL context using the settings provided.
-     * \note A created OpenGL context is not made current.
+     * \note A created OpenGL context is made current on the executing thread.
      * \note The context settings may not be respected exactly. Check the settings after creating the context.
      * \param settings Settings for the context
      */
@@ -52,7 +52,7 @@ public:
      *
      *
      * Creates an OpenGL context using the settings provided and attach it to a window.
-     * \note A created OpenGL context is not made current.
+     * \note A created OpenGL context is made current on the executing thread.
      * \note The context settings may not be respected exactly. Check the settings after creating the context.
      * \param window Window to attach the context to
      * \param settings Settings for the context
