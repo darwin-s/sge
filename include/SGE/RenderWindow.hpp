@@ -39,7 +39,8 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param contextSettings Settings for the underlying context
      */
-    explicit RenderWindow(ContextSettings contextSettings = ContextSettings());
+    explicit RenderWindow(
+        const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create render window
@@ -50,8 +51,9 @@ public:
      * \param title Title of the window
      * \param contextSettings Settings for the underlying context
      */
-    explicit RenderWindow(std::string_view title,
-                          ContextSettings contextSettings = ContextSettings());
+    explicit RenderWindow(
+        std::string_view title,
+        const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create render window
@@ -65,7 +67,7 @@ public:
      */
     RenderWindow(std::string_view title,
                  glm::ivec2 size,
-                 ContextSettings contextSettings = ContextSettings());
+                 const ContextSettings& contextSettings = ContextSettings());
 
     /**
      * \brief Create render window
@@ -79,9 +81,7 @@ public:
      */
     RenderWindow(std::string_view title,
                  Monitor::VideoMode videoMode,
-                 ContextSettings contextSettings = ContextSettings());
-
-    Context& getRenderingContext() override;
+                 const ContextSettings& contextSettings = ContextSettings());
 
     glm::ivec2 getPhysicalSize() const override;
 
@@ -92,9 +92,6 @@ public:
      * Swaps the drawing buffers for a window.
      */
     void swapBuffers();
-
-private:
-    Context m_context;
 };
 }
 

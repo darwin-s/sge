@@ -17,29 +17,25 @@
 #include <SDL.h>
 
 namespace sge {
-RenderWindow::RenderWindow(const ContextSettings contextSettings)
-    : Window(), m_context(*this, contextSettings) {
+RenderWindow::RenderWindow(const ContextSettings& contextSettings)
+    : Window(), RenderTarget(*this, contextSettings) {
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
-                           const ContextSettings contextSettings)
-    : Window(title), m_context(*this, contextSettings) {
+                           const ContextSettings& contextSettings)
+    : Window(title), RenderTarget(*this, contextSettings) {
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
                            const glm::ivec2 size,
-                           const ContextSettings contextSettings)
-    : Window(title, size), m_context(*this, contextSettings) {
+                           const ContextSettings& contextSettings)
+    : Window(title, size), RenderTarget(*this, contextSettings) {
 }
 
 RenderWindow::RenderWindow(const std::string_view title,
                            const Monitor::VideoMode videoMode,
-                           const ContextSettings contextSettings)
-    : Window(title, videoMode), m_context(*this, contextSettings) {
-}
-
-Context& RenderWindow::getRenderingContext() {
-    return m_context;
+                           const ContextSettings& contextSettings)
+    : Window(title, videoMode), RenderTarget(*this, contextSettings) {
 }
 
 glm::ivec2 RenderWindow::getPhysicalSize() const {
@@ -54,6 +50,7 @@ glm::ivec2 RenderWindow::getPhysicalSize() const {
 void RenderWindow::swapBuffers() {
     auto* w = static_cast<SDL_Window*>(getHandle());
 
+    flushRenderQueue();
     SDL_GL_SwapWindow(w);
 }
 }

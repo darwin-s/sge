@@ -42,5 +42,6 @@
 #include <SGE/Transformable.hpp>
 #include <SGE/Camera.hpp>
 #include <SGE/Texture.hpp>
+#include <SGE/Sprite.hpp>
 
 #endif//SGE_SGE_HPP

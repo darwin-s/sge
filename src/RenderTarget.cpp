@@ -14,18 +14,39 @@
 
 #include <SGE/RenderTarget.hpp>
 #include <SGE/Drawable.hpp>
-#include <SGE/VAO.hpp>
 #include <SGE/Shader.hpp>
+#include <SGE/Texture.hpp>
 #include <cmath>
 #include <glad.h>
+
+namespace {
+constexpr std::size_t batchVerticesNum = 1000;
+unsigned int maxTextures               = 0;
+}
 
 namespace sge {
 const Camera RenderTarget::defaultCamera = Camera();
 
-RenderTarget::RenderTarget() : m_cameraChanged(true) {
+RenderTarget::RenderTarget(const ContextSettings& contextSettings)
+    : m_cameraChanged(true), m_context(contextSettings), m_vertexCount(0),
+      m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
+      m_currentShader(nullptr), m_sync(nullptr), m_usedTextureUnits(0) {
+    setBuffers();
+    m_usedTextures.reserve(maxTextures);
+}
+
+RenderTarget::RenderTarget(const Window& win,
+                           const ContextSettings& contextSettings)
+    : m_cameraChanged(true), m_context(win, contextSettings), m_vertexCount(0),
+      m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
+      m_currentShader(nullptr), m_sync(nullptr), m_usedTextureUnits(0) {
+    setBuffers();
+    m_usedTextures.reserve(maxTextures);
 }
 
 void RenderTarget::setCamera(const Camera& camera) {
+    flushRenderQueue();
+
     m_camera        = camera;
     m_cameraChanged = true;
 }
@@ -70,10 +91,14 @@ glm::ivec2 RenderTarget::coordinatesToPixel(const glm::vec2& coordinate,
                          viewport.top));
 }
 
+Context& RenderTarget::getContext() {
+    return m_context;
+}
+
 void RenderTarget::clear(const Color& clearColor) {
     auto* active = Context::getCurrentContext();
 
-    getRenderingContext().setCurrent(true);
+    m_context.setCurrent(true);
     glClearColor(static_cast<GLfloat>(clearColor.red) / 255,
                  static_cast<GLfloat>(clearColor.green) / 255,
                  static_cast<GLfloat>(clearColor.blue) / 255,
@@ -90,35 +115,269 @@ void RenderTarget::draw(const Drawable& drawable,
     drawable.draw(*this, renderState);
 }
 
-void RenderTarget::drawTriangles(const VAO& vao,
-                                 const std::size_t firstVertex,
-                                 const std::size_t vertexCount,
-                                 const RenderState& renderState) {
-    auto* active = Context::getCurrentContext();
+void RenderTarget::drawTriangle(const std::array<Vertex, 3>& vertices,
+                                const RenderState& renderState) {
+    m_context.setCurrent(true);
 
-    getRenderingContext().setCurrent(true);
+    if (m_currentShader == nullptr) {
+        m_currentShader = renderState.shader;
+    }
+
+    if (m_vertexCount + 2 >= batchVerticesNum) {
+        flushRenderQueue();
+    }
+
+    if (m_indicesCount + 2 >= batchVerticesNum) {
+        flushRenderQueue();
+    }
+
+    bool newTexture = true;
+    for (const auto& t : m_usedTextures) {
+        if (t == renderState.texture || t == nullptr) {
+            newTexture = false;
+            break;
+        }
+    }
+
+    if (newTexture && m_usedTextureUnits + 1 >= maxTextures) {
+        flushRenderQueue();
+    }
+
+    if (renderState.shader != m_currentShader) {
+        flushRenderQueue();
+        m_currentShader = renderState.shader;
+    }
+
+    if (newTexture) {
+        m_usedTextures.push_back(renderState.texture);
+        m_usedTextureUnits++;
+    }
+
+    if (m_sync != nullptr) {
+        GLenum waitReturn = GL_UNSIGNALED;
+        while (waitReturn != GL_ALREADY_SIGNALED &&
+               waitReturn != GL_CONDITION_SATISFIED) {
+            waitReturn = glClientWaitSync(static_cast<GLsync>(m_sync),
+                                          GL_SYNC_FLUSH_COMMANDS_BIT,
+                                          1);
+        }
+        glDeleteSync(static_cast<GLsync>(m_sync));
+        m_sync = nullptr;
+    }
+
+    m_verticesBatch[m_vertexCount].pos =
+        renderState.transform * glm::vec4(vertices[0].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount].tint    = vertices[0].tint;
+    m_verticesBatch[m_vertexCount].texPos  = vertices[0].texPos;
+    m_verticesBatch[m_vertexCount].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 1].pos =
+        renderState.transform * glm::vec4(vertices[1].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount + 1].tint    = vertices[1].tint;
+    m_verticesBatch[m_vertexCount + 1].texPos  = vertices[1].texPos;
+    m_verticesBatch[m_vertexCount + 1].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 2].pos =
+        renderState.transform * glm::vec4(vertices[2].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount + 2].tint    = vertices[2].tint;
+    m_verticesBatch[m_vertexCount + 2].texPos  = vertices[2].texPos;
+    m_verticesBatch[m_vertexCount + 2].texUnit = m_usedTextureUnits - 1;
+    m_indices[m_vertexCount]                   = m_vertexCount;
+    m_indices[m_vertexCount + 1]               = m_vertexCount + 1;
+    m_indices[m_vertexCount + 2]               = m_vertexCount + 2;
+
+    m_defaultVBO.flushChanges(sizeof(Vertex) * m_vertexCount,
+                              sizeof(Vertex) * 3);
+
+    m_defaultEBO.flushChanges(sizeof(unsigned int) * m_vertexCount,
+                              sizeof(unsigned int) * 3);
+
+    m_vertexCount += 3;
+    m_indicesCount += 3;
+}
+
+void RenderTarget::drawQuad(const std::array<Vertex, 4>& vertices,
+                            const RenderState& renderState) {
+    m_context.setCurrent(true);
+
+    if (m_currentShader == nullptr) {
+        m_currentShader = renderState.shader;
+    }
+
+    if (m_vertexCount + 3 >= batchVerticesNum) {
+        flushRenderQueue();
+    }
+
+    if (m_indicesCount + 5 >= batchVerticesNum) {
+        flushRenderQueue();
+    }
+
+    bool newTexture = true;
+    for (const auto& t : m_usedTextures) {
+        if (t == renderState.texture || t == nullptr) {
+            newTexture = false;
+            break;
+        }
+    }
+
+    if (newTexture && m_usedTextureUnits + 1 >= maxTextures) {
+        flushRenderQueue();
+    }
+
+    if (renderState.shader != m_currentShader) {
+        flushRenderQueue();
+        m_currentShader = renderState.shader;
+    }
+
+    if (newTexture) {
+        m_usedTextures.push_back(renderState.texture);
+        m_usedTextureUnits++;
+    }
+
+    if (m_sync != nullptr) {
+        GLenum waitReturn = GL_UNSIGNALED;
+        while (waitReturn != GL_ALREADY_SIGNALED &&
+            waitReturn != GL_CONDITION_SATISFIED) {
+            waitReturn = glClientWaitSync(static_cast<GLsync>(m_sync),
+                                          GL_SYNC_FLUSH_COMMANDS_BIT,
+                                          1);
+        }
+        glDeleteSync(static_cast<GLsync>(m_sync));
+        m_sync = nullptr;
+    }
+
+    m_verticesBatch[m_vertexCount].pos =
+        renderState.transform * glm::vec4(vertices[0].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount].tint    = vertices[0].tint;
+    m_verticesBatch[m_vertexCount].texPos  = vertices[0].texPos;
+    m_verticesBatch[m_vertexCount].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 1].pos =
+        renderState.transform * glm::vec4(vertices[1].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount + 1].tint    = vertices[1].tint;
+    m_verticesBatch[m_vertexCount + 1].texPos  = vertices[1].texPos;
+    m_verticesBatch[m_vertexCount + 1].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 2].pos =
+        renderState.transform * glm::vec4(vertices[2].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount + 2].tint    = vertices[2].tint;
+    m_verticesBatch[m_vertexCount + 2].texPos  = vertices[2].texPos;
+    m_verticesBatch[m_vertexCount + 2].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 3].pos =
+        renderState.transform * glm::vec4(vertices[3].pos, 0.0f, 1.0f);
+    m_verticesBatch[m_vertexCount + 3].tint    = vertices[3].tint;
+    m_verticesBatch[m_vertexCount + 3].texPos  = vertices[3].texPos;
+    m_verticesBatch[m_vertexCount + 3].texUnit = m_usedTextureUnits - 1;
+    m_indices[m_vertexCount]                   = m_vertexCount;
+    m_indices[m_vertexCount + 1]               = m_vertexCount + 1;
+    m_indices[m_vertexCount + 2]               = m_vertexCount + 2;
+    m_indices[m_vertexCount + 3]               = m_vertexCount + 2;
+    m_indices[m_vertexCount + 4]               = m_vertexCount + 1;
+    m_indices[m_vertexCount + 5]               = m_vertexCount + 3;
+
+    m_defaultVBO.flushChanges(sizeof(Vertex) * m_vertexCount,
+                              sizeof(Vertex) * 4);
+
+    m_defaultEBO.flushChanges(sizeof(unsigned int) * m_vertexCount,
+                              sizeof(unsigned int) * 6);
+
+    m_vertexCount += 4;
+    m_indicesCount += 6;
+}
+
+void RenderTarget::flushRenderQueue() {
+    if (m_vertexCount == 0) {
+        return;
+    }
 
     if (m_cameraChanged) {
         const auto view = getViewport(getCamera());
         const auto top  = getPhysicalSize().y - (view.top + view.height);
 
         glViewport(view.left, top, view.width, view.height);
+        m_cameraChanged = false;
     }
 
-    if (renderState.shader != nullptr) {
-        renderState.shader->use();
-        if (renderState.shader->hasUniform("transform")) {
-            renderState.shader->setUniform("transform",
-                                           renderState.transform *
-                                               getCamera().getTransform());
+    if (m_currentShader != nullptr) {
+        m_currentShader->use();
+        if (m_currentShader->hasUniform("transform")) {
+            m_currentShader->setUniform("transform",
+                                        getCamera().getTransform());
+        }
+
+        if (m_currentShader->hasUniform("tex[0]")) {
+            for (int i = 0; i < m_usedTextureUnits; i++) {
+                std::string u = "tex[" + std::to_string(i) + "]";
+                m_currentShader->setUniform(u, i);
+                m_usedTextures[i]->bind(i);
+            }
         }
     }
 
-    vao.bind();
-    glDrawArrays(GL_TRIANGLES, firstVertex, vertexCount);
+    glDrawElements(GL_TRIANGLES, m_indicesCount, GL_UNSIGNED_INT, 0);
 
-    if (active != nullptr) {
-        active->setCurrent(true);
+    if (m_sync != nullptr) {
+        glDeleteSync(static_cast<GLsync>(m_sync));
+    }
+
+    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+    m_vertexCount      = 0;
+    m_indicesCount     = 0;
+    m_usedTextureUnits = 0;
+    m_usedTextures.clear();
+    m_currentShader = nullptr;
+}
+
+void RenderTarget::setBuffers() {
+    m_defaultVBO.allocate(sizeof(Vertex) * batchVerticesNum, VBO::WriteAccess);
+    m_defaultEBO.allocate(sizeof(unsigned int) * batchVerticesNum,
+                          VBO::WriteAccess);
+    m_defaultVAO.bindVBO(m_defaultVBO, 0, 0, sizeof(Vertex));
+    m_defaultVAO.enableAttribute(0);
+    m_defaultVAO.enableAttribute(1);
+    m_defaultVAO.enableAttribute(2);
+    m_defaultVAO.enableAttribute(3);
+    m_defaultVAO.setAttributeFormat(0,
+                                    2,
+                                    VAO::Data::Float,
+                                    true,
+                                    offsetof(Vertex, pos));
+    m_defaultVAO.setAttributeFormat(1,
+                                    3,
+                                    VAO::Data::UnsignedByte,
+                                    true,
+                                    offsetof(Vertex, tint));
+    m_defaultVAO.setAttributeFormat(2,
+                                    2,
+                                    VAO::Data::Float,
+                                    true,
+                                    offsetof(Vertex, texPos));
+    m_defaultVAO.setAttributeFormat(3,
+                                    1,
+                                    VAO::Data::Float,
+                                    false,
+                                    offsetof(Vertex, texUnit));
+    m_defaultVAO.setAttributeBinding(0, 0);
+    m_defaultVAO.setAttributeBinding(1, 0);
+    m_defaultVAO.setAttributeBinding(2, 0);
+    m_defaultVAO.setAttributeBinding(3, 0);
+
+    m_verticesBatch =
+        static_cast<Vertex*>(m_defaultVBO.mapBuffer(0,
+                                                    m_defaultVBO.getSize(),
+                                                    VBO::WriteAccess,
+                                                    true));
+    m_indices = static_cast<unsigned int*>(
+        m_defaultEBO.mapBuffer(0,
+                               m_defaultEBO.getSize(),
+                               VBO::WriteAccess,
+                               true));
+
+    m_defaultVAO.bind();
+    m_defaultEBO.bindElementArray();
+
+    if (maxTextures == 0) {
+        maxTextures = Texture::getMaximumImageUnits();
+        if (maxTextures > 32) {
+            maxTextures = 32;
+        }
     }
 }
 }

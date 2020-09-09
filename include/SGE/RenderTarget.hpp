@@ -21,11 +21,16 @@
 #include <SGE/Color.hpp>
 #include <SGE/Types.hpp>
 #include <SGE/Camera.hpp>
+#include <SGE/VBO.hpp>
+#include <SGE/VAO.hpp>
+#include <SGE/Vertex.hpp>
 #include <glm/vec2.hpp>
+#include <array>
+#include <vector>
 
 namespace sge {
 class Drawable;
-class VAO;
+class Window;
 
 /**
  * \brief Base for render targets
@@ -35,15 +40,29 @@ class VAO;
  */
 class SGE_API RenderTarget {
 public:
-    RenderTarget();
-
-    virtual ~RenderTarget() = default;
+    /**
+     * \brief Create rendering context
+     *
+     *
+     * Creates a rendering context with an OpenGL context,
+     * \param contextSettings Settings for the OpenGL context
+     */
+    explicit RenderTarget(
+        const ContextSettings& contextSettings = ContextSettings());
 
     /**
-     * \brief Get rendering context
-     * \return Reference to the rendering context
+     * \brief Create rendering context
+     *
+     *
+     * Creates a rendering context for a window with an OpenGL context.
+     * \param win Window to use for context
+     * \param contextSettings Settings for the OpenGL context
      */
-    [[nodiscard]] virtual Context& getRenderingContext() = 0;
+    explicit RenderTarget(
+        const Window& win,
+        const ContextSettings& contextSettings = ContextSettings());
+
+    virtual ~RenderTarget() = default;
 
     /**
      * \brief Get physical size
@@ -103,6 +122,8 @@ public:
     glm::ivec2 coordinatesToPixel(const glm::vec2& coordinate,
                                   const Camera& cam) const;
 
+    Context& getContext();
+
     /**
      * \brief Clear the framebuffer
      * \param clearColor Color to fill with
@@ -117,24 +138,33 @@ public:
     void draw(const Drawable& drawable,
               const RenderState& renderState = RenderState::defaultState);
 
-    /**
-     * \brief Draw triangles
-     * \param vao VAO for drawing
-     * \param firstVertex Index of first vertex
-     * \param vertexCount Number of vertices
-     * \param renderState Current rendering state
-     */
-    void
-    drawTriangles(const VAO& vao,
-                  std::size_t firstVertex,
-                  std::size_t vertexCount,
+    void drawTriangle(const std::array<Vertex, 3>& vertices,
+                      const RenderState& renderState = RenderState::defaultState);
+
+    void drawQuad(const std::array<Vertex, 4>& vertices,
                   const RenderState& renderState = RenderState::defaultState);
+
+    void flushRenderQueue();
 
     static const Camera defaultCamera;///< Default camera for render targets
 
 private:
+    void setBuffers();
+
     bool m_cameraChanged;
     Camera m_camera;
+    Context m_context;
+    VAO m_defaultVAO;
+    VBO m_defaultVBO;
+    VBO m_defaultEBO;
+    std::size_t m_vertexCount;
+    std::size_t m_indicesCount;
+    unsigned int* m_indices;
+    Vertex* m_verticesBatch;
+    std::shared_ptr<Shader> m_currentShader;
+    void* m_sync;
+    std::vector<std::shared_ptr<Texture>> m_usedTextures;
+    unsigned int m_usedTextureUnits;
 };
 }
 
