@@ -17,6 +17,7 @@
 
 #include <SGE/Export.hpp>
 #include <glm/mat4x4.hpp>
+#include <memory>
 
 namespace sge {
 class Shader;
@@ -35,7 +36,7 @@ public:
      * \brief Construct render state
      * \param shader Shader program to be used for rendering
      */
-    explicit RenderState(Shader* shader);
+    explicit RenderState(std::shared_ptr<Shader> shader);
 
     /**
      * \brief Construct render state
@@ -47,13 +48,13 @@ public:
      * \brief Construct render state
      * \param texture Texture to be used for rendering
      */
-    explicit RenderState(Texture* texture);
+    explicit RenderState(std::shared_ptr<Texture> texture);
 
     static RenderState defaultState;///< Default rendering state
 
-    Shader* shader;
+    std::shared_ptr<Shader> shader;
     glm::mat4 transform;
-    Texture* texture;
+    std::shared_ptr<Texture> texture;
 };
 }
 
