@@ -63,8 +63,11 @@ bool Shader::load(const std::size_t size,
         shader = glCreateShader(GL_FRAGMENT_SHADER);
     }
 
-    glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V, data, size);
-    glSpecializeShader(shader, "main", 0, nullptr, nullptr);
+    glShaderSource(shader,
+                   1,
+                   reinterpret_cast<const char* const*>(&data),
+                   reinterpret_cast<const GLint*>(&size));
+    glCompileShader(shader);
 
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (success == GL_FALSE) {
@@ -94,14 +97,14 @@ bool Shader::link() {
     GLint success;
     GLint uniforms;
     char* nameBuffer = nullptr;
-    GLsizei nbSize = 0;
+    GLsizei nbSize   = 0;
 
     glLinkProgram(m_id);
 
     glGetProgramiv(m_id, GL_LINK_STATUS, &success);
     if (success == GL_FALSE) {
         GLint logLength;
-        glGetProgramiv(m_id, GL_LINK_STATUS, &logLength);
+        glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &logLength);
 
         std::vector<GLchar> log(logLength);
         glGetProgramInfoLog(m_id, logLength, &logLength, log.data());
@@ -121,9 +124,35 @@ bool Shader::link() {
         glGetProgramInterfaceiv(m_id, GL_UNIFORM, GL_MAX_NAME_LENGTH, &nbSize);
         nameBuffer = new char[nbSize];
         for (auto i = 0; i < uniforms; i++) {
-            glGetProgramResourceName(m_id, GL_UNIFORM, i, nbSize, NULL, nameBuffer);
-            auto loc = glGetProgramResourceLocation(m_id, GL_UNIFORM, nameBuffer);
+            const GLenum prop = GL_ARRAY_SIZE;
+            GLint arraySize   = 0;
+            glGetProgramResourceName(m_id,
+                                     GL_UNIFORM,
+                                     i,
+                                     nbSize,
+                                     NULL,
+                                     nameBuffer);
+            auto loc =
+                glGetProgramResourceLocation(m_id, GL_UNIFORM, nameBuffer);
             m_uniforms.insert(std::make_pair(nameBuffer, loc));
+
+            glGetProgramResourceiv(m_id,
+                                   GL_UNIFORM,
+                                   i,
+                                   1,
+                                   &prop,
+                                   1,
+                                   NULL,
+                                   &arraySize);
+
+            for (auto j = 1; j < arraySize; j++) {
+                std::string n(nameBuffer);
+                n.resize(n.size() - 2);
+                n += std::to_string(j) + "]";
+                auto loc2 =
+                    glGetProgramResourceLocation(m_id, GL_UNIFORM, n.c_str());
+                m_uniforms.insert(std::make_pair(n, loc2));
+            }
         }
         delete[] nameBuffer;
     }
@@ -145,11 +174,25 @@ bool Shader::hasUniform(const std::string_view name) {
 
 void Shader::setUniform(const std::string_view name, const glm::mat4& mat) {
     if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
-        glProgramUniformMatrix4fv(m_id,
-                                  l->second,
-                                  1,
-                                  GL_FALSE,
-                                  &mat[0][0]);
+        glProgramUniformMatrix4fv(m_id, l->second, 1, GL_FALSE, &mat[0][0]);
+    } else {
+        throw std::runtime_error("Uniform does not exist");
+    }
+}
+
+void Shader::setUniform(std::string_view name, unsigned int uint) {
+    if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
+        glProgramUniform1ui(m_id, l->second, uint);
+    } else {
+        throw std::runtime_error("Uniform does not exist");
+    }
+}
+
+void Shader::setUniform(std::string_view name, signed int sint) {
+    if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
+        glProgramUniform1i(m_id, l->second, sint);
+    } else {
+        throw std::runtime_error("Uniform does not exist");
     }
 }
 }

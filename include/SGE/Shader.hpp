@@ -28,8 +28,6 @@ namespace sge {
  *
  *
  * This object is used to represent an OpenGL shader program used for drawing.
- * The shaders are assumed to have a "main()" entry point.
- * \note This object does not work with GLSL shaders, it only loads SPIR-V binaries
  * Usage example:
  * \code
  * sge::Shader s;
@@ -93,7 +91,7 @@ public:
      * \brief Load shader
      *
      *
-     * Load a shader binary in SPIR-V format from a virtual file.
+     * Load a GLSL shader from a virtual file.
      * \param file Path to the virtual file
      * \param type Shader type
      * \return true on success, false otherwise
@@ -104,7 +102,7 @@ public:
      * \brief Load shader
      *
      *
-     * Load a shader binary in SPIR-V format from memory
+     * Load a GLSL shader from memory
      * \param size Size of shader in memory
      * \param data Pointer to shader binary data
      * \param type Shader type
@@ -149,6 +147,26 @@ public:
      * \param mat Matrix to assign
      */
     void setUniform(std::string_view name, const glm::mat4& mat);
+
+    /**
+     * \brief Set shader uniform
+     *
+     *
+     * Sets an unsigned int shader uniform.
+     * \param name Name of the uniform
+     * \param uint Value to assign
+     */
+    void setUniform(std::string_view name, unsigned int uint);
+
+    /**
+     * \brief Set shader uniform
+     *
+     *
+     * Sets a signed int shader uniform.
+     * \param name Name of the uniform
+     * \param sint Value to assign
+     */
+    void setUniform(std::string_view name, signed int sint);
 
 private:
     unsigned int m_id;
