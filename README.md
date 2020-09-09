@@ -10,13 +10,14 @@ SGE officially supports only 64-bit machines, with OpenGL 4.6 support. It is bas
   
 ## Installation
 
-Use CMake to build and install the library. 
+Use CMake and Conan(optionally) to build and install the library. 
 If you downloaded the source in a folder named "sge" and 
 you want to build a release build, then the installation will
 look like this:
 
 ````Shell
 mkdir build
+conan install if=build ./sge
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ../sge
 cmake --build .
