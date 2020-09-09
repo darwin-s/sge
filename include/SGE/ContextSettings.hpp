@@ -27,8 +27,7 @@ namespace sge {
  * \note All contexts in debug builds of the library are debug builds
  * \note All contexts are OpenGL 4.6 core contexts without forward compatibility
  */
-class SGE_API ContextSettings {
-public:
+struct SGE_API ContextSettings {
     /**
      * \brief Construct a settings object
      *
