@@ -13,11 +13,14 @@
 // limitations under the License.
 
 #include <SGE/Application.hpp>
+#include <SGE/Version.hpp>
+#include <SGE/Context.hpp>
 #include <SGE/Log.hpp>
 #include <cassert>
 #include <stdexcept>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <glad.h>
 #include <physfs.h>
 
 namespace {
@@ -31,6 +34,9 @@ Application::Application() {
     }
 
     Log::general.open("log.txt");
+    Log::general << Log::MessageType::Info << "Started SGE v" << SGE_VER_MAJOR
+                 << "." << SGE_VER_MINOR << "." << SGE_VER_PATCH << "."
+                 << SGE_VER_TWEAK << Log::Operation::Endl;
 
     SDL_SetMainReady();
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
@@ -49,6 +55,17 @@ Application::Application() {
 
     assert(PHYSFS_getLastErrorCode() == PHYSFS_ERR_OK);
 
+    Context temp;
+    Log::general << Log::MessageType::Info << "OpenGL Vendor: "
+                 << reinterpret_cast<const char*>(glGetString(GL_VENDOR))
+                 << Log::Operation::Endl;
+    Log::general << Log::MessageType::Info << "OpenGL Renderer: "
+                 << reinterpret_cast<const char*>(glGetString(GL_RENDERER))
+                 << Log::Operation::Endl;
+    Log::general << Log::MessageType::Info << "OpenGL Version: "
+                 << reinterpret_cast<const char*>(glGetString(GL_VERSION))
+                 << Log::Operation::Endl;
+
     current = this;
 }
 
@@ -62,6 +79,10 @@ Application::Application(const int argc, char** argv) {
     }
 
     Log::general.open("log.txt");
+    Log::general.open("log.txt");
+    Log::general << Log::MessageType::Info << "Started SGE v" << SGE_VER_MAJOR
+                 << "." << SGE_VER_MINOR << "." << SGE_VER_PATCH << "."
+                 << SGE_VER_TWEAK << Log::Operation::Endl;
 
     SDL_SetMainReady();
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
@@ -79,6 +100,17 @@ Application::Application(const int argc, char** argv) {
     }
 
     assert(PHYSFS_getLastErrorCode() == PHYSFS_ERR_OK);
+
+    Context temp;
+    Log::general << Log::MessageType::Info << "OpenGL Vendor: "
+                 << reinterpret_cast<const char*>(glGetString(GL_VENDOR))
+                 << Log::Operation::Endl;
+    Log::general << Log::MessageType::Info << "OpenGL Renderer: "
+                 << reinterpret_cast<const char*>(glGetString(GL_RENDERER))
+                 << Log::Operation::Endl;
+    Log::general << Log::MessageType::Info << "OpenGL Version: "
+                 << reinterpret_cast<const char*>(glGetString(GL_VERSION))
+                 << Log::Operation::Endl;
 
     current = this;
 }
