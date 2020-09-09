@@ -201,6 +201,16 @@ public:
      */
     static unsigned int getMaximumSize();
 
+    /**
+     * \brief Get maximum image units
+     *
+     *
+     * Returns the maximum number of samplers bound in a fragment shader
+     * at a time.
+     * \return Maximum number of image units
+     */
+    static unsigned int getMaximumImageUnits();
+
 private:
     unsigned int m_id;
     glm::uvec2 m_size;

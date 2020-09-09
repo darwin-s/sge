@@ -75,7 +75,6 @@ bool Texture::loadFromMemory(const std::size_t size, const void* data) {
     }
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    stbi_set_flip_vertically_on_load(true);
     int w, h, c;
     auto* imageData = stbi_load_from_memory(static_cast<const stbi_uc*>(data),
                                             size,
@@ -247,6 +246,14 @@ unsigned int Texture::getMaximumSize() {
     assert(Context::getCurrentContext() != nullptr);
     int r;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &r);
+
+    return r;
+}
+
+unsigned int Texture::getMaximumImageUnits() {
+    assert(Context::getCurrentContext() != nullptr);
+    int r;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &r);
 
     return r;
 }
