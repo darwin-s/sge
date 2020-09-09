@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <SGE/Log.hpp>
+#include <iostream>
 #include <chrono>
 #include <ctime>
 #include <cassert>
@@ -105,19 +106,40 @@ Log& Log::operator<<(const MessageType message) {
 Log& Log::operator<<(const bool b) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (m_writeTime) {
         const auto t = getLocalTime();
         m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     if (b) {
         m_log << "true";
+        if (consOut) {
+            *os << "true";
+        }
     } else {
         m_log << "false";
+        if (consOut) {
+            *os << "false";
+        }
     }
 
     return *this;
@@ -126,16 +148,34 @@ Log& Log::operator<<(const bool b) {
 Log& Log::operator<<(const signed int i) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (m_writeTime) {
         const auto t = getLocalTime();
         m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     m_log << i;
+    if (consOut) {
+        *os << i;
+    }
 
     return *this;
 }
@@ -143,16 +183,34 @@ Log& Log::operator<<(const signed int i) {
 Log& Log::operator<<(const unsigned int i) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (m_writeTime) {
         const auto t = getLocalTime();
         m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     m_log << i;
+    if (consOut) {
+        *os << i;
+    }
 
     return *this;
 }
@@ -160,16 +218,34 @@ Log& Log::operator<<(const unsigned int i) {
 Log& Log::operator<<(const float f) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (m_writeTime) {
         const auto t = getLocalTime();
         m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     m_log << f;
+    if (consOut) {
+        *os << f;
+    }
 
     return *this;
 }
@@ -177,16 +253,34 @@ Log& Log::operator<<(const float f) {
 Log& Log::operator<<(const double d) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (m_writeTime) {
         const auto t = getLocalTime();
         m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     m_log << d;
+    if (consOut) {
+        *os << d;
+    }
 
     return *this;
 }
@@ -194,22 +288,49 @@ Log& Log::operator<<(const double d) {
 Log& Log::operator<<(const std::string_view s) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (m_writeTime) {
         const auto t = getLocalTime();
         m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     m_log << s;
+    if (consOut) {
+        *os << s;
+    }
 
     return *this;
 }
 
 Log& Log::operator<<(const char* s) {
     assert(m_log.is_open());
+
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
 
     if (s == nullptr) {
         throw std::invalid_argument("Null C-style string");
@@ -226,10 +347,19 @@ Log& Log::operator<<(const char* s) {
               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
+        if (consOut) {
+            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        }
+
         m_writeTime = false;
     }
 
     m_log << s;
+    if (consOut) {
+        *os << s;
+    }
 
     return *this;
 }
@@ -237,8 +367,20 @@ Log& Log::operator<<(const char* s) {
 Log& Log::operator<<(const Operation op) {
     assert(m_log.is_open());
 
+    auto consOut = false;
+    auto* os     = &std::cout;
+    if (m_mt == MessageType::Error) {
+        os = &std::cerr;
+    }
+    if (this == &general) {
+        consOut = true;
+    }
+
     if (op == Operation::Endl) {
         m_log << std::endl;
+        if (consOut) {
+            *os << std::endl;
+        }
         m_writeTime = true;
     }
 
