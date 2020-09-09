@@ -25,8 +25,7 @@ namespace sge {
  *
  * Object representing colors using 8bpp RGBA representation.
  */
-class SGE_API Color {
-public:
+struct SGE_API Color {
     /**
      * \brief Create color object
      * \param red Red value (0-255)
@@ -34,9 +33,9 @@ public:
      * \param blue Blue value (0-255)
      * \param alpha Alpha value (0-255)
      */
-    explicit Color(std::uint8_t red   = 0,
-                   std::uint8_t green = 0,
-                   std::uint8_t blue  = 0,
+    explicit Color(std::uint8_t red   = 255,
+                   std::uint8_t green = 255,
+                   std::uint8_t blue  = 255,
                    std::uint8_t alpha = 255);
 
     std::uint8_t red;  ///< Red value
