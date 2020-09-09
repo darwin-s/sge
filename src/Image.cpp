@@ -74,7 +74,6 @@ bool Image::loadFromMemory(const std::size_t size, const void* data) {
         stbi_image_free(m_data);
     }
 
-    stbi_set_flip_vertically_on_load(true);
     int x, y;
     m_data = stbi_load_from_memory(static_cast<const stbi_uc*>(data),
                                    size,
