@@ -21,10 +21,10 @@ ResourceManager& ResourceManager::instance() {
 }
 
 void ResourceManager::loadResource(std::shared_ptr<Resource> r,
-                                   const std::filesystem::path& path,
+                                   const char* path,
                                    std::uint64_t hash) {
     auto loaderThread = [](std::shared_ptr<sge::Resource> r,
-                           const std::filesystem::path& path) -> void {
+                           const char* path) -> void {
         r->loadFromFile(path);
         r->setReady(true);
     };

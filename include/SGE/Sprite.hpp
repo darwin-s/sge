@@ -22,7 +22,6 @@
 #include <SGE/Vertex.hpp>
 #include <SGE/Rectangle.hpp>
 #include <glm/vec2.hpp>
-#include <array>
 
 namespace sge {
 /**
@@ -58,7 +57,7 @@ public:
      * \param textureRect Texture rectangle to use (values from 0.0f to 1.0f)
      * \param size Model size of the sprite quad
      */
-    explicit Sprite(std::shared_ptr<Texture> texture = nullptr,
+    explicit Sprite(Texture* texture = nullptr,
                     const RectangleFloat& textureRect =
                         RectangleFloat(0.0f, 0.0f, 1.0f, 1.0f),
                     const glm::vec2& size = glm::vec2(1.0f, 1.0f));
@@ -67,7 +66,7 @@ public:
      * \brief Set sprite texture
      * \param texture Pointer to texture (can be nullptr)
      */
-    void setTexture(std::shared_ptr<Texture> texture);
+    void setTexture(Texture* texture);
 
     /**
      * \brief Set texture rectangle
@@ -98,7 +97,7 @@ public:
      * \brief Get sprite texture
      * \return Pointer to the texture used by the sprite
      */
-    [[nodiscard]] std::shared_ptr<Texture> getTexture() const;
+    [[nodiscard]] Texture* getTexture() const;
 
     /**
      * \brief Get texture rectangle
@@ -128,8 +127,8 @@ protected:
     void draw(RenderTarget& target, RenderState renderState) const override;
 
 private:
-    std::shared_ptr<Texture> m_tex;
-    std::array<Vertex, 4> m_vertices;
+    Texture* m_tex;
+    Vertex m_vertices[4];
     RectangleFloat m_textureRect;
 };
 }

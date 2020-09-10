@@ -126,7 +126,7 @@ RectangleFloat Camera::getRectangle() const {
     return rect;
 }
 
-float Camera::getRoatation() const {
+float Camera::getRotation() const {
     return m_rotation;
 }
 

@@ -26,16 +26,12 @@ Monitor Monitor::getPrimaryMonitor() {
     return Monitor(0);
 }
 
-std::vector<Monitor> Monitor::getMonitors() {
-    auto monCount = SDL_GetNumVideoDisplays();
-    std::vector<Monitor> monitors;
+std::size_t Monitor::getMonitorCount() {
+    return SDL_GetNumVideoDisplays();
+}
 
-    monitors.reserve(monCount);
-    for (auto i = 0; i < monCount; i++) {
-        monitors.emplace_back(i);
-    }
-
-    return monitors;
+Monitor Monitor::getMonitor(int index) {
+    return Monitor(index);
 }
 
 Monitor::VideoMode Monitor::getCurrentVideoMode() const {
@@ -47,19 +43,20 @@ Monitor::VideoMode Monitor::getCurrentVideoMode() const {
     return m;
 }
 
-std::vector<Monitor::VideoMode> Monitor::getSupportedVideoModes() const {
+std::size_t Monitor::getVideoModeCount() const {
     assert(m_handle < SDL_GetNumVideoDisplays());
-    auto modeCount = SDL_GetNumDisplayModes(m_handle);
-    std::vector<VideoMode> m(modeCount);
+    return SDL_GetNumDisplayModes(m_handle);
+}
 
-    for (auto i = 0; i < modeCount; i++) {
-        SDL_DisplayMode mode;
-        SDL_GetDisplayMode(m_handle, i, &mode);
-        VideoMode mod{mode.w, mode.h, mode.refresh_rate};
-        m.emplace_back(mod);
-    }
+Monitor::VideoMode Monitor::getVideoMode(int index) const {
+    assert(m_handle < SDL_GetNumVideoDisplays());
+    assert(index < SDL_GetNumDisplayModes(m_handle));
 
-    return m;
+    SDL_DisplayMode mode;
+    SDL_GetDisplayMode(m_handle, index, &mode);
+    VideoMode mod{mode.w, mode.h, mode.refresh_rate};
+
+    return mod;
 }
 
 RectangleInt Monitor::getAvailableWorkArea() const {
@@ -70,10 +67,9 @@ RectangleInt Monitor::getAvailableWorkArea() const {
     return RectangleInt(r.x, r.y, r.w, r.h);
 }
 
-std::string Monitor::getName() const {
+const char* Monitor::getName() const {
     assert(m_handle < SDL_GetNumVideoDisplays());
-    const auto* name = SDL_GetDisplayName(m_handle);
 
-    return std::string(name);
+    return SDL_GetDisplayName(m_handle);
 }
 }

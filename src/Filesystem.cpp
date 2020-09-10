@@ -13,77 +13,79 @@
 // limitations under the License.
 
 #include <SGE/Filesystem.hpp>
+#include <SGE/Application.hpp>
 #include <SGE/Log.hpp>
-#include <string>
+#include <filesystem>
 #include <cassert>
-#include <stdexcept>
 #include <physfs.h>
 
 namespace sge {
-bool Filesystem::exists(const std::filesystem::path& path) {
+bool Filesystem::exists(const char* path) {
     assert(PHYSFS_isInit());
-    return PHYSFS_exists(path.generic_u8string().c_str()) != 0;
+    return PHYSFS_exists(path) != 0;
 }
 
-std::size_t Filesystem::getFileSize(const std::filesystem::path& path) {
+std::size_t Filesystem::getFileSize(const char* path) {
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
-    if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        const auto ec   = PHYSFS_getLastErrorCode();
-        std::string msg = "Could not get file size: ";
-        msg += PHYSFS_getErrorByCode(ec);
+    if (PHYSFS_stat(path, &st) == 0) {
+        try {
+            const auto ec   = PHYSFS_getLastErrorCode();
+            std::string msg = "Could not get file size: ";
+            msg += PHYSFS_getErrorByCode(ec);
 
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg
+            Log::general << Log::MessageType::Warning << msg.c_str()
                          << Log::Operation::Endl;
+        } catch (...) {
+            Application::crashApplication("Failed string manipulation");
         }
 
-        throw std::runtime_error("Failed to get file size");
+        Application::crashApplication("Failed to get file size");
     }
 
     return st.filesize;
 }
 
-bool Filesystem::isFileReadOnly(const std::filesystem::path& path) {
+bool Filesystem::isFileReadOnly(const char* path) {
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
-    if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        const auto ec   = PHYSFS_getLastErrorCode();
-        std::string msg = "Could not find if file is read-only: ";
-        msg += PHYSFS_getErrorByCode(ec);
+    if (PHYSFS_stat(path, &st) == 0) {
+        try {
+            const auto ec   = PHYSFS_getLastErrorCode();
+            std::string msg = "Could not find if file is read-only: ";
+            msg += PHYSFS_getErrorByCode(ec);
 
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg
+            Log::general << Log::MessageType::Warning << msg.c_str()
                          << Log::Operation::Endl;
+        } catch (...) {
+            Application::crashApplication("Failed string manipulation");
         }
 
-        throw std::runtime_error("Failed to get file read-only property");
+        Application::crashApplication("Failed to get file read-only property");
     }
 
     return st.readonly != 0;
 }
 
-Filesystem::FileType
-Filesystem::getFileType(const std::filesystem::path& path) {
+Filesystem::FileType Filesystem::getFileType(const char* path) {
     assert(PHYSFS_isInit());
     PHYSFS_Stat st;
 
-    if (PHYSFS_stat(path.generic_u8string().c_str(), &st) == 0) {
-        const auto ec   = PHYSFS_getLastErrorCode();
-        std::string msg = "Could not get file type: ";
-        msg += PHYSFS_getErrorByCode(ec);
+    if (PHYSFS_stat(path, &st) == 0) {
+        try {
+            const auto ec   = PHYSFS_getLastErrorCode();
+            std::string msg = "Could not get file type: ";
+            msg += PHYSFS_getErrorByCode(ec);
 
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg
+            Log::general << Log::MessageType::Warning << msg.c_str()
                          << Log::Operation::Endl;
+        } catch (...) {
+            Application::crashApplication("Failed string manipulation");
         }
 
-        throw std::runtime_error("Failed to get file type");
+        Application::crashApplication("Failed to get file type");
     }
 
     switch (st.filetype) {
@@ -97,8 +99,7 @@ Filesystem::getFileType(const std::filesystem::path& path) {
     }
 }
 
-bool Filesystem::mount(const std::filesystem::path& archive,
-                       const std::filesystem::path& mountPoint) {
+bool Filesystem::mount(const char* archive, const char* mountPoint) {
     assert(PHYSFS_isInit());
 
 #ifndef SGE_DEBUG
@@ -106,43 +107,45 @@ bool Filesystem::mount(const std::filesystem::path& archive,
         return false;
     }
 #endif
+    try {
+        std::filesystem::path realName = archive;
 
-    auto realName = archive;
-
-    if (!std::filesystem::exists(realName)) {
-        realName.replace_extension(".zip");
         if (!std::filesystem::exists(realName)) {
-            realName.replace_extension(".7z");
+            realName.replace_extension(".zip");
             if (!std::filesystem::exists(realName)) {
-                std::scoped_lock sl(Log::generalMutex);
-                Log::general
-                    << Log::MessageType::Warning
-                    << "File mounting unsuccessful: non-existent archive"
-                    << Log::Operation::Endl;
-                return false;
+                realName.replace_extension(".7z");
+                if (!std::filesystem::exists(realName)) {
+                    Log::general
+                        << Log::MessageType::Warning
+                        << "File mounting unsuccessful: non-existent archive"
+                        << Log::Operation::Endl;
+                    return false;
+                }
             }
         }
-    }
 
-    if (PHYSFS_mount(realName.u8string().c_str(),
-                     mountPoint.generic_u8string().c_str(),
-                     0)
-        == 0) {
-        const auto ec   = PHYSFS_getLastErrorCode();
-        std::string msg = "File mounting unsuccessful: ";
-        msg += PHYSFS_getErrorByCode(ec);
+        if (PHYSFS_mount(realName.u8string().c_str(), mountPoint, 0) == 0) {
+            try {
+                const auto ec   = PHYSFS_getLastErrorCode();
+                std::string msg = "File mounting unsuccessful: ";
+                msg += PHYSFS_getErrorByCode(ec);
 
-        std::scoped_lock sl(Log::generalMutex);
-        Log::general << Log::MessageType::Warning << msg
-                     << Log::Operation::Endl;
+                Log::general << Log::MessageType::Warning << msg.c_str()
+                             << Log::Operation::Endl;
+            } catch (...) {
+                Application::crashApplication("Failed string manipulation");
+            }
 
-        return false;
+            return false;
+        }
+    } catch (...) {
+        Application::crashApplication("Failed string manipulation");
     }
 
     return true;
 }
 
-void Filesystem::unmount(const std::filesystem::path& archive) {
+void Filesystem::unmount(const char* archive) {
     assert(PHYSFS_isInit());
 
 #ifndef SGE_DEBUG
@@ -150,38 +153,35 @@ void Filesystem::unmount(const std::filesystem::path& archive) {
         return;
     }
 #endif
+    try {
+        std::filesystem::path realName = archive;
 
-    auto realName = archive;
-
-    if (!std::filesystem::exists(realName)) {
-        realName.replace_extension(".zip");
         if (!std::filesystem::exists(realName)) {
-            realName.replace_extension(".7z");
+            realName.replace_extension(".zip");
             if (!std::filesystem::exists(realName)) {
-                {
-                    std::scoped_lock sl(Log::generalMutex);
+                realName.replace_extension(".7z");
+                if (!std::filesystem::exists(realName)) {
                     Log::general
                         << Log::MessageType::Warning
                         << "File unmounting unsuccessful: non-existent archive"
                         << Log::Operation::Endl;
+                    Application::crashApplication("Failed to unmount archive");
                 }
-                throw std::runtime_error("Failed to unmount archive");
             }
         }
-    }
 
-    if (PHYSFS_unmount(realName.u8string().c_str()) == 0) {
-        const auto ec   = PHYSFS_getLastErrorCode();
-        std::string msg = "File unmounting unsuccessful: ";
-        msg += PHYSFS_getErrorByCode(ec);
+        if (PHYSFS_unmount(realName.u8string().c_str()) == 0) {
+            const auto ec   = PHYSFS_getLastErrorCode();
+            std::string msg = "File unmounting unsuccessful: ";
+            msg += PHYSFS_getErrorByCode(ec);
 
-        {
-            std::scoped_lock sl(Log::generalMutex);
-            Log::general << Log::MessageType::Warning << msg
+            Log::general << Log::MessageType::Warning << msg.c_str()
                          << Log::Operation::Endl;
-        }
 
-        throw std::runtime_error("Failed to unmount archive");
+            Application::crashApplication("Failed to unmount archive");
+        }
+    } catch (...) {
+        Application::crashApplication("Failed string manipulation");
     }
 }
 }

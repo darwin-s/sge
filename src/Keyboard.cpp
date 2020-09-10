@@ -448,15 +448,13 @@ int Keyboard::getKeyScancode(const Key key) {
     return SDL_GetScancodeFromKey(getCodeFromKey(key));
 }
 
-std::string Keyboard::getKeyName(const Key key) {
-    const auto* name = SDL_GetKeyName(getCodeFromKey(key));
-    return name != nullptr ? std::string(name) : "unknown";
+const char* Keyboard::getKeyName(const Key key) {
+    return SDL_GetKeyName(getCodeFromKey(key));
 }
 
-std::string Keyboard::getKeyName(const int scancode) {
-    const auto* name = SDL_GetKeyName(
+const char* Keyboard::getKeyName(const int scancode) {
+    return SDL_GetKeyName(
         SDL_GetKeyFromScancode(static_cast<SDL_Scancode>(scancode)));
-    return name != nullptr ? std::string(name) : "unknown";
 }
 
 Keyboard::KeyState Keyboard::getKeyState(const Key key) {

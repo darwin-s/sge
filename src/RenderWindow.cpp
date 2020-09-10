@@ -21,18 +21,18 @@ RenderWindow::RenderWindow(const ContextSettings& contextSettings)
     : Window(), RenderTarget(*this, contextSettings) {
 }
 
-RenderWindow::RenderWindow(const std::string_view title,
+RenderWindow::RenderWindow(const char* title,
                            const ContextSettings& contextSettings)
     : Window(title), RenderTarget(*this, contextSettings) {
 }
 
-RenderWindow::RenderWindow(const std::string_view title,
+RenderWindow::RenderWindow(const char* title,
                            const glm::ivec2 size,
                            const ContextSettings& contextSettings)
     : Window(title, size), RenderTarget(*this, contextSettings) {
 }
 
-RenderWindow::RenderWindow(const std::string_view title,
+RenderWindow::RenderWindow(const char* title,
                            const Monitor::VideoMode videoMode,
                            const ContextSettings& contextSettings)
     : Window(title, videoMode), RenderTarget(*this, contextSettings) {

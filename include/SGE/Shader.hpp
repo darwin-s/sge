@@ -17,10 +17,6 @@
 
 #include <SGE/Export.hpp>
 #include <glm/mat4x4.hpp>
-#include <filesystem>
-#include <string_view>
-#include <string>
-#include <unordered_map>
 
 namespace sge {
 /**
@@ -96,7 +92,7 @@ public:
      * \param type Shader type
      * \return true on success, false otherwise
      */
-    [[nodiscard]] bool load(const std::filesystem::path& file, Type type) const;
+    [[nodiscard]] bool load(const char* file, Type type) const;
 
     /**
      * \brief Load shader
@@ -136,7 +132,7 @@ public:
      * \param name Uniform name
      * \return true if shader contains uniform, false otherwise
      */
-    [[nodiscard]] bool hasUniform(std::string_view name);
+    [[nodiscard]] bool hasUniform(const char* name);
 
     /**
      * \brief Set shader uniform
@@ -146,7 +142,7 @@ public:
      * \param name Name of the uniform
      * \param mat Matrix to assign
      */
-    void setUniform(std::string_view name, const glm::mat4& mat);
+    void setUniform(const char* name, const glm::mat4& mat);
 
     /**
      * \brief Set shader uniform
@@ -156,7 +152,7 @@ public:
      * \param name Name of the uniform
      * \param uint Value to assign
      */
-    void setUniform(std::string_view name, unsigned int uint);
+    void setUniform(const char* name, unsigned int uint);
 
     /**
      * \brief Set shader uniform
@@ -166,11 +162,11 @@ public:
      * \param name Name of the uniform
      * \param sint Value to assign
      */
-    void setUniform(std::string_view name, signed int sint);
+    void setUniform(const char* name, signed int sint);
 
 private:
     unsigned int m_id;
-    std::unordered_map<std::string, int> m_uniforms;
+    void* m_uniforms;
 };
 }
 

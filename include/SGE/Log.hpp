@@ -16,10 +16,6 @@
 #define SGE_LOG_HPP
 
 #include <SGE/Export.hpp>
-#include <fstream>
-#include <filesystem>
-#include <string_view>
-#include <mutex>
 
 namespace sge {
 /**
@@ -37,7 +33,6 @@ namespace sge {
  * There is a global instance provided for convenience
  * and exceptions, but it is not opened by default. A Log
  * should be opened before you try to write to it.
- * \note The global log instance is not thread-safe and access to it should be accessed while locking the provided mutex
  * Usage example:
  * \code
  * if (!sge::Log::general.open("log.txt")) {
@@ -91,7 +86,7 @@ public:
      * \throws std::runtime_error
      * \param file Path to the log file to be opened
      */
-    explicit Log(const std::filesystem::path& file);
+    explicit Log(const char* file);
 
     /**
      * \brief Destroys a Log object
@@ -195,17 +190,6 @@ public:
      * \brief Write a string
      *
      *
-     * Writes a string to the log file.
-     * \note New-lines in messages are allowed, although highly discouraged.
-     * \param s String to write
-     * \return *this
-     */
-    Log& operator<<(std::string_view s);
-
-    /**
-     * \brief Write a string
-     *
-     *
      * Writes a C-style string to the log file.
      * \note C-Style strings are limited to 256 characters for safety.
      * \note New-lines in messages are allowed, although highly discouraged.
@@ -234,7 +218,7 @@ public:
      * \param file Path to the log file to be opened
      * \return true on success, false otherwise
      */
-    bool open(const std::filesystem::path& file);
+    bool open(const char* file);
 
     /**
      * \brief Check if the log file is open
@@ -265,12 +249,11 @@ public:
 
     static Log
         general;///< A global Log instance for convenience (not opened by default)
-    static std::mutex
-        generalMutex;///< Global mutex to protect the global instance
 private:
     MessageType m_mt;
-    std::ofstream m_log;
+    void* m_log;
     bool m_writeTime;
+    void* m_mutex;
 };
 }
 

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 #include <SGE/Context.hpp>
+#include <SGE/Application.hpp>
 #include <SGE/Window.hpp>
 #include <SGE/Log.hpp>
 #include <string>
-#include <stdexcept>
 #include <mutex>
 #include <cassert>
 #include <glad.h>
@@ -119,23 +119,24 @@ void GLAPIENTRY messageCallback(const GLenum source,
                                 [[maybe_unused]] const GLsizei length,
                                 const GLchar* message,
                                 [[maybe_unused]] const void* userParam) {
-    std::string msg = "OpenGL message: source - ";
-    msg += sourceToString(source);
-    msg += "; type - ";
-    msg += typeToString(type);
-    msg += "; id - ";
-    msg += std::to_string(id);
-    msg += "; severity - ";
-    msg += severityToString(severity);
-    msg += "; message - ";
-    msg += message;
-    {
-        std::scoped_lock logLock(sge::Log::generalMutex);
-        sge::Log::general << sge::Log::MessageType::Debug << msg
+    try {
+        std::string msg = "OpenGL message: source - ";
+        msg += sourceToString(source);
+        msg += "; type - ";
+        msg += typeToString(type);
+        msg += "; id - ";
+        msg += std::to_string(id);
+        msg += "; severity - ";
+        msg += severityToString(severity);
+        msg += "; message - ";
+        msg += message;
+        sge::Log::general << sge::Log::MessageType::Debug << msg.c_str()
                           << sge::Log::Operation::Endl;
-    }
-    if (type == GL_DEBUG_TYPE_ERROR) {
-        throw std::runtime_error(msg);
+        if (type == GL_DEBUG_TYPE_ERROR) {
+            sge::Application::crashApplication(msg.c_str());
+        }
+    } catch (...) {
+        sge::Application::crashApplication("Failed string manipulation");
     }
 }
 }
@@ -186,11 +187,10 @@ void Context::setCurrent(const bool current) {
         }
         if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
                                static_cast<SDL_GLContext>(m_handle)) != 0) {
-            std::scoped_lock logLock(sge::Log::generalMutex);
             sge::Log::general << sge::Log::MessageType::Error
                               << "SDL error: " << SDL_GetError()
                               << sge::Log::Operation::Endl;
-            throw std::runtime_error("SDL error");
+            Application::crashApplication("SDL error");
         }
         active = this;
     } else {
@@ -199,45 +199,40 @@ void Context::setCurrent(const bool current) {
         }
         if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
                                NULL) != 0) {
-            std::scoped_lock logLock(sge::Log::generalMutex);
             sge::Log::general << sge::Log::MessageType::Error
                               << "SDL error: " << SDL_GetError()
                               << sge::Log::Operation::Endl;
-            throw std::runtime_error("SDL error");
+            Application::crashApplication("SDL error");
         }
         active = nullptr;
     }
 }
 
-bool Context::isExtensionAvailable(const std::string_view extensionName) const {
+bool Context::isExtensionAvailable(const char* extensionName) const {
     if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
                            static_cast<SDL_GLContext>(m_handle)) != 0) {
-        std::scoped_lock logLock(sge::Log::generalMutex);
         sge::Log::general << sge::Log::MessageType::Error
                           << "SDL error: " << SDL_GetError()
                           << sge::Log::Operation::Endl;
-        throw std::runtime_error("SDL error");
+        Application::crashApplication("SDL error");
     }
-    const auto supported =
-        SDL_GL_ExtensionSupported(extensionName.data()) == SDL_TRUE;
+    const auto supported = SDL_GL_ExtensionSupported(extensionName) == SDL_TRUE;
     if (active != nullptr) {
         if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
                                static_cast<SDL_GLContext>(active->m_handle)) !=
             0) {
-            std::scoped_lock logLock(sge::Log::generalMutex);
             sge::Log::general << sge::Log::MessageType::Error
                               << "SDL error: " << SDL_GetError()
                               << sge::Log::Operation::Endl;
-            throw std::runtime_error("SDL error");
+            Application::crashApplication("SDL error");
         }
     } else {
         if (SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_windowHandle),
                                NULL) != 0) {
-            std::scoped_lock logLock(sge::Log::generalMutex);
             sge::Log::general << sge::Log::MessageType::Error
                               << "SDL error: " << SDL_GetError()
                               << sge::Log::Operation::Endl;
-            throw std::runtime_error("SDL error");
+            Application::crashApplication("SDL error");
         }
     }
     return supported;
@@ -276,11 +271,10 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
             if (SDL_GL_MakeCurrent(
                     static_cast<SDL_Window*>(shared->m_windowHandle),
                     static_cast<SDL_GLContext>(shared->m_handle)) != 0) {
-                std::scoped_lock logLock(sge::Log::generalMutex);
                 sge::Log::general << sge::Log::MessageType::Error
                                   << "SDL error: " << SDL_GetError()
                                   << sge::Log::Operation::Endl;
-                throw std::runtime_error("SDL error");
+                Application::crashApplication("SDL error");
             }
             SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
             if (winHandle == nullptr) {
@@ -306,7 +300,7 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
         if (!loadedGL) {
             if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(
                     SDL_GL_GetProcAddress)) == 0) {
-                throw std::runtime_error(
+                Application::crashApplication(
                     "Could not load OpenGL function pointers");
             }
             loadedGL = true;

@@ -78,12 +78,16 @@ public:
     static Monitor getPrimaryMonitor();
 
     /**
-     * \brief Get all monitors
-     *
-     * Returns a vector with all the monitors currently connected.
-     * \return Vector containing all currently connected monitors
+     * \brief Get number of monitors
+     * \return Number of monitors currently connected
      */
-    static std::vector<Monitor> getMonitors();
+    [[nodiscard]] static std::size_t getMonitorCount();
+
+    /**
+     * \brief Get monitor
+     * \return Currently connected monitor at the specified index
+     */
+    [[nodiscard]] static Monitor getMonitor(int index);
 
     /**
      * \brief Get current video mode
@@ -96,14 +100,20 @@ public:
     [[nodiscard]] VideoMode getCurrentVideoMode() const;
 
     /**
-     * \brief Get supported video modes
-     *
-     *
-     * Returns all the video modes supported by this monitor.
-     * \return Vector containing all supported video modes
-     * \sa Monitor::VideoMode
+     * \brief Get number of supported video modes
+     * \return Number of supported video modes
      */
-    [[nodiscard]] std::vector<VideoMode> getSupportedVideoModes() const;
+    [[nodiscard]] std::size_t getVideoModeCount() const;
+
+    /**
+     * \brief Get video mode
+     *
+     *
+     * Returns a certain video mode supported by the monitor.
+     * \param index Index of the video mode
+     * \return Video mode
+     */
+    [[nodiscard]] VideoMode getVideoMode(int index) const;
 
     /**
      * \brief Get available work area
@@ -122,11 +132,14 @@ public:
      * Returns the human-readable name of the monitor formatted in UTF-8.
      * \return String containing the monitor name
      */
-    [[nodiscard]] std::string getName() const;
+    [[nodiscard]] const char* getName() const;
 
 private:
     friend class Window;
     int m_handle;
+    const VideoMode* m_videoModes;
+
+    static Monitor* m_monitors;
 };
 }
 

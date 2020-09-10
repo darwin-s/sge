@@ -13,26 +13,26 @@
 // limitations under the License.
 
 #include <SGE/Image.hpp>
+#include <SGE/Application.hpp>
 #include <SGE/Filesystem.hpp>
 #include <SGE/InputFile.hpp>
 #include <stb_image.h>
-#include <stdexcept>
 
 namespace sge {
 Image::Image() : m_data(nullptr), m_channels(0), m_size(0, 0) {
 }
 
-Image::Image(const std::filesystem::path& file)
+Image::Image(const char* file)
     : m_data(nullptr), m_channels(0), m_size(0, 0) {
     if (!loadFromFile(file)) {
-        throw std::runtime_error("Failed to load image");
+        Application::crashApplication("Failed to load image");
     }
 }
 
 Image::Image(const std::size_t size, const void* data)
     : m_data(nullptr), m_channels(0), m_size(0, 0) {
     if (!loadFromMemory(size, data)) {
-        throw std::runtime_error("Failed to load image");
+        Application::crashApplication("Failed to load image");
     }
 }
 
@@ -61,12 +61,17 @@ Image& Image::operator=(Image&& other) noexcept {
     return *this;
 }
 
-bool Image::loadFromFile(const std::filesystem::path& path) {
+bool Image::loadFromFile(const char* path) {
     const auto fileSize = Filesystem::getFileSize(path);
     const InputFile file(path);
-    auto fileData = file.read(fileSize);
+    unsigned char* buff = new unsigned char[fileSize];
+    file.read(fileSize, buff);
 
-    return loadFromMemory(fileSize, fileData.data());
+    bool r = loadFromMemory(fileSize, buff);
+
+    delete[] buff;
+
+    return r;
 }
 
 bool Image::loadFromMemory(const std::size_t size, const void* data) {

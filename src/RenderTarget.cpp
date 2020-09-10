@@ -14,8 +14,8 @@
 
 #include <SGE/RenderTarget.hpp>
 #include <SGE/Drawable.hpp>
-#include <SGE/Shader.hpp>
 #include <SGE/Texture.hpp>
+#include <SGE/Application.hpp>
 #include <cmath>
 #include <glad.h>
 
@@ -30,18 +30,37 @@ const Camera RenderTarget::defaultCamera = Camera();
 RenderTarget::RenderTarget(const ContextSettings& contextSettings)
     : m_cameraChanged(true), m_context(contextSettings), m_vertexCount(0),
       m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
-      m_currentShader(nullptr), m_sync(nullptr), m_usedTextureUnits(0) {
+      m_currentShader(nullptr), m_sync(nullptr), m_usedTextures(nullptr),
+      m_usedTextureUnits(0) {
     setBuffers();
-    m_usedTextures.reserve(maxTextures);
+    try {
+        m_usedTextures = new std::vector<Texture*>;
+    } catch (...) {
+        Application::crashApplication("Bad alloc");
+    }
+    auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
+    ut->reserve(maxTextures);
 }
 
 RenderTarget::RenderTarget(const Window& win,
                            const ContextSettings& contextSettings)
     : m_cameraChanged(true), m_context(win, contextSettings), m_vertexCount(0),
       m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
-      m_currentShader(nullptr), m_sync(nullptr), m_usedTextureUnits(0) {
+      m_currentShader(nullptr), m_sync(nullptr), m_usedTextures(nullptr),
+      m_usedTextureUnits(0) {
     setBuffers();
-    m_usedTextures.reserve(maxTextures);
+    try {
+        m_usedTextures = new std::vector<Texture*>;
+    } catch (...) {
+        Application::crashApplication("Bad alloc");
+    }
+    auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
+    ut->reserve(maxTextures);
+}
+
+RenderTarget::~RenderTarget() {
+    auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
+    delete ut;
 }
 
 void RenderTarget::setCamera(const Camera& camera) {
@@ -115,9 +134,10 @@ void RenderTarget::draw(const Drawable& drawable,
     drawable.draw(*this, renderState);
 }
 
-void RenderTarget::drawTriangle(const std::array<Vertex, 3>& vertices,
+void RenderTarget::drawTriangle(const Vertex* vertices,
                                 const RenderState& renderState) {
     m_context.setCurrent(true);
+    auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
 
     if (m_currentShader == nullptr) {
         m_currentShader = renderState.shader;
@@ -131,11 +151,17 @@ void RenderTarget::drawTriangle(const std::array<Vertex, 3>& vertices,
         flushRenderQueue();
     }
 
-    bool newTexture = true;
-    for (const auto& t : m_usedTextures) {
-        if (t == renderState.texture || t == nullptr) {
-            newTexture = false;
-            break;
+    unsigned int textureUnit = 0;
+    bool newTexture          = true;
+    for (unsigned int i = 0; i < ut->size(); i++) {
+        try {
+            if (ut->at(i) == renderState.texture || ut->at(i) == nullptr) {
+                newTexture  = false;
+                textureUnit = i;
+                break;
+            }
+        } catch (...) {
+            Application::crashApplication("Failed to access vector");
         }
     }
 
@@ -149,7 +175,12 @@ void RenderTarget::drawTriangle(const std::array<Vertex, 3>& vertices,
     }
 
     if (newTexture) {
-        m_usedTextures.push_back(renderState.texture);
+        try {
+            ut->push_back(renderState.texture);
+        } catch (...) {
+            Application::crashApplication("Cannot push back to vector");
+        }
+        textureUnit = m_usedTextureUnits;
         m_usedTextureUnits++;
     }
 
@@ -169,20 +200,20 @@ void RenderTarget::drawTriangle(const std::array<Vertex, 3>& vertices,
         renderState.transform * glm::vec4(vertices[0].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount].tint    = vertices[0].tint;
     m_verticesBatch[m_vertexCount].texPos  = vertices[0].texPos;
-    m_verticesBatch[m_vertexCount].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 1].pos =
         renderState.transform * glm::vec4(vertices[1].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount + 1].tint    = vertices[1].tint;
     m_verticesBatch[m_vertexCount + 1].texPos  = vertices[1].texPos;
-    m_verticesBatch[m_vertexCount + 1].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 1].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 2].pos =
         renderState.transform * glm::vec4(vertices[2].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount + 2].tint    = vertices[2].tint;
     m_verticesBatch[m_vertexCount + 2].texPos  = vertices[2].texPos;
-    m_verticesBatch[m_vertexCount + 2].texUnit = m_usedTextureUnits - 1;
-    m_indices[m_vertexCount]                   = m_vertexCount;
-    m_indices[m_vertexCount + 1]               = m_vertexCount + 1;
-    m_indices[m_vertexCount + 2]               = m_vertexCount + 2;
+    m_verticesBatch[m_vertexCount + 2].texUnit = textureUnit;
+    m_indices[m_indicesCount]                  = m_vertexCount;
+    m_indices[m_indicesCount + 1]              = m_vertexCount + 1;
+    m_indices[m_indicesCount + 2]              = m_vertexCount + 2;
 
     m_defaultVBO.flushChanges(sizeof(Vertex) * m_vertexCount,
                               sizeof(Vertex) * 3);
@@ -194,9 +225,10 @@ void RenderTarget::drawTriangle(const std::array<Vertex, 3>& vertices,
     m_indicesCount += 3;
 }
 
-void RenderTarget::drawQuad(const std::array<Vertex, 4>& vertices,
+void RenderTarget::drawQuad(const Vertex* vertices,
                             const RenderState& renderState) {
     m_context.setCurrent(true);
+    auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
 
     if (m_currentShader == nullptr) {
         m_currentShader = renderState.shader;
@@ -210,11 +242,17 @@ void RenderTarget::drawQuad(const std::array<Vertex, 4>& vertices,
         flushRenderQueue();
     }
 
-    bool newTexture = true;
-    for (const auto& t : m_usedTextures) {
-        if (t == renderState.texture || t == nullptr) {
-            newTexture = false;
-            break;
+    unsigned int textureUnit = 0;
+    bool newTexture          = true;
+    for (unsigned int i = 0; i < ut->size(); i++) {
+        try {
+            if (ut->at(i) == renderState.texture || ut->at(i) == nullptr) {
+                newTexture  = false;
+                textureUnit = i;
+                break;
+            }
+        } catch (...) {
+            Application::crashApplication("Failed to access vector");
         }
     }
 
@@ -228,14 +266,19 @@ void RenderTarget::drawQuad(const std::array<Vertex, 4>& vertices,
     }
 
     if (newTexture) {
-        m_usedTextures.push_back(renderState.texture);
+        try {
+            ut->push_back(renderState.texture);
+        } catch (...) {
+            Application::crashApplication("Cannot push back to vector");
+        }
+        textureUnit = m_usedTextureUnits;
         m_usedTextureUnits++;
     }
 
     if (m_sync != nullptr) {
         GLenum waitReturn = GL_UNSIGNALED;
         while (waitReturn != GL_ALREADY_SIGNALED &&
-            waitReturn != GL_CONDITION_SATISFIED) {
+               waitReturn != GL_CONDITION_SATISFIED) {
             waitReturn = glClientWaitSync(static_cast<GLsync>(m_sync),
                                           GL_SYNC_FLUSH_COMMANDS_BIT,
                                           1);
@@ -248,28 +291,28 @@ void RenderTarget::drawQuad(const std::array<Vertex, 4>& vertices,
         renderState.transform * glm::vec4(vertices[0].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount].tint    = vertices[0].tint;
     m_verticesBatch[m_vertexCount].texPos  = vertices[0].texPos;
-    m_verticesBatch[m_vertexCount].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 1].pos =
         renderState.transform * glm::vec4(vertices[1].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount + 1].tint    = vertices[1].tint;
     m_verticesBatch[m_vertexCount + 1].texPos  = vertices[1].texPos;
-    m_verticesBatch[m_vertexCount + 1].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 1].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 2].pos =
         renderState.transform * glm::vec4(vertices[2].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount + 2].tint    = vertices[2].tint;
     m_verticesBatch[m_vertexCount + 2].texPos  = vertices[2].texPos;
-    m_verticesBatch[m_vertexCount + 2].texUnit = m_usedTextureUnits - 1;
+    m_verticesBatch[m_vertexCount + 2].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 3].pos =
         renderState.transform * glm::vec4(vertices[3].pos, 0.0f, 1.0f);
     m_verticesBatch[m_vertexCount + 3].tint    = vertices[3].tint;
     m_verticesBatch[m_vertexCount + 3].texPos  = vertices[3].texPos;
-    m_verticesBatch[m_vertexCount + 3].texUnit = m_usedTextureUnits - 1;
-    m_indices[m_vertexCount]                   = m_vertexCount;
-    m_indices[m_vertexCount + 1]               = m_vertexCount + 1;
-    m_indices[m_vertexCount + 2]               = m_vertexCount + 2;
-    m_indices[m_vertexCount + 3]               = m_vertexCount + 2;
-    m_indices[m_vertexCount + 4]               = m_vertexCount + 1;
-    m_indices[m_vertexCount + 5]               = m_vertexCount + 3;
+    m_verticesBatch[m_vertexCount + 3].texUnit = textureUnit;
+    m_indices[m_indicesCount]                  = m_vertexCount;
+    m_indices[m_indicesCount + 1]              = m_vertexCount + 1;
+    m_indices[m_indicesCount + 2]              = m_vertexCount + 2;
+    m_indices[m_indicesCount + 3]              = m_vertexCount + 2;
+    m_indices[m_indicesCount + 4]              = m_vertexCount + 1;
+    m_indices[m_indicesCount + 5]              = m_vertexCount + 3;
 
     m_defaultVBO.flushChanges(sizeof(Vertex) * m_vertexCount,
                               sizeof(Vertex) * 4);
@@ -285,6 +328,8 @@ void RenderTarget::flushRenderQueue() {
     if (m_vertexCount == 0) {
         return;
     }
+
+    auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
 
     if (m_cameraChanged) {
         const auto view = getViewport(getCamera());
@@ -303,9 +348,13 @@ void RenderTarget::flushRenderQueue() {
 
         if (m_currentShader->hasUniform("tex[0]")) {
             for (int i = 0; i < m_usedTextureUnits; i++) {
-                std::string u = "tex[" + std::to_string(i) + "]";
-                m_currentShader->setUniform(u, i);
-                m_usedTextures[i]->bind(i);
+                try {
+                    std::string u = "tex[" + std::to_string(i) + "]";
+                    m_currentShader->setUniform(u.c_str(), i);
+                    ut->at(i)->bind(i);
+                } catch (...) {
+                    Application::crashApplication("Failed string manipulation");
+                }
             }
         }
     }
@@ -321,7 +370,7 @@ void RenderTarget::flushRenderQueue() {
     m_vertexCount      = 0;
     m_indicesCount     = 0;
     m_usedTextureUnits = 0;
-    m_usedTextures.clear();
+    ut->clear();
     m_currentShader = nullptr;
 }
 

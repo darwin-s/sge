@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include <SGE/Log.hpp>
+#include <SGE/Application.hpp>
+#include <fstream>
+#include <mutex>
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -20,7 +23,7 @@
 #include <stdexcept>
 
 namespace {
-constexpr int maxStringSize = 256;
+constexpr int maxStringSize = 1024;
 
 std::tm getLocalTime() {
     std::tm t{};
@@ -67,368 +70,443 @@ bool isStringSafe(const char* s) {
 
 namespace sge {
 Log Log::general;
-std::mutex Log::generalMutex;
 
-Log::Log() : m_mt(MessageType::Info), m_writeTime(false) {
+Log::Log()
+    : m_mt(MessageType::Info), m_log(nullptr), m_writeTime(false),
+      m_mutex(nullptr) {
+    try {
+        m_log = new std::ofstream;
+        m_mutex = new std::mutex;
+    } catch (...) {
+        Application::crashApplication("Bad alloc");
+    }
 }
 
-Log::Log(const std::filesystem::path& file)
-    : m_mt(MessageType::Info), m_writeTime(true) {
+Log::Log(const char* file)
+    : m_mt(MessageType::Info), m_log(new std::ofstream), m_writeTime(true),
+      m_mutex(new std::mutex) {
     if (!open(file)) {
-        throw std::runtime_error("Failed to open log");
+        Application::crashApplication("Failed to open log");
     }
 }
 
 Log::~Log() {
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+
     close();
+    delete m;
+    delete l;
 }
 
 Log::Log(Log&& other) noexcept
     : m_mt(other.m_mt), m_writeTime(other.m_writeTime) {
-    m_log = std::move(other.m_log);
+    m_log       = other.m_log;
+    other.m_log = nullptr;
 }
 
 Log& Log::operator=(Log&& other) noexcept {
     m_mt        = other.m_mt;
     m_writeTime = other.m_writeTime;
 
-    m_log = std::move(other.m_log);
+    m_log       = other.m_log;
+    other.m_log = nullptr;
 
     return *this;
 }
 
 Log& Log::operator<<(const MessageType message) {
-    m_mt = message;
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
 
-    return *this;
+    try {
+        std::scoped_lock lck(*m);
+
+        m_mt = message;
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 Log& Log::operator<<(const bool b) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
+        }
+        if (this == &general) {
+            consOut = true;
         }
 
-        m_writeTime = false;
-    }
+        if (m_writeTime) {
+            const auto t = getLocalTime();
+            *l << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-    if (b) {
-        m_log << "true";
-        if (consOut) {
-            *os << "true";
-        }
-    } else {
-        m_log << "false";
-        if (consOut) {
-            *os << "false";
-        }
-    }
+            if (consOut) {
+                *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                    << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
+                    << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            }
 
-    return *this;
+            m_writeTime = false;
+        }
+
+        if (b) {
+            *l << "true";
+            if (consOut) {
+                *os << "true";
+            }
+        } else {
+            *l << "false";
+            if (consOut) {
+                *os << "false";
+            }
+        }
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 Log& Log::operator<<(const signed int i) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
+        }
+        if (this == &general) {
+            consOut = true;
         }
 
-        m_writeTime = false;
-    }
+        if (m_writeTime) {
+            const auto t = getLocalTime();
+            *l << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-    m_log << i;
-    if (consOut) {
-        *os << i;
-    }
+            if (consOut) {
+                *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                    << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
+                    << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            }
 
-    return *this;
+            m_writeTime = false;
+        }
+
+        *l << i;
+        if (consOut) {
+            *os << i;
+        }
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 Log& Log::operator<<(const unsigned int i) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
+        }
+        if (this == &general) {
+            consOut = true;
         }
 
-        m_writeTime = false;
-    }
+        if (m_writeTime) {
+            const auto t = getLocalTime();
+            *l << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-    m_log << i;
-    if (consOut) {
-        *os << i;
-    }
+            if (consOut) {
+                *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                    << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
+                    << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            }
 
-    return *this;
+            m_writeTime = false;
+        }
+
+        *l << i;
+        if (consOut) {
+            *os << i;
+        }
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 Log& Log::operator<<(const float f) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
+        }
+        if (this == &general) {
+            consOut = true;
         }
 
-        m_writeTime = false;
-    }
+        if (m_writeTime) {
+            const auto t = getLocalTime();
+            *l << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-    m_log << f;
-    if (consOut) {
-        *os << f;
-    }
+            if (consOut) {
+                *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                    << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
+                    << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            }
 
-    return *this;
+            m_writeTime = false;
+        }
+
+        *l << f;
+        if (consOut) {
+            *os << f;
+        }
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 Log& Log::operator<<(const double d) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
+        }
+        if (this == &general) {
+            consOut = true;
         }
 
-        m_writeTime = false;
-    }
+        if (m_writeTime) {
+            const auto t = getLocalTime();
+            *l << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
 
-    m_log << d;
-    if (consOut) {
-        *os << d;
-    }
+            if (consOut) {
+                *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                    << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
+                    << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            }
 
-    return *this;
-}
-
-Log& Log::operator<<(const std::string_view s) {
-    assert(m_log.is_open());
-
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
-
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            m_writeTime = false;
         }
 
-        m_writeTime = false;
-    }
+        *l << d;
+        if (consOut) {
+            *os << d;
+        }
 
-    m_log << s;
-    if (consOut) {
-        *os << s;
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
     }
-
-    return *this;
 }
 
 Log& Log::operator<<(const char* s) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (s == nullptr) {
-        throw std::invalid_argument("Null C-style string");
-    }
-
-    if (!isStringSafe(s)) {
-        throw std::invalid_argument(
-            "C-style string longer than 256 characters");
-    }
-
-    if (m_writeTime) {
-        const auto t = getLocalTime();
-        m_log << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-              << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-              << ":" << t.tm_min << ":" << t.tm_sec << "] ";
-
-        if (consOut) {
-            *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
-                << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
-                << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
+        }
+        if (this == &general) {
+            consOut = true;
         }
 
-        m_writeTime = false;
-    }
+        if (s == nullptr) {
+            Application::crashApplication("Null C-style string");
+        }
 
-    m_log << s;
-    if (consOut) {
-        *os << s;
-    }
+        if (!isStringSafe(s)) {
+            Application::crashApplication(
+                "C-style string longer than 256 characters");
+        }
 
-    return *this;
+        if (m_writeTime) {
+            const auto t = getLocalTime();
+            *l << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+               << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@" << t.tm_hour
+               << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+
+            if (consOut) {
+                *os << "[" << getMtText(m_mt) << "][" << t.tm_mday << "/"
+                    << t.tm_mon + 1 << "/" << t.tm_year + 1900 << "@"
+                    << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec << "] ";
+            }
+
+            m_writeTime = false;
+        }
+
+        *l << s;
+        if (consOut) {
+            *os << s;
+        }
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 Log& Log::operator<<(const Operation op) {
-    assert(m_log.is_open());
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    assert(l->is_open());
 
-    auto consOut = false;
-    auto* os     = &std::cout;
-    if (m_mt == MessageType::Error) {
-        os = &std::cerr;
-    }
-    if (this == &general) {
-        consOut = true;
-    }
+    try {
+        std::scoped_lock lck(*m);
 
-    if (op == Operation::Endl) {
-        m_log << std::endl;
-        if (consOut) {
-            *os << std::endl;
+        auto consOut = false;
+        auto* os     = &std::cout;
+        if (m_mt == MessageType::Error) {
+            os = &std::cerr;
         }
-        m_writeTime = true;
-    }
+        if (this == &general) {
+            consOut = true;
+        }
 
-    return *this;
+        if (op == Operation::Endl) {
+            *l << std::endl;
+            if (consOut) {
+                *os << std::endl;
+            }
+            m_writeTime = true;
+        }
+
+        return *this;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
-bool Log::open(const std::filesystem::path& file) {
-    if (m_log.is_open()) {
-        close();
+bool Log::open(const char* file) {
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+
+    try {
+        std::scoped_lock lck(*m);
+
+        if (l->is_open()) {
+            close();
+        }
+
+        m_mt = MessageType::Info;
+        l->open(file, std::ios::out | std::ios::app);
+        m_writeTime = true;
+
+        const auto t = getLocalTime();
+        *l << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/"
+           << t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":"
+           << t.tm_sec << std::endl;
+
+        return l->is_open();
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
     }
-
-    m_mt = MessageType::Info;
-    m_log.open(file, std::ios::out | std::ios::app);
-    m_writeTime = true;
-
-    const auto t = getLocalTime();
-    m_log << "Log started at " << t.tm_mday << "/" << t.tm_mon + 1 << "/"
-          << t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":"
-          << t.tm_sec << std::endl;
-
-    return m_log.is_open();
 }
 
 bool Log::isOpen() const {
-    return m_log.is_open();
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+
+    try {
+        std::scoped_lock lck(*m);
+        return l->is_open();
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 
 void Log::close() {
-    if (!m_log.is_open()) {
-        return;
+    auto* l = reinterpret_cast<std::ofstream*>(m_log);
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+
+    try {
+        std::scoped_lock lck(*m);
+        if (!l->is_open()) {
+            return;
+        }
+
+        if (!m_writeTime) {
+            *l << std::endl;
+        }
+
+        m_writeTime = true;
+        m_mt        = MessageType::Info;
+
+        const auto t = getLocalTime();
+        *l << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/"
+           << t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":"
+           << t.tm_sec << std::endl;
+
+        l->close();
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
     }
-
-    if (!m_writeTime) {
-        m_log << std::endl;
-    }
-
-    m_writeTime = true;
-    m_mt        = MessageType::Info;
-
-    const auto t = getLocalTime();
-    m_log << "Log ended at " << t.tm_mday << "/" << t.tm_mon + 1 << "/"
-          << t.tm_year + 1900 << "@" << t.tm_hour << ":" << t.tm_min << ":"
-          << t.tm_sec << std::endl;
-
-    m_log.close();
 }
 
 Log::MessageType Log::getMessageType() const {
-    return m_mt;
+    auto* m = reinterpret_cast<std::mutex*>(m_mutex);
+    try {
+        std::scoped_lock lck(*m);
+        return m_mt;
+    } catch (...) {
+        Application::crashApplication("Failed to lock mutex");
+    }
 }
 }

@@ -52,7 +52,7 @@ int Mouse::getCodeFromButton(const Button button) {
     }
 }
 
-std::string Mouse::getButtonName(const Button button) {
+const char* Mouse::getButtonName(const Button button) {
     switch (button) {
     case Button::Left:
         return "LMB";

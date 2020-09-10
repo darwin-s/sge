@@ -33,9 +33,9 @@ Window::Window()
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const std::string_view title)
+Window::Window(const char* title)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
-    m_handle = SDL_CreateWindow(title.data(),
+    m_handle = SDL_CreateWindow(title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 100,
@@ -45,9 +45,9 @@ Window::Window(const std::string_view title)
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const std::string_view title, const glm::ivec2& size)
+Window::Window(const char* title, const glm::ivec2& size)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
-    m_handle = SDL_CreateWindow(title.data(),
+    m_handle = SDL_CreateWindow(title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 size.x,
@@ -57,10 +57,9 @@ Window::Window(const std::string_view title, const glm::ivec2& size)
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const std::string_view title,
-               const Monitor::VideoMode& videoMode)
+Window::Window(const char* title, const Monitor::VideoMode& videoMode)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
-    m_handle = SDL_CreateWindow(title.data(),
+    m_handle = SDL_CreateWindow(title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 100,
@@ -102,8 +101,8 @@ void Window::processEvents() {
     SDL_FilterEvents(reinterpret_cast<SDL_EventFilter>(eventFilter), this);
 }
 
-void Window::setTitle(const std::string_view title) {
-    SDL_SetWindowTitle(static_cast<SDL_Window*>(m_handle), title.data());
+void Window::setTitle(const char* title) {
+    SDL_SetWindowTitle(static_cast<SDL_Window*>(m_handle), title);
 }
 
 void Window::setPosition(const glm::ivec2& pos) {

@@ -19,7 +19,6 @@
 #include <SGE/Window.hpp>
 #include <SGE/RenderTarget.hpp>
 #include <SGE/Context.hpp>
-#include <string_view>
 
 namespace sge {
 
@@ -52,7 +51,7 @@ public:
      * \param contextSettings Settings for the underlying context
      */
     explicit RenderWindow(
-        std::string_view title,
+        const char* title,
         const ContextSettings& contextSettings = ContextSettings());
 
     /**
@@ -65,7 +64,7 @@ public:
      * \param size Size of the window
      * \param contextSettings Settings for the underlying context
      */
-    RenderWindow(std::string_view title,
+    RenderWindow(const char* title,
                  glm::ivec2 size,
                  const ContextSettings& contextSettings = ContextSettings());
 
@@ -79,7 +78,7 @@ public:
      * \param videoMode Video mode to be set
      * \param contextSettings Settings for the underlying context
      */
-    RenderWindow(std::string_view title,
+    RenderWindow(const char* title,
                  Monitor::VideoMode videoMode,
                  const ContextSettings& contextSettings = ContextSettings());
 

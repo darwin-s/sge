@@ -16,10 +16,10 @@
 #include <SGE/RenderTarget.hpp>
 
 namespace sge {
-Sprite::Sprite(std::shared_ptr<Texture> texture,
+Sprite::Sprite(Texture* texture,
                const RectangleFloat& textureRect,
                const glm::vec2& size)
-    : m_tex(std::move(texture)) {
+    : m_tex(texture) {
     m_vertices[0].pos.x = 0.0f;
     m_vertices[0].pos.y = 0.0f;
     m_vertices[1].pos.y = 0.0f;
@@ -29,8 +29,8 @@ Sprite::Sprite(std::shared_ptr<Texture> texture,
     setTint(Color(255, 255, 255, 255));
 }
 
-void Sprite::setTexture(std::shared_ptr<Texture> texture) {
-    m_tex = std::move(texture);
+void Sprite::setTexture(Texture* texture) {
+    m_tex = texture;
 }
 
 void Sprite::setTextureRectangle(const RectangleFloat& textureRect) {
@@ -63,7 +63,7 @@ void Sprite::setModelSize(const glm::vec2& size) {
     setModelSize(size.x, size.y);
 }
 
-std::shared_ptr<Texture> Sprite::getTexture() const {
+Texture* Sprite::getTexture() const {
     return m_tex;
 }
 

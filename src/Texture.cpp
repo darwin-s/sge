@@ -13,12 +13,12 @@
 // limitations under the License.
 
 #include <SGE/Texture.hpp>
+#include <SGE/Application.hpp>
 #include <SGE/Context.hpp>
 #include <SGE/Filesystem.hpp>
 #include <SGE/InputFile.hpp>
 #include <glad.h>
 #include <stb_image.h>
-#include <stdexcept>
 #include <cassert>
 #include <cmath>
 
@@ -28,11 +28,11 @@ Texture::Texture()
       m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
 }
 
-Texture::Texture(const std::filesystem::path& file)
+Texture::Texture(const char* file)
     : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
       m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
     if (!loadFromFile(file)) {
-        throw std::runtime_error("Failed to load texture");
+        Application::crashApplication("Failed to load texture");
     }
 }
 
@@ -40,7 +40,7 @@ Texture::Texture(const std::size_t size, const void* data)
     : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
       m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
     if (loadFromMemory(size, data)) {
-        throw std::runtime_error("Failed to load texture");
+        Application::crashApplication("Failed to load texture");
     }
 }
 
@@ -48,7 +48,7 @@ Texture::Texture(const Image& image)
     : m_id(0), m_size(0, 0), m_wrapMode(WrapMode::ClampToBorder),
       m_filterMode(FilterMode::Nearest), m_hasMipmaps(false) {
     if (loadFromImage(image)) {
-        throw std::runtime_error("Failed to load texture");
+        Application::crashApplication("Failed to load texture");
     }
 }
 
@@ -59,12 +59,17 @@ Texture::~Texture() {
     }
 }
 
-bool Texture::loadFromFile(const std::filesystem::path& path) {
+bool Texture::loadFromFile(const char* path) {
     const auto imageSize = Filesystem::getFileSize(path);
     const InputFile image(path);
-    auto imageData = image.read(imageSize);
+    auto* buffer = new unsigned char[imageSize];
+    image.read(imageSize, buffer);
 
-    return loadFromMemory(imageSize, imageData.data());
+    bool r = loadFromMemory(imageSize, buffer);
+
+    delete[] buffer;
+
+    return r;
 }
 
 bool Texture::loadFromMemory(const std::size_t size, const void* data) {

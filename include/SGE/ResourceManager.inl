@@ -14,7 +14,7 @@
 
 template<typename T>
 std::shared_ptr<T>
-ResourceManager::getResource(const std::filesystem::path& path) {
+ResourceManager::getResource(const char* path) {
     static_assert(std::is_base_of_v<Resource, T>,
                   "Type must be derived from sge::Resource!");
     static_assert(std::is_default_constructible_v<T>,

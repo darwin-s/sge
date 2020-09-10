@@ -18,7 +18,6 @@
 #include <SGE/Export.hpp>
 #include <SGE/Monitor.hpp>
 #include <SGE/ContextSettings.hpp>
-#include <string_view>
 
 namespace sge {
 class Window;
@@ -101,7 +100,7 @@ public:
      * \return true if the extension is supported and available, false otherwise
      */
     [[nodiscard]] bool
-    isExtensionAvailable(std::string_view extensionName) const;
+    isExtensionAvailable(const char* extensionName) const;
 
     /**
      * \brief Get the active context on the current thread.

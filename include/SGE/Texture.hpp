@@ -79,7 +79,7 @@ public:
      * Creates a texture by loading an image from a virtual file.
      * \param file File to load texture from
      */
-    explicit Texture(const std::filesystem::path& file);
+    explicit Texture(const char* file);
 
     /**
      * \brief Create texture
@@ -118,7 +118,7 @@ public:
      * \param path Path to file
      * \return true on success, false otherwise
      */
-    bool loadFromFile(const std::filesystem::path& path) override;
+    bool loadFromFile(const char* path) override;
 
     /**
      * \brief Load texture

@@ -17,7 +17,6 @@
 
 #include <SGE/Export.hpp>
 #include <glm/vec2.hpp>
-#include <string>
 
 namespace sge {
 class Window;
@@ -97,7 +96,7 @@ public:
      * \param button Mouse::Button type
      * \return String containing the button name
      */
-    [[nodiscard]] static std::string getButtonName(Button button);
+    [[nodiscard]] static const char* getButtonName(Button button);
 
     /**
      * \brief Get button state

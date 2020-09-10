@@ -16,8 +16,6 @@
 #define SGE_APPLICATION_HPP
 
 #include <SGE/Export.hpp>
-#include <string>
-#include <vector>
 
 namespace sge {
 /**
@@ -123,9 +121,20 @@ public:
      *
      *
      * Get the arguments used to create the current application.
-     * \return Vector with application arguments
+     * \return Pointer to application arguments
      */
-    [[nodiscard]] std::vector<std::string> getArgs() const;
+    [[nodiscard]] const char* const* getArgs() const;
+
+    /**
+     * \brief Get argument cound
+     *
+     *
+     * Get the number of arguments passed to the application.
+     * \return Number of application arguments
+     */
+    [[nodiscard]] int getArgCount() const;
+
+    [[noreturn]] static void crashApplication(const char* reason);
 
 private:
     /**
@@ -150,7 +159,8 @@ private:
      */
     virtual ReturnCode onRun() = 0;
 
-    std::vector<std::string> m_args;
+    const char* const* m_args;
+    int m_argc;
 };
 }
 

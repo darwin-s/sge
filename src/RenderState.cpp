@@ -17,15 +17,15 @@
 namespace sge {
 RenderState RenderState::defaultState = RenderState(glm::mat4(1.0f));
 
-RenderState::RenderState(std::shared_ptr<Shader> shader)
-    : shader(std::move(shader)), transform(1.0f), texture(nullptr) {
+RenderState::RenderState(Shader* shader)
+    : shader(shader), transform(1.0f), texture(nullptr) {
 }
 
 RenderState::RenderState(const glm::mat4& transform)
     : shader(nullptr), transform(transform), texture(nullptr) {
 }
 
-RenderState::RenderState(std::shared_ptr<Texture> texture)
-    : shader(nullptr), transform(1.0f), texture(std::move(texture)) {
+RenderState::RenderState(Texture* texture)
+    : shader(nullptr), transform(1.0f), texture(texture) {
 }
 }

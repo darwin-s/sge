@@ -13,16 +13,23 @@
 // limitations under the License.
 
 #include <SGE/Shader.hpp>
+#include <SGE/Application.hpp>
 #include <SGE/Context.hpp>
 #include <SGE/Filesystem.hpp>
 #include <SGE/InputFile.hpp>
 #include <SGE/Log.hpp>
+#include <unordered_map>
 #include <cassert>
 #include <glad.h>
 
 namespace sge {
-Shader::Shader() {
+Shader::Shader() : m_uniforms(nullptr) {
     assert(Context::getCurrentContext());
+    try {
+        m_uniforms = new std::unordered_map<std::string, int>;
+    } catch (...) {
+        Application::crashApplication("Bad alloc");
+    }
     m_id = glCreateProgram();
 }
 
@@ -33,6 +40,10 @@ Shader::Shader(Shader&& other) noexcept : m_id(other.m_id) {
 Shader::~Shader() {
     assert(Context::getCurrentContext());
     glDeleteProgram(m_id);
+
+    auto* uf =
+        reinterpret_cast<std::unordered_map<std::string, int>*>(m_uniforms);
+    delete uf;
 }
 
 Shader& Shader::operator=(Shader&& other) noexcept {
@@ -42,13 +53,18 @@ Shader& Shader::operator=(Shader&& other) noexcept {
     return *this;
 }
 
-bool Shader::load(const std::filesystem::path& file, const Type type) const {
+bool Shader::load(const char* file, const Type type) const {
     assert(Context::getCurrentContext());
     const auto shaderSize = Filesystem::getFileSize(file);
     const InputFile shader(file);
-    auto shaderData = shader.read(shaderSize);
+    auto* buffer = new unsigned char[shaderSize];
+    shader.read(shaderSize, buffer);
 
-    return load(shaderSize, shaderData.data(), type);
+    bool r = load(shaderSize, buffer, type);
+
+    delete[] buffer;
+
+    return r;
 }
 
 bool Shader::load(const std::size_t size,
@@ -79,7 +95,6 @@ bool Shader::load(const std::size_t size,
 
         glDeleteShader(shader);
 
-        std::scoped_lock l(Log::generalMutex);
         Log::general << Log::MessageType::Error
                      << "Shader compilation error: " << log.data()
                      << Log::Operation::Endl;
@@ -98,6 +113,8 @@ bool Shader::link() {
     GLint uniforms;
     char* nameBuffer = nullptr;
     GLsizei nbSize   = 0;
+    auto* uf =
+        reinterpret_cast<std::unordered_map<std::string, int>*>(m_uniforms);
 
     glLinkProgram(m_id);
 
@@ -111,7 +128,6 @@ bool Shader::link() {
 
         glDeleteProgram(m_id);
 
-        std::scoped_lock l(Log::generalMutex);
         Log::general << Log::MessageType::Error
                      << "Shader compilation error: " << log.data()
                      << Log::Operation::Endl;
@@ -134,7 +150,12 @@ bool Shader::link() {
                                      nameBuffer);
             auto loc =
                 glGetProgramResourceLocation(m_id, GL_UNIFORM, nameBuffer);
-            m_uniforms.insert(std::make_pair(nameBuffer, loc));
+            try {
+                uf->insert(std::make_pair(nameBuffer, loc));
+            } catch (...) {
+                Application::crashApplication(
+                    "Could not insert into unordered map");
+            }
 
             glGetProgramResourceiv(m_id,
                                    GL_UNIFORM,
@@ -146,12 +167,22 @@ bool Shader::link() {
                                    &arraySize);
 
             for (auto j = 1; j < arraySize; j++) {
-                std::string n(nameBuffer);
-                n.resize(n.size() - 2);
-                n += std::to_string(j) + "]";
-                auto loc2 =
-                    glGetProgramResourceLocation(m_id, GL_UNIFORM, n.c_str());
-                m_uniforms.insert(std::make_pair(n, loc2));
+                try {
+                    std::string n(nameBuffer);
+                    n.resize(n.size() - 2);
+                    n += std::to_string(j) + "]";
+                    auto loc2 = glGetProgramResourceLocation(m_id,
+                                                             GL_UNIFORM,
+                                                             n.c_str());
+                    try {
+                        uf->insert(std::make_pair(n, loc2));
+                    } catch (...) {
+                        Application::crashApplication(
+                            "Could not insert into unordered map");
+                    }
+                } catch (...) {
+                    Application::crashApplication("Failed string manipulation");
+                }
             }
         }
         delete[] nameBuffer;
@@ -164,35 +195,44 @@ void Shader::use() const {
     glUseProgram(m_id);
 }
 
-bool Shader::hasUniform(const std::string_view name) {
-    if (m_uniforms.find(name.data()) != m_uniforms.end()) {
+bool Shader::hasUniform(const char* name) {
+    auto* uf =
+        reinterpret_cast<std::unordered_map<std::string, int>*>(m_uniforms);
+
+    if (uf->find(name) != uf->end()) {
         return true;
     }
 
     return false;
 }
 
-void Shader::setUniform(const std::string_view name, const glm::mat4& mat) {
-    if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
+void Shader::setUniform(const char* name, const glm::mat4& mat) {
+    auto* uf =
+        reinterpret_cast<std::unordered_map<std::string, int>*>(m_uniforms);
+    if (auto l = uf->find(name); l != uf->end()) {
         glProgramUniformMatrix4fv(m_id, l->second, 1, GL_FALSE, &mat[0][0]);
     } else {
-        throw std::runtime_error("Uniform does not exist");
+        Application::crashApplication("Uniform does not exist");
     }
 }
 
-void Shader::setUniform(std::string_view name, unsigned int uint) {
-    if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
+void Shader::setUniform(const char* name, const unsigned int uint) {
+    auto* uf =
+        reinterpret_cast<std::unordered_map<std::string, int>*>(m_uniforms);
+    if (auto l = uf->find(name); l != uf->end()) {
         glProgramUniform1ui(m_id, l->second, uint);
     } else {
-        throw std::runtime_error("Uniform does not exist");
+        Application::crashApplication("Uniform does not exist");
     }
 }
 
-void Shader::setUniform(std::string_view name, signed int sint) {
-    if (auto l = m_uniforms.find(name.data()); l != m_uniforms.end()) {
+void Shader::setUniform(const char* name, const signed int sint) {
+    auto* uf =
+        reinterpret_cast<std::unordered_map<std::string, int>*>(m_uniforms);
+    if (auto l = uf->find(name); l != uf->end()) {
         glProgramUniform1i(m_id, l->second, sint);
     } else {
-        throw std::runtime_error("Uniform does not exist");
+        Application::crashApplication("Uniform does not exist");
     }
 }
 }

@@ -173,7 +173,7 @@ public:
      * \brief Get camera rotation
      * \return Camera's rotation in degrees
      */
-    [[nodiscard]] float getRoatation() const;
+    [[nodiscard]] float getRotation() const;
 
     /**
      * \brief Get camera's transform matrix

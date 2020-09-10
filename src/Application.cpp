@@ -17,7 +17,8 @@
 #include <SGE/Context.hpp>
 #include <SGE/Log.hpp>
 #include <cassert>
-#include <stdexcept>
+#include <exception>
+#include <string>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <glad.h>
@@ -28,9 +29,9 @@ sge::Application* current = nullptr;
 }
 
 namespace sge {
-Application::Application() {
+Application::Application() : m_args(nullptr), m_argc(0) {
     if (current != nullptr) {
-        throw std::logic_error("More than one application is current");
+        crashApplication("More than one active progra");
     }
 
     Log::general.open("log.txt");
@@ -41,16 +42,20 @@ Application::Application() {
     SDL_SetMainReady();
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
                  SDL_INIT_JOYSTICK | SDL_INIT_VIDEO) != 0) {
-        throw std::runtime_error("Could not initialize SDL!");
+        crashApplication("Could not initialize SDL!");
     }
 
     if (PHYSFS_init(NULL) == 0) {
         const auto code = PHYSFS_getLastErrorCode();
-        std::string msg = "Failed to initialize PhysFS: ";
-        if (code != PHYSFS_ERR_OK) {
-            msg += PHYSFS_getErrorByCode(code);
+        try {
+            std::string msg = "Failed to initialize PhysFS: ";
+            if (code != PHYSFS_ERR_OK) {
+                msg += PHYSFS_getErrorByCode(code);
+            }
+            crashApplication(msg.c_str());
+        } catch (...) {
+            crashApplication("Failed string manipulation");
         }
-        throw std::runtime_error(msg);
     }
 
     assert(PHYSFS_getLastErrorCode() == PHYSFS_ERR_OK);
@@ -69,14 +74,14 @@ Application::Application() {
     current = this;
 }
 
-Application::Application(const int argc, char** argv) {
+Application::Application(const int argc, char** argv)
+    : m_args(nullptr), m_argc(0) {
     if (current != nullptr) {
-        throw std::logic_error("More than one application is current");
+        crashApplication("More than one application is current");
     }
 
-    for (auto i = 0; i < argc; i++) {
-        m_args.emplace_back(argv[i]);
-    }
+    m_args = argv;
+    m_argc = argc;
 
     Log::general.open("log.txt");
     Log::general.open("log.txt");
@@ -87,16 +92,20 @@ Application::Application(const int argc, char** argv) {
     SDL_SetMainReady();
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
                  SDL_INIT_JOYSTICK | SDL_INIT_VIDEO) != 0) {
-        throw std::runtime_error("Could not initialize SDL!");
+        crashApplication("Could not initialize SDL!");
     }
 
     if (PHYSFS_init(argv[0]) == 0) {
-        const auto code = PHYSFS_getLastErrorCode();
-        std::string msg = "Failed to initialize PhysFS: ";
-        if (code != PHYSFS_ERR_OK) {
-            msg += PHYSFS_getErrorByCode(code);
+        try {
+            const auto code = PHYSFS_getLastErrorCode();
+            std::string msg = "Failed to initialize PhysFS: ";
+            if (code != PHYSFS_ERR_OK) {
+                msg += PHYSFS_getErrorByCode(code);
+            }
+            crashApplication(msg.c_str());
+        } catch (...) {
+            crashApplication("Failed string manipulation");
         }
-        throw std::runtime_error(msg);
     }
 
     assert(PHYSFS_getLastErrorCode() == PHYSFS_ERR_OK);
@@ -139,9 +148,34 @@ Application::ReturnCode Application::run() {
     return ReturnOk;
 }
 
-std::vector<std::string> Application::getArgs() const {
+const char* const* Application::getArgs() const {
     assert(current == this);
 
     return m_args;
+}
+
+int Application::getArgCount() const {
+    assert(current == this);
+
+    return m_argc;
+}
+
+void Application::crashApplication(const char* reason) {
+    try {
+        std::string message =
+            "SGE has crashed!\nFor more information consult the "
+            "log file.\n Reason: ";
+        message += reason;
+        Log::general << Log::MessageType::Error
+                     << "Application crash: " << reason << Log::Operation::Endl;
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+                                 "SGE Crash",
+                                 message.c_str(),
+                                 NULL);
+    }  catch (...) {
+        std::terminate();
+    }
+
+    std::terminate();
 }
 }

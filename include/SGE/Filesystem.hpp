@@ -16,7 +16,7 @@
 #define SGE_FILESYSTEM_HPP
 
 #include <SGE/Export.hpp>
-#include <filesystem>
+#include <SGE/Types.hpp>
 
 namespace sge {
 /**
@@ -62,7 +62,7 @@ public:
      * \param path Path to the file
      * \return true if file exists, false otherwise
      */
-    [[nodiscard]] static bool exists(const std::filesystem::path& path);
+    [[nodiscard]] static bool exists(const char* path);
 
     /**
      * \brief Get File Size
@@ -73,8 +73,7 @@ public:
      * \param path Path to the file
      * \return Size of the file, or 0 if it doesn't exist or it is empty
      */
-    [[nodiscard]] static std::size_t
-    getFileSize(const std::filesystem::path& path);
+    [[nodiscard]] static std::size_t getFileSize(const char* path);
 
     /**
      * \brief Is File Read-Only
@@ -85,7 +84,7 @@ public:
      * \param path Path to the file
      * \return true if file is read-only or was not found, false otherwise
      */
-    [[nodiscard]] static bool isFileReadOnly(const std::filesystem::path& path);
+    [[nodiscard]] static bool isFileReadOnly(const char* path);
 
     /**
      * \brief Get File Type
@@ -97,8 +96,7 @@ public:
      * \return The type of the file, or FileType::Other if there was a problem
      * \sa Filesystem::FileType
      */
-    [[nodiscard]] static FileType
-    getFileType(const std::filesystem::path& path);
+    [[nodiscard]] static FileType getFileType(const char* path);
 
     /**
      * \brief Mount archive
@@ -111,8 +109,7 @@ public:
      * \param mountPoint The point on which to mount the archive in the virtual filesystem
      * \return true on success, false otherwise
      */
-    static bool mount(const std::filesystem::path& archive,
-                      const std::filesystem::path& mountPoint);
+    static bool mount(const char* archive, const char* mountPoint);
 
     /**
      * \brief Unmount archive
@@ -123,7 +120,7 @@ public:
      * \throws std::runtime_error
      * \param archive The physical archive to be unmounted
      */
-    static void unmount(const std::filesystem::path& archive);
+    static void unmount(const char* archive);
 };
 }
 

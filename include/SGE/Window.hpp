@@ -20,7 +20,6 @@
 #include <SGE/EventHandler.hpp>
 #include <SGE/ContextSettings.hpp>
 #include <SGE/Context.hpp>
-#include <string_view>
 
 namespace sge {
 /**
@@ -58,7 +57,7 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
      */
-    explicit Window(std::string_view title);
+    explicit Window(const char* title);
 
     /**
      * \brief Create window
@@ -69,7 +68,7 @@ public:
      * \param title Title of the window
      * \param size Size of the window
      */
-    Window(std::string_view title,
+    Window(const char* title,
            const glm::ivec2& size);
 
     /**
@@ -81,7 +80,7 @@ public:
      * \param title Title of the window
      * \param videoMode Video mode to be set
      */
-    Window(std::string_view title,
+    Window(const char* title,
            const Monitor::VideoMode& videoMode);
     Window(const Window&)     = delete;
     Window(Window&&) noexcept = delete;
@@ -147,7 +146,7 @@ public:
      * Sets the title of the window.
      * \param title UTF-8 encoded string to be set as title
      */
-    void setTitle(std::string_view title);
+    void setTitle(const char* title);
 
     /**
      * \brief Set window position

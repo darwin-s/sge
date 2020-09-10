@@ -17,7 +17,6 @@
 
 #include <SGE/Types.hpp>
 #include <SGE/Export.hpp>
-#include <string_view>
 
 namespace sge {
 /**
@@ -65,9 +64,10 @@ public:
      *
      * Constructs a hash object by applying the algorithm
      * to the data provided and assigning the value to the object.
-     * \param data vector with the raw data
+     * \param size Size of raw data
+     * \param data Pointer to raw data
      */
-    explicit Hash(const ByteData& data);
+    Hash(std::size_t size, const void* data);
 
     /**
      * \brief Construct a hash from a string
@@ -77,7 +77,7 @@ public:
      * to a string and assigning the value to the object.
      * \param s String to be hashed
      */
-    explicit Hash(std::string_view s);
+    explicit Hash(const char* s);
 
     /**
      * \brief Assign the hash value using a raw value
@@ -99,18 +99,7 @@ public:
      * \param s The string to be hashed
      * \return *this
      */
-    Hash& operator=(std::string_view s);
-
-    /**
-     * \brief Assign the hash value using raw data
-     *
-     *
-     * Assigns the value of a hash object by applying the hashing
-     * algorithm to raw data and using that value.
-     * \param data data vector with raw bytes
-     * \return *this
-     */
-    Hash& operator=(const ByteData& data);
+    Hash& operator=(const char* s);
 
     /**
      * \brief Compare hashes

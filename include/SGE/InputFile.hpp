@@ -17,7 +17,6 @@
 
 #include <SGE/Export.hpp>
 #include <SGE/Types.hpp>
-#include <filesystem>
 
 namespace sge {
 /**
@@ -35,7 +34,8 @@ namespace sge {
  */
 class SGE_API InputFile {
 public:
-    static constexpr std::size_t defaultBufferSize = 65536;///< Default internal buffer size
+    static constexpr std::size_t defaultBufferSize =
+        65536;///< Default internal buffer size
 
     /**
      * \brief Create file
@@ -54,7 +54,7 @@ public:
      * \param path Path to the virtual file
      * \param bufferSize Internal buffer size
      */
-    explicit InputFile(const std::filesystem::path& path,
+    explicit InputFile(const char* path,
                        std::size_t bufferSize = defaultBufferSize);
 
     /**
@@ -95,8 +95,7 @@ public:
      * \param bufferSize Size of the internal buffer
      * \return true on success, false otherwise
      */
-    bool open(const std::filesystem::path& path,
-              std::size_t bufferSize = defaultBufferSize);
+    bool open(const char* path, std::size_t bufferSize = defaultBufferSize);
 
     /**
      * \brief Is File Open
@@ -111,12 +110,13 @@ public:
      * \brief Read File Data
      *
      *
-     * Reads a number of bytes from the file and returns it as a std::vector.
+     * Reads a number of bytes from the file and writes it into a buffer.
      * \throws std::runtime_error
      * \param bytes Number of bytes to read
-     * \return the std::vector containing the data.
+     * \param buffer Buffer to read into
+     * \return Number of bytes read (may be less than std::size_t bytes if file reached EOF)
      */
-    [[nodiscard]] ByteData read(std::size_t bytes) const;
+    std::size_t read(std::size_t bytes, void* buffer) const;
 
     /**
      * \brief End of File

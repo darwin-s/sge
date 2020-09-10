@@ -61,7 +61,7 @@ public:
      * \return Shared pointer to the resource
      */
     template<typename T>
-    std::shared_ptr<T> getResource(const std::filesystem::path& path);
+    std::shared_ptr<T> getResource(const char* path);
 
     /**
      * \brief Get Resource
@@ -78,7 +78,7 @@ public:
 private:
     ResourceManager() = default;
     SGE_PRIVATE void loadResource(std::shared_ptr<Resource> r,
-                                  const std::filesystem::path& path,
+                                  const char* path,
                                   std::uint64_t hash);
     std::unordered_map<std::uint64_t, std::weak_ptr<Resource>> m_map;
 };

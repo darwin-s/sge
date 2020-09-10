@@ -13,26 +13,28 @@
 // limitations under the License.
 
 #include <SGE/Hash.hpp>
+#include <cstring>
 
 namespace {
 constexpr uint64_t fnvPrime  = 0x00000100000001B3;
 constexpr uint64_t fnvOffset = 0xcbf29ce484222325;
 
-std::uint64_t fnv(const sge::ByteData& data) {
+std::uint64_t fnv(const std::size_t size, const void* data) {
+    const auto* d = reinterpret_cast<const std::uint8_t*>(data);
     auto hash = fnvOffset;
 
-    for (const auto& b : data) {
-        hash = (hash ^ b) * fnvPrime;
+    for (auto i = 0; i < size; i++) {
+        hash = (hash ^ d[i]) * fnvPrime;
     }
 
     return hash;
 }
 
-std::uint64_t fnv(const std::string_view s) {
+std::uint64_t fnv(const char* s) {
     auto hash = fnvOffset;
 
-    for (const auto& b : s) {
-        hash = (hash ^ static_cast<const std::uint8_t>(b)) * fnvPrime;
+    for (auto i = 0; i < std::strlen(s); i++) {
+        hash = (hash ^ static_cast<const std::uint8_t>(s[i])) * fnvPrime;
     }
 
     return hash;
@@ -46,10 +48,10 @@ Hash::Hash() : m_hash(0) {
 Hash::Hash(const std::uint64_t hash) : m_hash(hash) {
 }
 
-Hash::Hash(const ByteData& data) : m_hash(fnv(data)) {
+Hash::Hash(std::size_t size, const void* data) : m_hash(fnv(size, data)) {
 }
 
-Hash::Hash(const std::string_view s) : m_hash(fnv(s)) {
+Hash::Hash(const char* s) : m_hash(fnv(s)) {
 }
 
 Hash& Hash::operator=(const std::uint64_t hash) {
@@ -58,14 +60,8 @@ Hash& Hash::operator=(const std::uint64_t hash) {
     return *this;
 }
 
-Hash& Hash::operator=(const std::string_view s) {
+Hash& Hash::operator=(const char* s) {
     m_hash = fnv(s);
-
-    return *this;
-}
-
-Hash& Hash::operator=(const ByteData& data) {
-    m_hash = fnv(data);
 
     return *this;
 }

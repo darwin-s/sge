@@ -17,7 +17,6 @@
 
 #include <SGE/Export.hpp>
 #include <SGE/Types.hpp>
-#include <memory>
 
 namespace sge {
 class VAO;

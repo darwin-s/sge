@@ -16,7 +16,6 @@
 #define SGE_KEYBOARD_HPP
 
 #include <SGE/Export.hpp>
-#include <string>
 
 namespace sge {
 class Window;
@@ -214,7 +213,7 @@ public:
      * \param key Keyboard::Key type
      * \return String containing the key name
      */
-    [[nodiscard]] static std::string getKeyName(Key key);
+    [[nodiscard]] static const char* getKeyName(Key key);
 
     /**
      * \brief Get key name
@@ -225,7 +224,7 @@ public:
      * \param scancode Key scancode
      * \return String containing the key name
      */
-    [[nodiscard]] static std::string getKeyName(int scancode);
+    [[nodiscard]] static const char* getKeyName(int scancode);
 
     /**
      * \brief Get key state

@@ -24,9 +24,8 @@
 #include <SGE/VBO.hpp>
 #include <SGE/VAO.hpp>
 #include <SGE/Vertex.hpp>
+#include <SGE/Shader.hpp>
 #include <glm/vec2.hpp>
-#include <array>
-#include <vector>
 
 namespace sge {
 class Drawable;
@@ -62,7 +61,7 @@ public:
         const Window& win,
         const ContextSettings& contextSettings = ContextSettings());
 
-    virtual ~RenderTarget() = default;
+    virtual ~RenderTarget();
 
     /**
      * \brief Get physical size
@@ -138,10 +137,10 @@ public:
     void draw(const Drawable& drawable,
               const RenderState& renderState = RenderState::defaultState);
 
-    void drawTriangle(const std::array<Vertex, 3>& vertices,
+    void drawTriangle(const Vertex* vertices,
                       const RenderState& renderState = RenderState::defaultState);
 
-    void drawQuad(const std::array<Vertex, 4>& vertices,
+    void drawQuad(const Vertex* vertices,
                   const RenderState& renderState = RenderState::defaultState);
 
     void flushRenderQueue();
@@ -161,9 +160,9 @@ private:
     std::size_t m_indicesCount;
     unsigned int* m_indices;
     Vertex* m_verticesBatch;
-    std::shared_ptr<Shader> m_currentShader;
+    Shader* m_currentShader;
     void* m_sync;
-    std::vector<std::shared_ptr<Texture>> m_usedTextures;
+    void* m_usedTextures;
     unsigned int m_usedTextureUnits;
 };
 }

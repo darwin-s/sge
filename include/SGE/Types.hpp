@@ -18,8 +18,5 @@
 #include <cstdint>
 #include <vector>
 
-namespace sge {
-using ByteData = std::vector<std::uint8_t>;
-}
 
 #endif//SGE_TYPES_HPP

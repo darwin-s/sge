@@ -61,7 +61,7 @@ public:
      * \throws std::runtime_error
      * \param file Path to the virtual file
      */
-    explicit Image(const std::filesystem::path& file);
+    explicit Image(const char* file);
 
     /**
      * \brief Create image
@@ -112,7 +112,7 @@ public:
      * \param path Path to the virtual file
      * \returns true on success, false otherwise
      */
-    bool loadFromFile(const std::filesystem::path& path) override;
+    bool loadFromFile(const char* path) override;
 
     /**
      * \brief Load image from memory

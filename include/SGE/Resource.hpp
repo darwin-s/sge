@@ -16,10 +16,8 @@
 #define SGE_RESOURCE_HPP
 
 #include <SGE/Export.hpp>
-#include <filesystem>
-#include <string_view>
+#include <SGE/Types.hpp>//std::uint64_t
 #include <mutex>
-#include <cstdint>//std::uint64_t
 
 namespace sge {
 class ResourceManager;
@@ -52,7 +50,7 @@ public:
      * \param path Path to the virtual file
      * \return true on success, false otherwise
      */
-    virtual bool loadFromFile(const std::filesystem::path& path) = 0;
+    virtual bool loadFromFile(const char* path) = 0;
 
     /**
      * \brief Load resource
@@ -103,7 +101,7 @@ protected:
      * Set the fail state of the resource with a reason to be logged.
      * \param reason Reason of failure
      */
-    void fail(std::string_view reason);
+    void fail(const char* reason);
 
     /**
      * \brief Set Ready Flag

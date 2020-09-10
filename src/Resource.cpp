@@ -33,11 +33,10 @@ bool Resource::isFailed() const {
     return m_failed;
 }
 
-void Resource::fail(const std::string_view reason) {
+void Resource::fail(const char* reason) {
     std::string msg = "Resource loading failed: ";
     msg += reason;
-    std::scoped_lock sl(Log::generalMutex);
-    Log::general << Log::MessageType::Warning << msg << Log::Operation::Endl;
+    Log::general << Log::MessageType::Warning << msg.c_str() << Log::Operation::Endl;
     m_failed = true;
 }
 
