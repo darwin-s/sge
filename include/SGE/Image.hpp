@@ -58,7 +58,6 @@ public:
      *
      *
      * Creates and loads an image from a virtual file.
-     * \throws std::runtime_error
      * \param file Path to the virtual file
      */
     explicit Image(const char* file);
@@ -68,7 +67,6 @@ public:
      *
      *
      * Creates and loads an image from memory.
-     * \throws std::runtime_error
      * \param size Size of provided data in bytes
      * \param data Pointer to the data buffer
      */

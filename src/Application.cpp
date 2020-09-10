@@ -164,7 +164,7 @@ void Application::crashApplication(const char* reason) {
     try {
         std::string message =
             "SGE has crashed!\nFor more information consult the "
-            "log file.\n Reason: ";
+            "log file.\nReason: ";
         message += reason;
         Log::general << Log::MessageType::Error
                      << "Application crash: " << reason << Log::Operation::Endl;

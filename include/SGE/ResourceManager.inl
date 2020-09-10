@@ -19,7 +19,7 @@ ResourceManager::getResource(const char* path) {
                   "Type must be derived from sge::Resource!");
     static_assert(std::is_default_constructible_v<T>,
                   "Resource type must be default constructible!");
-    uint64_t hash = static_cast<std::uint64_t>(Hash(path.generic_u8string()));
+    uint64_t hash = static_cast<std::uint64_t>(Hash(path));
     auto it       = m_map.find(hash);
 
     if (it != m_map.end()) {

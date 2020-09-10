@@ -50,7 +50,6 @@ public:
      *
      *
      * Creates a file and immediately opens it.
-     * \throws std::runtime_error
      * \param path Path to the virtual file
      * \param bufferSize Internal buffer size
      */
@@ -111,7 +110,6 @@ public:
      *
      *
      * Reads a number of bytes from the file and writes it into a buffer.
-     * \throws std::runtime_error
      * \param bytes Number of bytes to read
      * \param buffer Buffer to read into
      * \return Number of bytes read (may be less than std::size_t bytes if file reached EOF)
@@ -123,7 +121,6 @@ public:
      *
      *
      * Returns whether the end of file was reached.
-     * \throws std::runtime_error
      * \return true if EOF was reached, false otherwise.
      */
     [[nodiscard]] bool eof() const;
@@ -133,7 +130,6 @@ public:
      *
      *
      * Returns the current position in the file, relative to it's beginning.
-     * \throws std::runtime_error
      * \return The byte number at which this handle is set
      */
     [[nodiscard]] std::size_t tell() const;
@@ -143,7 +139,6 @@ public:
      *
      *
      * Seeks to a certain position in the file, relative to the beginning.
-     * \throws std::runtime_error
      * \param seekPosition Position to seek to.
      */
     void seekg(std::size_t seekPosition);

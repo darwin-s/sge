@@ -69,7 +69,6 @@ public:
      *
      *
      * Returns the size of a virtual file. If the file does not exist or it is empty 0 is returned.
-     * \throws std::runtime_error
      * \param path Path to the file
      * \return Size of the file, or 0 if it doesn't exist or it is empty
      */
@@ -80,7 +79,6 @@ public:
      *
      *
      * Returns whether the file is read-only or not.
-     * \throws std::runtime_error
      * \param path Path to the file
      * \return true if file is read-only or was not found, false otherwise
      */
@@ -91,7 +89,6 @@ public:
      *
      *
      * Returns the type of the virtual file.
-     * \throws std::runtime_error
      * \param path Path to the file
      * \return The type of the file, or FileType::Other if there was a problem
      * \sa Filesystem::FileType
@@ -116,8 +113,7 @@ public:
      *
      *
      * Unmount a archive from the virtual filesystem.
-     * \note If the archive was mounted without an extension, then it should be unmounted without one as well
-     * \throws std::runtime_error
+     * \note If the archive was mounted without an extension, then it should be unmounted without one as well.
      * \param archive The physical archive to be unmounted
      */
     static void unmount(const char* archive);
