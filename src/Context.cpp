@@ -34,28 +34,6 @@ std::recursive_mutex sharedMutex;
 bool loadedGL = false;
 std::mutex loadedMutex;
 
-void setHints(const sge::ContextSettings& settings) {
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, settings.redBits);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, settings.greenBits);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, settings.blueBits);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, settings.alphaBits);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, settings.depthBits);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, settings.stencilBits);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    if (settings.samples > 0) {
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, settings.samples);
-    }
-    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE,
-                        settings.srgbCapable ? 1 : 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, openGlVersionMajor);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, openGlVersionMinor);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
-                        settings.debugContext ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
-}
-
 const char* sourceToString(const GLenum source) {
     switch (source) {
     case GL_DEBUG_SOURCE_API:
@@ -245,7 +223,7 @@ Context* Context::getCurrentContext() {
 void Context::create(void* winHandle, const ContextSettings& settings) {
     {
         std::scoped_lock sl(sharedMutex);
-        if (sharedCount == 0) {
+        if (sharedCount == 0 && shared == nullptr) {
 #ifdef SGE_DEBUG
             const ContextSettings s(false, 0, true, false);
 #else
@@ -255,7 +233,7 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
             shared = new Context(s);
         }
         sharedCount++;
-        setHints(settings);
+        setSettings(settings);
         if (sharedCount == 0) {
             SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
             m_windowHandle =
@@ -276,7 +254,6 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
                                   << sge::Log::Operation::Endl;
                 Application::crashApplication("SDL error");
             }
-            SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
             if (winHandle == nullptr) {
                 m_windowHandle =
                     SDL_CreateWindow("hidden",
@@ -349,5 +326,44 @@ void Context::create(void* winHandle, const ContextSettings& settings) {
         &m_settings.stencilBits);
 
     active = this;
+}
+
+void Context::setSettings(const ContextSettings& settings) {
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, settings.redBits);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, settings.greenBits);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, settings.blueBits);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, settings.alphaBits);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, settings.depthBits);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, settings.stencilBits);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    if (settings.samples > 0) {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, settings.samples);
+    }
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE,
+                        settings.srgbCapable ? 1 : 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, openGlVersionMajor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, openGlVersionMinor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+                        settings.debugContext ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+}
+
+void Context::setSharedContextCurrent() {
+    {
+        std::scoped_lock sl(sharedMutex);
+        if (sharedCount == 0 && shared == nullptr) {
+#ifdef SGE_DEBUG
+            const ContextSettings s(false, 0, true, false);
+#else
+            const ContextSettings s(false, 0, false, false);
+#endif
+            sharedCount--;
+            shared = new Context(s);
+            shared->setCurrent(true);
+        }
+    }
 }
 }

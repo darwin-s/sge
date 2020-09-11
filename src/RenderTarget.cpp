@@ -28,10 +28,9 @@ namespace sge {
 const Camera RenderTarget::defaultCamera = Camera();
 
 RenderTarget::RenderTarget(const ContextSettings& contextSettings)
-    : m_cameraChanged(true), m_context(contextSettings), m_vertexCount(0),
-      m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
-      m_currentShader(nullptr), m_sync(nullptr), m_usedTextures(nullptr),
-      m_usedTextureUnits(0) {
+    : m_context(contextSettings), m_vertexCount(0), m_indicesCount(0),
+      m_indices(nullptr), m_verticesBatch(nullptr), m_currentShader(nullptr),
+      m_sync(nullptr), m_usedTextures(nullptr), m_usedTextureUnits(0) {
     setBuffers();
     try {
         m_usedTextures = new std::vector<Texture*>;
@@ -44,10 +43,9 @@ RenderTarget::RenderTarget(const ContextSettings& contextSettings)
 
 RenderTarget::RenderTarget(const Window& win,
                            const ContextSettings& contextSettings)
-    : m_cameraChanged(true), m_context(win, contextSettings), m_vertexCount(0),
-      m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
-      m_currentShader(nullptr), m_sync(nullptr), m_usedTextures(nullptr),
-      m_usedTextureUnits(0) {
+    : m_context(win, contextSettings), m_vertexCount(0), m_indicesCount(0),
+      m_indices(nullptr), m_verticesBatch(nullptr), m_currentShader(nullptr),
+      m_sync(nullptr), m_usedTextures(nullptr), m_usedTextureUnits(0) {
     setBuffers();
     try {
         m_usedTextures = new std::vector<Texture*>;
@@ -66,8 +64,7 @@ RenderTarget::~RenderTarget() {
 void RenderTarget::setCamera(const Camera& camera) {
     flushRenderQueue();
 
-    m_camera        = camera;
-    m_cameraChanged = true;
+    m_camera = camera;
 }
 
 const Camera& RenderTarget::getCamera() const {
@@ -331,13 +328,10 @@ void RenderTarget::flushRenderQueue() {
 
     auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
 
-    if (m_cameraChanged) {
-        const auto view = getViewport(getCamera());
-        const auto top  = getPhysicalSize().y - (view.top + view.height);
+    const auto view = getViewport(getCamera());
+    const auto top  = getPhysicalSize().y - (view.top + view.height);
 
-        glViewport(view.left, top, view.width, view.height);
-        m_cameraChanged = false;
-    }
+    glViewport(view.left, top, view.width, view.height);
 
     if (m_currentShader != nullptr) {
         m_currentShader->use();

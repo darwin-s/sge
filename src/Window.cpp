@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <SGE/Window.hpp>
+#include <SGE/Context.hpp>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 
@@ -21,8 +22,10 @@ sge::EventHandler defaultHandler;
 }
 
 namespace sge {
-Window::Window()
+Window::Window(const ContextSettings& settings)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    Context::setSharedContextCurrent();
+    Context::setSettings(settings);
     m_handle = SDL_CreateWindow("Untitled",
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
@@ -33,8 +36,10 @@ Window::Window()
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const char* title)
+Window::Window(const char* title, const ContextSettings& settings)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    Context::setSharedContextCurrent();
+    Context::setSettings(settings);
     m_handle = SDL_CreateWindow(title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
@@ -45,8 +50,12 @@ Window::Window(const char* title)
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const char* title, const glm::ivec2& size)
+Window::Window(const char* title,
+               const glm::ivec2& size,
+               const ContextSettings& settings)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    Context::setSharedContextCurrent();
+    Context::setSettings(settings);
     m_handle = SDL_CreateWindow(title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
@@ -57,8 +66,12 @@ Window::Window(const char* title, const glm::ivec2& size)
     SDL_SetWindowData(static_cast<SDL_Window*>(m_handle), "win", this);
 }
 
-Window::Window(const char* title, const Monitor::VideoMode& videoMode)
+Window::Window(const char* title,
+               const Monitor::VideoMode& videoMode,
+               const ContextSettings& settings)
     : m_handle(nullptr), m_eventHandler(&defaultHandler), m_open(false) {
+    Context::setSharedContextCurrent();
+    Context::setSettings(settings);
     m_handle = SDL_CreateWindow(title,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,

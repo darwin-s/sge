@@ -19,7 +19,6 @@
 #include <SGE/Monitor.hpp>
 #include <SGE/EventHandler.hpp>
 #include <SGE/ContextSettings.hpp>
-#include <SGE/Context.hpp>
 
 namespace sge {
 /**
@@ -46,8 +45,9 @@ public:
      *
      * Creates a window
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
+     * \param settings Settings for window
      */
-    explicit Window();
+    explicit Window(const ContextSettings& settings = ContextSettings());
 
     /**
      * \brief Create window
@@ -56,8 +56,10 @@ public:
      * Creates a window, setting it's title.
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
+     * \param settings Settings for window
      */
-    explicit Window(const char* title);
+    explicit Window(const char* title,
+                    const ContextSettings& settings = ContextSettings());
 
     /**
      * \brief Create window
@@ -67,9 +69,11 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
      * \param size Size of the window
+     * \param settings Settings for window
      */
     Window(const char* title,
-           const glm::ivec2& size);
+           const glm::ivec2& size,
+           const ContextSettings& settings = ContextSettings());
 
     /**
      * \brief Create window
@@ -79,9 +83,11 @@ public:
      * \note A created window is not yet shown on the screen. Use the "show" method to make it visible
      * \param title Title of the window
      * \param videoMode Video mode to be set
+     * \param settings Settings for window
      */
     Window(const char* title,
-           const Monitor::VideoMode& videoMode);
+           const Monitor::VideoMode& videoMode,
+           const ContextSettings& settings = ContextSettings());
     Window(const Window&)     = delete;
     Window(Window&&) noexcept = delete;
     Window& operator=(const Window&) = delete;

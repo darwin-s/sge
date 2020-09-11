@@ -150,7 +150,6 @@ public:
 private:
     void setBuffers();
 
-    bool m_cameraChanged;
     Camera m_camera;
     Context m_context;
     VAO m_defaultVAO;

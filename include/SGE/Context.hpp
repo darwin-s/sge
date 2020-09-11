@@ -112,6 +112,17 @@ public:
      */
     static Context* getCurrentContext();
 
+    /**
+     * \brief Set window creation hints for the context.
+     * \param settings Settings for the context
+     */
+    static void setSettings(const ContextSettings& settings = ContextSettings());
+
+    /**
+     * \brief Make the shared context current
+     */
+    static void setSharedContextCurrent();
+
 private:
     SGE_PRIVATE void create(void* winHandle, const ContextSettings& settings);
     ContextSettings m_settings;
