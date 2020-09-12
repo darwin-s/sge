@@ -28,8 +28,6 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Filesystem.hpp
         ${INC_PREF}/InputFile.hpp
         ${INC_PREF}/Resource.hpp
-        ${INC_PREF}/ResourceManager.hpp
-        ${INC_PREF}/ResourceManager.inl
         ${INC_PREF}/VBO.hpp
         ${INC_PREF}/VAO.hpp
         ${INC_PREF}/Vertex.hpp
@@ -68,8 +66,6 @@ set(SGE_SRC
         ${SRC_PREF}/Window.cpp
         ${SRC_PREF}/Filesystem.cpp
         ${SRC_PREF}/InputFile.cpp
-        ${SRC_PREF}/Resource.cpp
-        ${SRC_PREF}/ResourceManager.cpp
         ${SRC_PREF}/VBO.cpp
         ${SRC_PREF}/VAO.cpp
         ${SRC_PREF}/Shader.cpp

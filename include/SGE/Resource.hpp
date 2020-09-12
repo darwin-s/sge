@@ -16,8 +16,8 @@
 #define SGE_RESOURCE_HPP
 
 #include <SGE/Export.hpp>
-#include <SGE/Types.hpp>//std::uint64_t
-#include <mutex>
+#include <SGE/Types.hpp>
+#include <filesystem>
 
 namespace sge {
 class ResourceManager;
@@ -28,18 +28,9 @@ class ResourceManager;
  *
  * This class must be used for any resources that are to be loaded from files.
  * It is used for resource managing.
- * \note Resources most be default constructible for the Resource Manager to work with them
  */
 class SGE_API Resource {
 public:
-    /**
-     * \brief Create new resource
-     *
-     *
-     * Creates a new empty un-initialized resource object.
-     */
-    Resource();
-
     virtual ~Resource() = default;
 
     /**
@@ -62,63 +53,6 @@ public:
      * \return true on success, false otherwise
      */
     virtual bool loadFromMemory(std::size_t size, const void* data) = 0;
-
-    /**
-     * \brief Get file id
-     *
-     *
-     * Returns the internal id of the file.
-     * \return internal id of the file, used for faster resource management
-     */
-    [[nodiscard]] std::uint64_t getId() const;
-
-    /**
-     * \brief Is Resource Ready
-     *
-     *
-     * Returns whether the file was loaded at this point.
-     * \note If the resource is not loaded through the ResourceManager, then it is the obligation of the
-     * \note resource to set the ready flag.
-     * \return true if resource is loaded, false otherwise
-     */
-    [[nodiscard]] bool isReady() const;
-
-    /**
-     * \brief Did Resource Fail
-     *
-     *
-     * Returns whether there was an error loading the resource.
-     * \note It is de responsibility of the resource to set this flag.
-     * \return true if there was an error, false otherwise
-     */
-    [[nodiscard]] bool isFailed() const;
-
-protected:
-    /**
-     * \brief Fail Resource
-     *
-     *
-     * Set the fail state of the resource with a reason to be logged.
-     * \param reason Reason of failure
-     */
-    void fail(const char* reason);
-
-    /**
-     * \brief Set Ready Flag
-     *
-     *
-     * Sets the ready flag of the resource
-     * \param ready State of the ready flag
-     */
-    void setReady(bool ready);
-
-private:
-    friend class ResourceManager;
-    std::uint64_t m_id;
-    bool m_ready;
-    bool m_failed;
-    mutable std::mutex m_readyMutex;
-    mutable std::mutex m_idMutex;
 };
 }
 
