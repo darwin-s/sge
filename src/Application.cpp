@@ -172,7 +172,7 @@ void Application::crashApplication(const char* reason) {
                                  "SGE Crash",
                                  message.c_str(),
                                  NULL);
-    }  catch (...) {
+    } catch (...) {
         std::terminate();
     }
 

@@ -63,7 +63,7 @@ bool InputFile::open(const char* path, const std::size_t bufferSize) {
 
     m_handle = PHYSFS_openRead(path);
     if (m_handle == nullptr) {
-        const auto ec   = PHYSFS_getLastErrorCode();
+        const auto ec = PHYSFS_getLastErrorCode();
         try {
             std::string msg = "File opening unsuccessful: ";
             msg += PHYSFS_getErrorByCode(ec);
@@ -125,7 +125,7 @@ std::size_t InputFile::read(const std::size_t bytes, void* buffer) const {
                          << Log::Operation::Endl;
 
             Application::crashApplication("Failed to read file");
-        }  catch (...) {
+        } catch (...) {
             sge::Application::crashApplication("Failed string manipulation");
         }
     }
@@ -141,8 +141,9 @@ std::size_t InputFile::read(const std::size_t bytes, void* buffer) const {
                              << Log::Operation::Endl;
 
                 Application::crashApplication("Failed to read file");
-            }  catch (...) {
-                sge::Application::crashApplication("Failed string manipulation");
+            } catch (...) {
+                sge::Application::crashApplication(
+                    "Failed string manipulation");
             }
         }
     }

@@ -96,8 +96,8 @@ void Camera::move(const glm::vec2& offset) {
 }
 
 void Camera::zoom(const float factor) {
-    const auto zoom = 1.0f
-        / factor;//For example a 2x zoom would mean shrinking the view size twice
+    const auto zoom = 1.0f /
+        factor;//For example a 2x zoom would mean shrinking the view size twice
 
     setSize(m_size.x * zoom, m_size.y * zoom);
 }
@@ -145,10 +145,22 @@ const glm::mat4& Camera::getTransform() const {
         const auto c = -a * m_center.x;
         const auto d = -b * m_center.y;
 
-        m_transform = glm::mat4(           a * cos,          -b * sin, 0.0f, 0.0f,
-                                           a * sin,           b * cos, 0.0f, 0.0f,
-                                              0.0f,              0.0f, 1.0f, 0.0f,
-                                a * translateX + c, b* translateY + d, 0.0f, 1.0f);
+        m_transform = glm::mat4(a * cos,
+                                -b * sin,
+                                0.0f,
+                                0.0f,
+                                a * sin,
+                                b * cos,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                1.0f,
+                                0.0f,
+                                a * translateX + c,
+                                b * translateY + d,
+                                0.0f,
+                                1.0f);
 
         m_transformNeedsUpdate = false;
     }

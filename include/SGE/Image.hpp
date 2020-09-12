@@ -141,19 +141,9 @@ public:
      */
     const glm::uvec2& getSize() const;
 
-    /**
-     * \brief Get number of channels
-     *
-     *
-     * Returns the number of color channels in this image.
-     * \returns Number of color channels
-     */
-    int getChannelNo() const;
-
 private:
     unsigned char* m_data;
     glm::uvec2 m_size;
-    int m_channels;
 };
 }
 

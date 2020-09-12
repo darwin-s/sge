@@ -19,28 +19,26 @@
 #include <stb_image.h>
 
 namespace sge {
-Image::Image() : m_data(nullptr), m_channels(0), m_size(0, 0) {
+Image::Image() : m_data(nullptr), m_size(0, 0) {
 }
 
-Image::Image(const char* file)
-    : m_data(nullptr), m_channels(0), m_size(0, 0) {
+Image::Image(const char* file) : m_data(nullptr), m_size(0, 0) {
     if (!loadFromFile(file)) {
         Application::crashApplication("Failed to load image");
     }
 }
 
 Image::Image(const std::size_t size, const void* data)
-    : m_data(nullptr), m_channels(0), m_size(0, 0) {
+    : m_data(nullptr), m_size(0, 0) {
     if (!loadFromMemory(size, data)) {
         Application::crashApplication("Failed to load image");
     }
 }
 
 Image::Image(Image&& other) noexcept
-    : m_data(other.m_data), m_size(other.m_size), m_channels(other.m_channels) {
-    other.m_data     = nullptr;
-    other.m_size     = glm::uvec2(0, 0);
-    other.m_channels = 0;
+    : m_data(other.m_data), m_size(other.m_size) {
+    other.m_data = nullptr;
+    other.m_size = glm::uvec2(0, 0);
 }
 
 Image::~Image() {
@@ -50,13 +48,11 @@ Image::~Image() {
 }
 
 Image& Image::operator=(Image&& other) noexcept {
-    m_data     = other.m_data;
-    m_size     = other.m_size;
-    m_channels = other.m_channels;
+    m_data = other.m_data;
+    m_size = other.m_size;
 
-    other.m_data     = nullptr;
-    other.m_size     = glm::uvec2(0, 0);
-    other.m_channels = 0;
+    other.m_data = nullptr;
+    other.m_size = glm::uvec2(0, 0);
 
     return *this;
 }
@@ -84,7 +80,7 @@ bool Image::loadFromMemory(const std::size_t size, const void* data) {
                                    size,
                                    &x,
                                    &y,
-                                   &m_channels,
+                                   NULL,
                                    STBI_rgb_alpha);
 
     if (x < 0 || y < 0) {
@@ -103,9 +99,5 @@ unsigned char* Image::getPixelData() const {
 
 const glm::uvec2& Image::getSize() const {
     return m_size;
-}
-
-int Image::getChannelNo() const {
-    return m_channels;
 }
 }

@@ -80,14 +80,15 @@ bool Texture::loadFromMemory(const std::size_t size, const void* data) {
     }
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-    int w, h, c;
+    int w, h;
     auto* imageData = stbi_load_from_memory(static_cast<const stbi_uc*>(data),
                                             size,
                                             &w,
                                             &h,
-                                            &c,
+                                            NULL,
                                             STBI_rgb_alpha);
-    if (imageData == nullptr || c < 4 || w == 0 || h == 0) {
+
+    if (imageData == nullptr || w == 0 || h == 0) {
         if (imageData != nullptr) {
             stbi_image_free(imageData);
         }
@@ -121,10 +122,6 @@ bool Texture::loadFromImage(const Image& image) {
 
     if (m_id != 0) {
         glDeleteTextures(1, &m_id);
-    }
-
-    if (image.getChannelNo() < 4) {
-        return false;
     }
 
     if (image.getSize().x == 0 || image.getSize().y == 0) {
@@ -202,8 +199,8 @@ void Texture::setFilterMode(const FilterMode mode) {
     if (!m_hasMipmaps) {
         if (m == GL_NEAREST_MIPMAP_NEAREST || m == GL_LINEAR_MIPMAP_NEAREST) {
             m = GL_NEAREST;
-        } else if (m == GL_NEAREST_MIPMAP_LINEAR
-                   || m == GL_LINEAR_MIPMAP_LINEAR) {
+        } else if (m == GL_NEAREST_MIPMAP_LINEAR ||
+                   m == GL_LINEAR_MIPMAP_LINEAR) {
             m = GL_LINEAR;
         }
     }

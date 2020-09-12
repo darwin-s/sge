@@ -14,6 +14,7 @@
 
 #include <SGE/ResourceManager.hpp>
 #include <SGE/Hash.hpp>
+
 namespace sge {
 ResourceManager& ResourceManager::instance() {
     static ResourceManager rm;

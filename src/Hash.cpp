@@ -21,7 +21,7 @@ constexpr uint64_t fnvOffset = 0xcbf29ce484222325;
 
 std::uint64_t fnv(const std::size_t size, const void* data) {
     const auto* d = reinterpret_cast<const std::uint8_t*>(data);
-    auto hash = fnvOffset;
+    auto hash     = fnvOffset;
 
     for (auto i = 0; i < size; i++) {
         hash = (hash ^ d[i]) * fnvPrime;

@@ -36,7 +36,8 @@ bool Resource::isFailed() const {
 void Resource::fail(const char* reason) {
     std::string msg = "Resource loading failed: ";
     msg += reason;
-    Log::general << Log::MessageType::Warning << msg.c_str() << Log::Operation::Endl;
+    Log::general << Log::MessageType::Warning << msg.c_str()
+                 << Log::Operation::Endl;
     m_failed = true;
 }
 

@@ -22,8 +22,7 @@ constexpr float PI = 3.14159265358979323846;
 namespace sge {
 Transformable::Transformable()
     : m_origin(0.0f, 0.0f), m_position(0.0f, 0.0f), m_scale(1.0f, 1.0f),
-      m_rotation(0.0f), m_transform(1.0f),
-      m_transformNeedsUpdate(true) {
+      m_rotation(0.0f), m_transform(1.0f), m_transformNeedsUpdate(true) {
 }
 
 void Transformable::setOrigin(const float x, const float y) {
@@ -116,10 +115,22 @@ const glm::mat4& Transformable::getTransform() const {
         const auto translateY =
             m_origin.x * scaleXSin - m_origin.y * scaleYCos + m_position.y;
 
-        m_transform = glm::mat4( scaleXCos, -scaleXSin, 0.0f, 0.0f,
-                                 scaleYSin,  scaleYCos, 0.0f, 0.0f,
-                                      0.0f,       0.0f, 1.0f, 0.0f,
-                                translateX, translateY, 0.0f, 1.0f);
+        m_transform = glm::mat4(scaleXCos,
+                                -scaleXSin,
+                                0.0f,
+                                0.0f,
+                                scaleYSin,
+                                scaleYCos,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                1.0f,
+                                0.0f,
+                                translateX,
+                                translateY,
+                                0.0f,
+                                1.0f);
 
         m_transformNeedsUpdate = false;
     }
