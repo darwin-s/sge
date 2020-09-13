@@ -14,6 +14,7 @@
 
 #include <SGE/Camera.hpp>
 #include <cmath>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace {
 constexpr float PI = 3.14159265358979323846;
@@ -132,35 +133,13 @@ float Camera::getRotation() const {
 
 const glm::mat4& Camera::getTransform() const {
     if (m_transformNeedsUpdate) {
-        const auto radians = m_rotation * PI / 180.0f;//Radians = angle*pi/180
-        const auto cos     = std::cos(radians);
-        const auto sin     = std::sin(radians);
-        const auto translateX =
-            -m_center.x * cos - m_center.y * sin + m_center.x;
-        const auto translateY =
-            m_center.x * sin - m_center.y * cos + m_center.y;
+        const auto radians = -m_rotation * PI / 180.0f;//Radians = angle*pi/180
 
-        const auto a = 2.0f / m_size.x;
-        const auto b = 2.0f / m_size.y;
-        const auto c = -a * m_center.x;
-        const auto d = -b * m_center.y;
-
-        m_transform = glm::mat4(a * cos,
-                                -b * sin,
-                                0.0f,
-                                0.0f,
-                                a * sin,
-                                b * cos,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                1.0f,
-                                0.0f,
-                                a * translateX + c,
-                                b * translateY + d,
-                                0.0f,
-                                1.0f);
+        RectangleFloat r = getRectangle();
+        m_transform =
+            glm::ortho(r.left, r.left + r.width, r.top - r.height, r.top);
+        m_transform =
+            glm::rotate(m_transform, radians, glm::vec3(0.0f, 0.0f, 1.0f));
 
         m_transformNeedsUpdate = false;
     }

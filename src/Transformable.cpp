@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <SGE/Transformable.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 
 namespace {
@@ -103,35 +104,18 @@ float Transformable::getRotation() const {
 const glm::mat4& Transformable::getTransform() const {
     if (m_transformNeedsUpdate) {
         const auto radians = -m_rotation * PI / 180.0f;//Radians = angle*pi/180
-        const auto cos     = std::cos(radians);
-        const auto sin     = std::sin(radians);
-        const auto scaleXCos = m_scale.x * cos;
-        const auto scaleYCos = m_scale.y * cos;
-        const auto scaleXSin = m_scale.x * sin;
-        const auto scaleYSin = m_scale.y * sin;
-        //This codes transforms the origin and then adds the position to it
-        const auto translateX =
-            -m_origin.x * scaleXCos - m_origin.y * scaleYSin + m_position.x;
-        const auto translateY =
-            m_origin.x * scaleXSin - m_origin.y * scaleYCos + m_position.y;
-
-        m_transform = glm::mat4(scaleXCos,
-                                -scaleXSin,
-                                0.0f,
-                                0.0f,
-                                scaleYSin,
-                                scaleYCos,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                1.0f,
-                                0.0f,
-                                translateX,
-                                translateY,
-                                0.0f,
-                                1.0f);
-
+        m_transform        = glm::mat4(1.0f);
+        m_transform =
+            glm::translate(m_transform,
+                           glm::vec3(m_position.x, m_position.y, 0.0f));
+        m_transform = glm::translate(m_transform,
+                                     glm::vec3(m_origin.x, m_origin.y, 0.0f));
+        m_transform =
+            glm::rotate(m_transform, radians, glm::vec3(0.0f, 0.0f, 1.0f));
+        m_transform = glm::translate(m_transform,
+                                     glm::vec3(-m_origin.x, -m_origin.y, 0.0f));
+        m_transform =
+            glm::scale(m_transform, glm::vec3(m_scale.x, m_scale.y, 1.0f));
         m_transformNeedsUpdate = false;
     }
 
