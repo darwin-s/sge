@@ -119,7 +119,7 @@ generate_export_header(sge EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/../inclu
         NO_EXPORT_MACRO_NAME SGE_PRIVATE)
 
 if (APPLE)
-    message(FATAL_ERROR "Apple is not supported, because of lack of OpenGL 4.5 support")
+    message(FATAL_ERROR "Apple is not supported, because of lack of OpenGL 4.6 support")
 endif ()
 
 if (UNIX)
