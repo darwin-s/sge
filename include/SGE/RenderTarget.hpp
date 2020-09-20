@@ -20,7 +20,7 @@
 #include <SGE/RenderState.hpp>
 #include <SGE/Color.hpp>
 #include <SGE/Types.hpp>
-#include <SGE/Camera.hpp>
+#include <SGE/CameraOrtho.hpp>
 #include <SGE/VBO.hpp>
 #include <SGE/VAO.hpp>
 #include <SGE/Vertex.hpp>
@@ -85,7 +85,7 @@ public:
      * \brief Get camera
      * \return Currently used camera for this target
      */
-    [[nodiscard]] const Camera& getCamera() const;
+    [[nodiscard]] const Camera* getCamera() const;
 
     /**
      * \brief Get viewport dimensions
@@ -137,20 +137,38 @@ public:
     void draw(const Drawable& drawable,
               const RenderState& renderState = RenderState::defaultState);
 
-    void drawTriangle(const Vertex* vertices,
-                      const RenderState& renderState = RenderState::defaultState);
+    /**
+     * \brief Draw Triangles
+     * \param vertices Pointer to a vertex array with 3 vertices
+     * \param renderState Rendering state
+     */
+    void
+    drawTriangle(const Vertex* vertices,
+                 const RenderState& renderState = RenderState::defaultState);
 
+    /**
+     * \brief Draw Quad
+     * \param vertices Pointer to a vertex array with 4 vertices
+     * \param renderState Rendering states
+     */
     void drawQuad(const Vertex* vertices,
                   const RenderState& renderState = RenderState::defaultState);
 
+    /**
+     * \brief Flush rendering queue
+     * 
+     * 
+     * Flushes all pending drawing operations.
+     */
     void flushRenderQueue();
 
-    static const Camera defaultCamera;///< Default camera for render targets
+    static const CameraOrtho
+        defaultCamera;///< Default camera for render targets
 
 private:
     void setBuffers();
 
-    Camera m_camera;
+    const Camera* m_camera;
     Context m_context;
     VAO m_defaultVAO;
     VBO m_defaultVBO;

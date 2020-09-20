@@ -40,6 +40,8 @@ set(SGE_PUBLIC_INCLUDES
         ${INC_PREF}/Image.hpp
         ${INC_PREF}/Transformable.hpp
         ${INC_PREF}/Camera.hpp
+        ${INC_PREF}/CameraOrtho.hpp
+        ${INC_PREF}/CameraPersp.hpp
         ${INC_PREF}/Rectangle.hpp
         ${INC_PREF}/Rectangle.inl
         ${INC_PREF}/Texture.hpp
@@ -77,7 +79,9 @@ set(SGE_SRC
         ${SRC_PREF}/Transformable.cpp
         ${SRC_PREF}/Camera.cpp
         ${SRC_PREF}/Texture.cpp
-        ${SRC_PREF}/Sprite.cpp)
+        ${SRC_PREF}/Sprite.cpp
+        ${SRC_PREF}/CameraOrtho.cpp
+        ${SRC_PREF}/CameraPersp.cpp)
 
 add_library(sge SHARED ${SGE_SRC} ${SGE_GENERATED_INCLUDES} ${SGE_PUBLIC_INCLUDES} ${SGE_PRIVATE_INCLUDES})
 add_library(SGE::sge ALIAS sge)

@@ -28,7 +28,7 @@ namespace sge {
  * Object representing a single vertex, used for drawing.
  */
 struct SGE_API Vertex {
-    glm::vec2 pos;   ///< Position
+    glm::vec3 pos;   ///< Position
     Color tint;      ///< Tint
     glm::vec2 texPos;///< Texture position
     float texUnit;   ///< Texture unit (set by the batch renderer)

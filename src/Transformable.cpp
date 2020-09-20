@@ -22,100 +22,130 @@ constexpr float PI = 3.14159265358979323846;
 
 namespace sge {
 Transformable::Transformable()
-    : m_origin(0.0f, 0.0f), m_position(0.0f, 0.0f), m_scale(1.0f, 1.0f),
-      m_rotation(0.0f), m_transform(1.0f), m_transformNeedsUpdate(true) {
+    : m_origin(0.0f, 0.0f, 0.0f), m_position(0.0f, 0.0f, 0.0f),
+      m_scale(1.0f, 1.0f, 1.0f), m_rotation(0.0f), m_transform(1.0f),
+      m_transformNeedsUpdate(true) {
 }
 
-void Transformable::setOrigin(const float x, const float y) {
+void Transformable::setOrigin(const float x, const float y, const float z) {
     m_origin.x             = x;
     m_origin.y             = y;
+    m_origin.z             = z;
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::setOrigin(const glm::vec2& origin) {
-    setOrigin(origin.x, origin.y);
+void Transformable::setOrigin(const glm::vec3& origin) {
+    setOrigin(origin.x, origin.y, origin.z);
 }
 
-void Transformable::setPosition(const float x, const float y) {
+void Transformable::setPosition(const float x, const float y, const float z) {
     m_position.x           = x;
     m_position.y           = y;
+    m_position.z           = z;
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::setPosition(const glm::vec2& position) {
-    setPosition(position.x, position.y);
+void Transformable::setPosition(const glm::vec3& position) {
+    setPosition(position.x, position.y, position.z);
 }
 
-void Transformable::setScale(const float xFactor, const float yFactor) {
+void Transformable::setScale(const float xFactor,
+                             const float yFactor,
+                             float zFactor) {
     m_scale.x              = xFactor;
     m_scale.y              = yFactor;
+    m_scale.z              = zFactor;
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::setScale(const glm::vec2& factor) {
-    setScale(factor.x, factor.y);
+void Transformable::setScale(const glm::vec3& factor) {
+    setScale(factor.x, factor.y, factor.z);
 }
 
-void Transformable::setRotation(const float degrees) {
-    m_rotation = std::fmod(degrees, 360.0f);
-    if (m_rotation < 0.0f) {
-        m_rotation += 360.0f;
+void Transformable::setRotation(const float xDeg,
+                                const float yDeg,
+                                const float zDeg) {
+    m_rotation.x = std::fmod(xDeg, 360.0f);
+    m_rotation.y = std::fmod(yDeg, 360.0f);
+    m_rotation.z = std::fmod(zDeg, 360.0f);
+
+    if (m_rotation.x < 0.0f) {
+        m_rotation.x += 360.0f;
+    }
+    if (m_rotation.y < 0.0f) {
+        m_rotation.y += 360.0f;
+    }
+    if (m_rotation.z < 0.0f) {
+        m_rotation.z += 360.0f;
     }
 
     m_transformNeedsUpdate = true;
 }
 
-void Transformable::move(const float x, const float y) {
-    setPosition(m_position.x + x, m_position.y + y);
+void Transformable::setRotation(const glm::vec3& degrees) {
+    setRotation(degrees.x, degrees.y, degrees.z);
 }
 
-void Transformable::move(const glm::vec2& offset) {
-    move(offset.x, offset.y);
+void Transformable::move(const float x, const float y, const float z) {
+    setPosition(m_position.x + x, m_position.y + y, m_position.z + z);
 }
 
-void Transformable::scale(const float xFactor, const float yFactor) {
-    setScale(m_scale.x * xFactor, m_scale.y * yFactor);
+void Transformable::move(const glm::vec3& offset) {
+    move(offset.x, offset.y, offset.z);
 }
 
-void Transformable::scale(const glm::vec2& factor) {
-    scale(factor.x, factor.y);
+void Transformable::scale(const float xFactor,
+                          const float yFactor,
+                          const float zFactor) {
+    setScale(m_scale.x * xFactor, m_scale.y * yFactor, m_scale.z * zFactor);
 }
 
-void Transformable::rotate(const float degrees) {
-    setRotation(m_rotation + degrees);
+void Transformable::scale(const glm::vec3& factor) {
+    scale(factor.x, factor.y, factor.z);
 }
 
-const glm::vec2& Transformable::getOrigin() const {
+void Transformable::rotate(const float xDeg,
+                           const float yDeg,
+                           const float zDeg) {
+    setRotation(m_rotation.x + xDeg, m_rotation.y + yDeg, m_rotation.z + zDeg);
+}
+
+void Transformable::rotate(const glm::vec3& degrees) {
+    rotate(degrees.x, degrees.y, degrees.z);
+}
+
+const glm::vec3& Transformable::getOrigin() const {
     return m_origin;
 }
 
-const glm::vec2& Transformable::getPosition() const {
+const glm::vec3& Transformable::getPosition() const {
     return m_position;
 }
 
-const glm::vec2& Transformable::getScale() const {
+const glm::vec3& Transformable::getScale() const {
     return m_scale;
 }
 
-float Transformable::getRotation() const {
+glm::vec3 Transformable::getRotation() const {
     return m_rotation;
 }
 
 const glm::mat4& Transformable::getTransform() const {
     if (m_transformNeedsUpdate) {
-        const auto radians = -m_rotation * PI / 180.0f;//Radians = angle*pi/180
-        m_transform        = glm::mat4(1.0f);
-        m_transform =
-            glm::translate(m_transform,
-                           glm::vec3(m_position.x, m_position.y, 0.0f));
-        m_transform = glm::translate(m_transform,
-                                     glm::vec3(m_origin.x, m_origin.y, 0.0f));
-        m_transform =
-            glm::rotate(m_transform, radians, glm::vec3(0.0f, 0.0f, 1.0f));
-        m_transform = glm::translate(m_transform,
-                                     glm::vec3(-m_origin.x, -m_origin.y, 0.0f));
-        m_transform =
-            glm::scale(m_transform, glm::vec3(m_scale.x, m_scale.y, 1.0f));
+        m_transform            = glm::mat4(1.0f);
+        m_transform            = glm::translate(m_transform, m_position);
+        m_transform            = glm::translate(m_transform, m_origin);
+        m_transform            = glm::rotate(m_transform,
+                                  glm::radians(m_rotation.x),
+                                  glm::vec3(1.0f, 0.0f, 0.0f));
+        m_transform            = glm::rotate(m_transform,
+                                  glm::radians(m_rotation.y),
+                                  glm::vec3(0.0f, 1.0f, 0.0f));
+        m_transform            = glm::rotate(m_transform,
+                                  glm::radians(m_rotation.z),
+                                  glm::vec3(0.0f, 0.0f, 1.0f));
+        m_transform            = glm::translate(m_transform, -m_origin);
+        m_transform            = glm::scale(m_transform, m_scale);
         m_transformNeedsUpdate = false;
     }
 

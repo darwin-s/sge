@@ -22,12 +22,13 @@
 
 namespace sge {
 /**
- * \brief 2D Camera object
+ * \brief Camera object
  *
  *
- * This object represents a 2D camera with the ability to set the viewport.
+ * This object represents a camera with the ability to set the viewport.
  * Setting the viewport allows to define where on the screen the camera's contents
- * will be drawn. The camera can be moved, rotated and zoomed.
+ * will be drawn. The camera can be moved, rotated and zoomed. This is a base class for cameras 
+ * with different perspective transforms.
  * Usage example:
  * \code
  * sge::Camera map(sge::RectangleFloat(0.0f, 0.0f, 10.0f, 10.0f)); // Camera that shows the world from (0, 0) to (10, 10)
@@ -44,28 +45,9 @@ public:
      * \brief Create camera
      *
      *
-     * Creates a default camera, that displays the world from (-1, -1) to (1, 1).
+     * Creates a default camera at (0, 0, 1) looking towards negative Z with no rotation
      */
     Camera();
-
-    /**
-     * \brief Create camera
-     *
-     *
-     * Creates a camera that display a rectangular area of the world.
-     * \param rect Rectangle defining the camera's view
-     */
-    explicit Camera(const RectangleFloat& rect);
-
-    /**
-     * \brief Create camera
-     *
-     *
-     * Creates a camera that is centered on a point and has a certain size.
-     * \param center Center coordinates of the camera
-     * \param size Size of the camera's rectangle
-     */
-    Camera(const glm::vec2& center, const glm::vec2& size);
 
     /**
      * \brief Set camera viewport
@@ -78,70 +60,98 @@ public:
     void setViewPort(const RectangleFloat& viewportRatio);
 
     /**
-     * \brief Set camera center
-     * \param x Center's x coordinate
-     * \param y Center's y coordinate
+     * \brief Look at position
+     * \param x X position
+     * \param y Y position
+     * \param z Z position
      */
-    void setCenter(float x, float y);
+    void lookAt(float x, float y, float z = 0.0f);
 
     /**
-     * \brief Set camera center
-     * \param center Position of the center
+     * \brief Look at position
+     * \param position Position to look towards
      */
-    void setCenter(const glm::vec2& center);
+    void lookAt(const glm::vec3& position);
 
     /**
-     * \brief Set camera size
-     * \param width Width of camera's view rectangle
-     * \param height Height of camera's view rectangle
+     * \brief Set the camera's direction vector
+     * 
+     * 
+     * \note The direction values must be normalized
+     * \param x X direction
+     * \param y Y direction
+     * \param z Z direction
      */
-    void setSize(float width, float height);
+    void setDirection(float x, float y, float z = -1.0f);
 
     /**
-     * \brief Set camera size
-     * \param size Size of the camera
+     * \brief Set the camera's direction vector
+     * 
+     * 
+     * \note The direction vector must be normalized
+     * \param direction Direction vector
      */
-    void setSize(const glm::vec2& size);
+    void setDirection(const glm::vec3& direction);
 
     /**
-     * \brief Set camera view rectangle
-     * \param rect Rectangle representing the camera's view
+     * \brief Set camera position
+     * \param x X position
+     * \param y Y position
+     * \param z Z position
      */
-    void setRectangle(const RectangleFloat& rect);
+    void setPosition(float x, float y, float z = 1.0f);
+
+    /**
+     * \brief Set camera position
+     * \param position Position of the camera
+     */
+    void setPosition(const glm::vec3& position);
 
     /**
      * \brief Set camera rotation
-     * \param degrees Camera rotation in degrees
+     * \param yaw Yaw rotation in degrees
+     * \param pitch Piych rotation in degrees
      */
-    void setRotation(float degrees);
+    void setRotation(float yaw, float pitch);
+
+    /**
+     * \brief Set camera rotation
+     * 
+     * 
+     * Sets camera rotation (X - yaw, Y - pitch)
+     * \param degrees Camera rotation vector in degrees
+     */
+    void setRotation(const glm::vec2& degrees);
 
     /**
      * \brief Move camera
      * \param x X offset
      * \param y Y offset
+     * \param z Z offset
      */
-    void move(float x, float y);
+    void move(float x, float y, float z = 0.0f);
 
     /**
      * \brief Move camera
      * \param offset Position offset
      */
-    void move(const glm::vec2& offset);
-
-    /**
-     * \brief Zoom camera
-     *
-     *
-     * Zooms the camera by a certain factor. A factor value of X makes the objects look X times bigger.
-     * \param factor Zoom factor
-     */
-    void zoom(float factor);
+    void move(const glm::vec3& offset);
 
     /**
      * \brief Rotate camera
-     * \param degrees Rotation in degrees
+     * \param yaw Yaw rotation in degrees
+     * \param pitch Piych rotation in degrees
      */
-    void rotate(float degrees);
+    void rotate(float yaw, float pitch);
+
+    /**
+     * \brief Rotate camera
+     * 
+     * 
+     * Rotate camera (X - yaw, Y - pitch)
+     * \param degrees Rotation vector in degrees
+     */
+    void rotate(const glm::vec2& degrees);
 
     /**
      * \brief Get viewport
@@ -152,50 +162,51 @@ public:
     [[nodiscard]] const RectangleFloat& getViewport() const;
 
     /**
-     * \brief Get camera center
-     * \return Camera center position
+     * \brief Get camera postion
+     * \return Camera position
      */
-    [[nodiscard]] const glm::vec2& getCenter() const;
+    [[nodiscard]] const glm::vec3& getPosition() const;
 
     /**
-     * \brief Get camera size
-     * \return Size of camera's view rectangle
+     * \brief Get normalized direction vector
+     * \return Direction vector of the camera
      */
-    [[nodiscard]] const glm::vec2& getSize() const;
-
-    /**
-     * \brief Get camera view rectangle
-     * \return Camera's view rectangle
-     */
-    [[nodiscard]] RectangleFloat getRectangle() const;
+    [[nodiscard]] const glm::vec3& getDirection() const;
 
     /**
      * \brief Get camera rotation
+     * 
+     * 
+     * Get camera's rotation vector (X - yaw, Y - pitch)
      * \return Camera's rotation in degrees
      */
-    [[nodiscard]] float getRotation() const;
+    [[nodiscard]] const glm::vec2& getRotation() const;
 
     /**
-     * \brief Get camera's transform matrix
-     * \return Transform to world coordinates
+     * \brief Get camera transform
+     * \return Camera perspective and view transform
      */
-    [[nodiscard]] const glm::mat4& getTransform() const;
+    [[nodiscard]] glm::mat4 getTransform() const;
+
+    /**
+     * \brief Get camera's perspective transform matrix
+     * \return Perspective transform
+     */
+    [[nodiscard]] virtual const glm::mat4& getPerspectiveTransform() const = 0;
 
     /**
      * \brief Get inverse of camera's transform matrix
      * \return Inverse of transform matrix
      */
-    [[nodiscard]] const glm::mat4& getInverseTransform() const;
+    [[nodiscard]] glm::mat4 getInverseTransform() const;
 
 private:
-    glm::vec2 m_center;
-    glm::vec2 m_size;
-    float m_rotation;
+    glm::vec3 m_position;
+    glm::vec3 m_direction;
+    glm::vec2 m_rotation;
     RectangleFloat m_viewport;
     mutable glm::mat4 m_transform;
     mutable bool m_transformNeedsUpdate;
-    mutable glm::mat4 m_inverseTransform;
-    mutable bool m_inverseTransformNeedsUpdate;
 };
 }
 

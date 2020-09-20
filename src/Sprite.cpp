@@ -24,6 +24,10 @@ Sprite::Sprite(Texture* texture,
     m_vertices[0].pos.y = 0.0f;
     m_vertices[1].pos.y = 0.0f;
     m_vertices[2].pos.x = 0.0f;
+    m_vertices[0].pos.z = 0.0f;
+    m_vertices[1].pos.z = 0.0f;
+    m_vertices[2].pos.z = 0.0f;
+    m_vertices[3].pos.z = 0.0f;
     setTextureRectangle(textureRect);
     setModelSize(size);
     setTint(Color(255, 255, 255, 255));

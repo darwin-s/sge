@@ -40,6 +40,8 @@
 #include <SGE/Image.hpp>
 #include <SGE/Transformable.hpp>
 #include <SGE/Camera.hpp>
+#include <SGE/CameraOrtho.hpp>
+#include <SGE/CameraPersp.hpp>
 #include <SGE/Texture.hpp>
 #include <SGE/Sprite.hpp>
 

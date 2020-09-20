@@ -25,12 +25,14 @@ unsigned int maxTextures               = 0;
 }
 
 namespace sge {
-const Camera RenderTarget::defaultCamera = Camera();
+const CameraOrtho RenderTarget::defaultCamera = CameraOrtho();
 
 RenderTarget::RenderTarget(const ContextSettings& contextSettings)
-    : m_context(contextSettings), m_vertexCount(0), m_indicesCount(0),
-      m_indices(nullptr), m_verticesBatch(nullptr), m_currentShader(nullptr),
-      m_sync(nullptr), m_usedTextures(nullptr), m_usedTextureUnits(0) {
+    : m_camera(&defaultCamera), m_context(contextSettings), m_vertexCount(0),
+      m_indicesCount(0), m_indices(nullptr), m_verticesBatch(nullptr),
+      m_currentShader(nullptr), m_sync(nullptr), m_usedTextures(nullptr),
+      m_usedTextureUnits(0) {
+    glEnable(GL_DEPTH_TEST);
     setBuffers();
     try {
         m_usedTextures = new std::vector<Texture*>;
@@ -43,9 +45,11 @@ RenderTarget::RenderTarget(const ContextSettings& contextSettings)
 
 RenderTarget::RenderTarget(const Window& win,
                            const ContextSettings& contextSettings)
-    : m_context(win, contextSettings), m_vertexCount(0), m_indicesCount(0),
-      m_indices(nullptr), m_verticesBatch(nullptr), m_currentShader(nullptr),
-      m_sync(nullptr), m_usedTextures(nullptr), m_usedTextureUnits(0) {
+    : m_camera(&defaultCamera), m_context(win, contextSettings),
+      m_vertexCount(0), m_indicesCount(0), m_indices(nullptr),
+      m_verticesBatch(nullptr), m_currentShader(nullptr), m_sync(nullptr),
+      m_usedTextures(nullptr), m_usedTextureUnits(0) {
+    glEnable(GL_DEPTH_TEST);
     setBuffers();
     try {
         m_usedTextures = new std::vector<Texture*>;
@@ -64,10 +68,10 @@ RenderTarget::~RenderTarget() {
 void RenderTarget::setCamera(const Camera& camera) {
     flushRenderQueue();
 
-    m_camera = camera;
+    m_camera = &camera;
 }
 
-const Camera& RenderTarget::getCamera() const {
+const Camera* RenderTarget::getCamera() const {
     return m_camera;
 }
 
@@ -119,7 +123,7 @@ void RenderTarget::clear(const Color& clearColor) {
                  static_cast<GLfloat>(clearColor.green) / 255,
                  static_cast<GLfloat>(clearColor.blue) / 255,
                  static_cast<GLfloat>(clearColor.alpha) / 255);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (active != nullptr) {
         active->setCurrent(true);
@@ -194,17 +198,17 @@ void RenderTarget::drawTriangle(const Vertex* vertices,
     }
 
     m_verticesBatch[m_vertexCount].pos =
-        renderState.transform * glm::vec4(vertices[0].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[0].pos, 1.0f);
     m_verticesBatch[m_vertexCount].tint    = vertices[0].tint;
     m_verticesBatch[m_vertexCount].texPos  = vertices[0].texPos;
     m_verticesBatch[m_vertexCount].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 1].pos =
-        renderState.transform * glm::vec4(vertices[1].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[1].pos, 1.0f);
     m_verticesBatch[m_vertexCount + 1].tint    = vertices[1].tint;
     m_verticesBatch[m_vertexCount + 1].texPos  = vertices[1].texPos;
     m_verticesBatch[m_vertexCount + 1].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 2].pos =
-        renderState.transform * glm::vec4(vertices[2].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[2].pos, 1.0f);
     m_verticesBatch[m_vertexCount + 2].tint    = vertices[2].tint;
     m_verticesBatch[m_vertexCount + 2].texPos  = vertices[2].texPos;
     m_verticesBatch[m_vertexCount + 2].texUnit = textureUnit;
@@ -285,22 +289,22 @@ void RenderTarget::drawQuad(const Vertex* vertices,
     }
 
     m_verticesBatch[m_vertexCount].pos =
-        renderState.transform * glm::vec4(vertices[0].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[0].pos, 1.0f);
     m_verticesBatch[m_vertexCount].tint    = vertices[0].tint;
     m_verticesBatch[m_vertexCount].texPos  = vertices[0].texPos;
     m_verticesBatch[m_vertexCount].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 1].pos =
-        renderState.transform * glm::vec4(vertices[1].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[1].pos, 1.0f);
     m_verticesBatch[m_vertexCount + 1].tint    = vertices[1].tint;
     m_verticesBatch[m_vertexCount + 1].texPos  = vertices[1].texPos;
     m_verticesBatch[m_vertexCount + 1].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 2].pos =
-        renderState.transform * glm::vec4(vertices[2].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[2].pos, 1.0f);
     m_verticesBatch[m_vertexCount + 2].tint    = vertices[2].tint;
     m_verticesBatch[m_vertexCount + 2].texPos  = vertices[2].texPos;
     m_verticesBatch[m_vertexCount + 2].texUnit = textureUnit;
     m_verticesBatch[m_vertexCount + 3].pos =
-        renderState.transform * glm::vec4(vertices[3].pos, 0.0f, 1.0f);
+        renderState.transform * glm::vec4(vertices[3].pos, 1.0f);
     m_verticesBatch[m_vertexCount + 3].tint    = vertices[3].tint;
     m_verticesBatch[m_vertexCount + 3].texPos  = vertices[3].texPos;
     m_verticesBatch[m_vertexCount + 3].texUnit = textureUnit;
@@ -328,7 +332,7 @@ void RenderTarget::flushRenderQueue() {
 
     auto* ut = reinterpret_cast<std::vector<Texture*>*>(m_usedTextures);
 
-    const auto view = getViewport(getCamera());
+    const auto view = getViewport(*getCamera());
     const auto top  = getPhysicalSize().y - (view.top + view.height);
 
     glViewport(view.left, top, view.width, view.height);
@@ -337,7 +341,7 @@ void RenderTarget::flushRenderQueue() {
         m_currentShader->use();
         if (m_currentShader->hasUniform("transform")) {
             m_currentShader->setUniform("transform",
-                                        getCamera().getTransform());
+                                        getCamera()->getTransform());
         }
 
         if (m_currentShader->hasUniform("tex[0]")) {
@@ -378,7 +382,7 @@ void RenderTarget::setBuffers() {
     m_defaultVAO.enableAttribute(2);
     m_defaultVAO.enableAttribute(3);
     m_defaultVAO.setAttributeFormat(0,
-                                    2,
+                                    3,
                                     VAO::Data::Float,
                                     true,
                                     offsetof(Vertex, pos));

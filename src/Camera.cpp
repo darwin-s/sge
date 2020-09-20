@@ -22,137 +22,134 @@ constexpr float PI = 3.14159265358979323846;
 
 namespace sge {
 Camera::Camera()
-    : m_center(0.0f, 0.0f), m_size(2.0f, 2.0f), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(1.0f),
-      m_transformNeedsUpdate(true), m_inverseTransform(1.0f),
-      m_inverseTransformNeedsUpdate(true) {
-}
-
-Camera::Camera(const RectangleFloat& rect)
-    : m_center(rect.left + rect.width / 2.0f, rect.top - rect.height / 2.0f),
-      m_size(rect.width, rect.height), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(1.0f),
-      m_transformNeedsUpdate(true), m_inverseTransform(1.0f),
-      m_inverseTransformNeedsUpdate(true) {
-}
-
-Camera::Camera(const glm::vec2& center, const glm::vec2& size)
-    : m_center(center), m_size(size), m_rotation(0.0f),
-      m_viewport(0.0f, 0.0f, 1.0f, 1.0f), m_transform(1.0f),
-      m_transformNeedsUpdate(true), m_inverseTransform(1.0f),
-      m_inverseTransformNeedsUpdate(true) {
+    : m_position(0.0f, 0.0f, 1.0f), m_direction(0.0f, 0.0f, -1.0f),
+      m_rotation(0.0f, 0.0f), m_viewport(0.0f, 0.0f, 1.0f, 1.0f),
+      m_transform(1.0f), m_transformNeedsUpdate(true) {
 }
 
 void Camera::setViewPort(const RectangleFloat& viewportRatio) {
     m_viewport = viewportRatio;
 }
 
-void Camera::setCenter(const float x, const float y) {
-    m_center.x = x;
-    m_center.y = y;
+void Camera::lookAt(float x, float y, float z) {
+    m_direction = glm::normalize(m_position - glm::vec3(x, y, z));
 
-    m_transformNeedsUpdate        = true;
-    m_inverseTransformNeedsUpdate = true;
+    m_transformNeedsUpdate = true;
 }
 
-void Camera::setCenter(const glm::vec2& center) {
-    setCenter(center.x, center.y);
+void Camera::lookAt(const glm::vec3& position) {
+    lookAt(position.x, position.y, position.z);
 }
 
-void Camera::setSize(const float width, const float height) {
-    m_size.x = width;
-    m_size.y = height;
+void Camera::setDirection(float x, float y, float z) {
+    m_direction = glm::vec3(x, y, z);
 
-    m_transformNeedsUpdate        = true;
-    m_inverseTransformNeedsUpdate = true;
+    m_transformNeedsUpdate = true;
 }
 
-void Camera::setSize(const glm::vec2& size) {
-    setSize(size.x, size.y);
+void Camera::setDirection(const glm::vec3& direction) {
+    setDirection(direction.x, direction.y, direction.z);
 }
 
-void Camera::setRectangle(const RectangleFloat& rect) {
-    m_center.x = rect.left + rect.width / 2.0f;
-    m_center.y = rect.top - rect.height / 2.0f;
-    m_size.x   = rect.width;
-    m_size.y   = rect.height;
+void Camera::setPosition(float x, float y, float z) {
+    m_position = glm::vec3(x, y, z);
+
+    m_transformNeedsUpdate = true;
 }
 
-void Camera::setRotation(const float degrees) {
-    m_rotation = std::fmod(degrees, 360.0f);
-    if (m_rotation < 0.0f) {
-        m_rotation += 360.0f;
-    }
-
-    m_transformNeedsUpdate        = true;
-    m_inverseTransformNeedsUpdate = true;
+void Camera::setPosition(const glm::vec3& position) {
+    setPosition(position.x, position.y, position.z);
 }
 
-void Camera::move(const float x, const float y) {
-    setCenter(m_center.x + x, m_center.y + y);
+void Camera::setRotation(float yaw, float pitch) {
+    m_rotation = glm::vec2(yaw, pitch);
+    m_direction.x =
+        cos(glm::radians(m_rotation.x)) * cos(glm::radians(m_rotation.y));
+    m_direction.y = sin(glm::radians(m_rotation.y));
+    m_direction.z =
+        sin(glm::radians(m_rotation.x)) * cos(glm::radians(m_rotation.y));
+    m_direction = glm::normalize(m_direction);
+
+    m_transformNeedsUpdate = true;
 }
 
-void Camera::move(const glm::vec2& offset) {
-    move(offset.x, offset.y);
+void Camera::setRotation(const glm::vec2& degrees) {
+    setRotation(degrees.x, degrees.y);
 }
 
-void Camera::zoom(const float factor) {
-    const auto zoom = 1.0f /
-        factor;//For example a 2x zoom would mean shrinking the view size twice
+void Camera::move(float x, float y, float z) {
+    //glm::vec3 mv = glm::vec3(x, y, z);
+    //mv *= m_direction;
+    //setPosition(m_position.x + mv.x, m_position.y + mv.y, m_position.z + mv.z);
+    m_position += z * m_direction;
+    m_position += x *
+        glm::normalize(glm::cross(m_direction, glm::vec3(0.0f, 1.0f, 0.0f)));
+    m_position.y += y;
 
-    setSize(m_size.x * zoom, m_size.y * zoom);
+    m_transformNeedsUpdate = true;
 }
 
-void Camera::rotate(const float degrees) {
-    setRotation(m_rotation + degrees);
+void Camera::move(const glm::vec3& offset) {
+    move(offset.x, offset.y, offset.z);
+}
+
+void Camera::rotate(float yaw, float pitch) {
+    m_rotation.x += yaw;
+    m_rotation.y -= pitch;
+
+    m_direction.x +=
+        cos(glm::radians(m_rotation.x)) * cos(glm::radians(m_rotation.y));
+    m_direction.y += sin(glm::radians(m_rotation.y));
+    m_direction.z +=
+        sin(glm::radians(m_rotation.x)) * cos(glm::radians(m_rotation.y));
+    m_direction = glm::normalize(m_direction);
+
+    m_transformNeedsUpdate = true;
+}
+
+void Camera::rotate(const glm::vec2& degrees) {
+    rotate(degrees.x, degrees.y);
 }
 
 const RectangleFloat& Camera::getViewport() const {
     return m_viewport;
 }
 
-const glm::vec2& Camera::getCenter() const {
-    return m_center;
+const glm::vec3& Camera::getPosition() const {
+    return m_position;
 }
 
-const glm::vec2& Camera::getSize() const {
-    return m_size;
+const glm::vec3& Camera::getDirection() const {
+    return m_direction;
 }
 
-RectangleFloat Camera::getRectangle() const {
-    const RectangleFloat rect{m_center.x - m_size.x / 2.0f,
-                              m_center.y + m_size.y / 2.0f,
-                              m_size.x,
-                              m_size.y};
-    return rect;
-}
-
-float Camera::getRotation() const {
+const glm::vec2& Camera::getRotation() const {
     return m_rotation;
 }
 
-const glm::mat4& Camera::getTransform() const {
+glm::mat4 Camera::getTransform() const {
     if (m_transformNeedsUpdate) {
-        const auto radians = -m_rotation * PI / 180.0f;//Radians = angle*pi/180
+        glm::vec3 dir = m_direction;
+        /*if (m_rotation.x != 0 && m_rotation.y != 0) {
+            dir.x = cos(glm::radians(m_rotation.x)) *
+                cos(glm::radians(m_rotation.y));
+            dir.y = sin(glm::radians(m_rotation.y));
+            dir.z = sin(glm::radians(m_rotation.x)) *
+                cos(glm::radians(m_rotation.y));
+            dir = glm::normalize(dir);
+        }*/
 
-        RectangleFloat r = getRectangle();
-        m_transform =
-            glm::ortho(r.left, r.left + r.width, r.top - r.height, r.top);
-        m_transform =
-            glm::rotate(m_transform, radians, glm::vec3(0.0f, 0.0f, 1.0f));
+        m_transform = glm::lookAt(m_position,
+                                  m_position + dir,
+                                  glm::vec3(0.0f, 1.0f, 0.0f));
 
         m_transformNeedsUpdate = false;
     }
 
-    return m_transform;
+    return getPerspectiveTransform() * m_transform;
 }
 
-const glm::mat4& Camera::getInverseTransform() const {
-    if (m_inverseTransformNeedsUpdate) {
-        m_inverseTransform            = glm::inverse(getTransform());
-        m_inverseTransformNeedsUpdate = false;
-    }
-
-    return m_inverseTransform;
+glm::mat4 Camera::getInverseTransform() const {
+    return glm::inverse(getTransform());
 }
 }

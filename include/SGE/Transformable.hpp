@@ -16,7 +16,7 @@
 #define SGE_TRANSFORMABLE_HPP
 
 #include <SGE/Export.hpp>
-#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
 namespace sge {
@@ -45,8 +45,9 @@ public:
      * Sets the origin of the transformable object.
      * \param x X value of origin
      * \param y Y value of origin
+     * \param z Z value of origin
      */
-    void setOrigin(float x, float y);
+    void setOrigin(float x, float y, float z = 0.0f);
 
     /**
      * \brief Set origin
@@ -55,7 +56,7 @@ public:
      * Sets the origin of the transformable object.
      * \param origin Origin position
      */
-    void setOrigin(const glm::vec2& origin);
+    void setOrigin(const glm::vec3& origin);
 
     /**
      * \brief Set position
@@ -64,8 +65,9 @@ public:
      * Sets the position of the transformable object.
      * \param x X value of position
      * \param y Y value of position
+     * \param z Z value of position
      */
-    void setPosition(float x, float y);
+    void setPosition(float x, float y, float z = 0.0f);
 
     /**
      * \brief Set position
@@ -74,7 +76,7 @@ public:
      * Sets the position of the transformable object.
      * \param position New Position
      */
-    void setPosition(const glm::vec2& position);
+    void setPosition(const glm::vec3& position);
 
     /**
      * \brief Set scale
@@ -83,8 +85,9 @@ public:
      * Sets the scale factors of the transformable object.
      * \param xFactor X scale factor
      * \param yFactor Y scale factor
+     * \param zFactor Z scale factor
      */
-    void setScale(float xFactor, float yFactor);
+    void setScale(float xFactor, float yFactor, float zFactor = 1.0f);
 
     /**
      * \brief Set scale
@@ -93,16 +96,27 @@ public:
      * Sets the scale factors of the transformable object.
      * \param factor Scale factor
      */
-    void setScale(const glm::vec2& factor);
+    void setScale(const glm::vec3& factor);
+
+    /**
+     * \brief Set rotation
+     * 
+     * 
+     * Sets the rotation of the transformable object.
+     * \param xDeg X axis rotation in degrees
+     * \param yDeg Y axis rotation in degrees
+     * \param zDeg Z axis rotation in degrees
+     */
+    void setRotation(float xDeg, float yDeg, float zDeg);
 
     /**
      * \brief Set rotation
      *
      *
      * Sets the rotation of the transformable object.
-     * \param degrees Rotation in degrees
+     * \param degrees Rotation vector in degrees
      */
-    void setRotation(float degrees);
+    void setRotation(const glm::vec3& degrees);
 
     /**
      * \brief Move object
@@ -111,8 +125,9 @@ public:
      * Move the transformable object.
      * \param x X offset
      * \param y Y offset
+     * \param z Z offset
      */
-    void move(float x, float y);
+    void move(float x, float y, float z = 0.0f);
 
     /**
      * \brief Move object
@@ -121,7 +136,7 @@ public:
      * Move the transformable object.
      * \param offset Position offset
      */
-    void move(const glm::vec2& offset);
+    void move(const glm::vec3& offset);
 
     /**
      * \brief Scale object
@@ -130,8 +145,9 @@ public:
      * Scales the transformable object.
      * \param xFactor X scale factor
      * \param yFactor Y scale factor
+     * \param zFactor Z scale factor
      */
-    void scale(float xFactor, float yFactor);
+    void scale(float xFactor, float yFactor, float zFactor = 1.0f);
 
     /**
      * \brief Scale object
@@ -140,40 +156,51 @@ public:
      * Scales the transformable object.
      * \param factor Scaling factor
      */
-    void scale(const glm::vec2& factor);
+    void scale(const glm::vec3& factor);
+
+    /**
+     * \brief Rotate object
+     * 
+     * 
+     * Rotate transformable object.
+     * \param xDeg X axis rotation in degrees
+     * \param yDeg Y axis rotation in degrees
+     * \param zDeg Z axis rotation in degrees
+     */
+    void rotate(float xDeg, float yDeg, float zDeg);
 
     /**
      * \brief Rotate object
      *
      *
      * Rotate the transformable object.
-     * \param degrees Degrees to rotate
+     * \param degrees Rotation vector in degrees
      */
-    void rotate(float degrees);
+    void rotate(const glm::vec3& degrees);
 
     /**
      * \brief Get origin
      * \return Origin position
      */
-    [[nodiscard]] const glm::vec2& getOrigin() const;
+    [[nodiscard]] const glm::vec3& getOrigin() const;
 
     /**
      * \brief Get position
      * \return Object position
      */
-    [[nodiscard]] const glm::vec2& getPosition() const;
+    [[nodiscard]] const glm::vec3& getPosition() const;
 
     /**
      * \brief Get scale
      * \return Object scale factor
      */
-    [[nodiscard]] const glm::vec2& getScale() const;
+    [[nodiscard]] const glm::vec3& getScale() const;
 
     /**
      * \brief Get rotation
-     * \return Object rotation in degrees
+     * \return Object rotation vector in degrees
      */
-    [[nodiscard]] float getRotation() const;
+    [[nodiscard]] glm::vec3 getRotation() const;
 
     /**
      * \brief Get transform
@@ -185,10 +212,10 @@ public:
     [[nodiscard]] const glm::mat4& getTransform() const;
 
 private:
-    glm::vec2 m_origin;
-    glm::vec2 m_position;
-    glm::vec2 m_scale;
-    float m_rotation;
+    glm::vec3 m_origin;
+    glm::vec3 m_position;
+    glm::vec3 m_scale;
+    glm::vec3 m_rotation;
     mutable glm::mat4 m_transform;
     mutable bool m_transformNeedsUpdate;
 };
